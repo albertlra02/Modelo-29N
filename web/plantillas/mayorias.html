@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% from "_macros.html" import grafico, cabecera %}
+{% block titulo %}Mayorías{% endblock %}
+{% block contenido %}
+{{ cabecera("Mayorías", "Calculadora de pactos",
+  "Elige qué partidos suman y mira en cuántas de las " ~ (p.n_sim|miles) ~ " simulaciones llegan a los 176 escaños de la mayoría absoluta.") }}
+
+<section class="tarjeta calculadora" data-calculadora>
+  <div class="calculadora__controles">
+    <div class="grupo">
+      <span class="grupo__etiqueta" id="etq-atajos">Atajos</span>
+      <div class="fichas" role="group" aria-labelledby="etq-atajos" data-atajos></div>
+    </div>
+    <div class="grupo">
+      <span class="grupo__etiqueta" id="etq-partidos">Partidos que suman <span class="grupo__extra">(entre paréntesis, su mediana de escaños)</span></span>
+      <div class="fichas" role="group" aria-labelledby="etq-partidos" data-partidos></div>
+    </div>
+  </div>
+  <div class="calculadora__resultado" aria-live="polite">
+    <div class="calculadora__cifras">
+      <p class="cifra" data-cifra>–</p>
+      <p class="cifra__texto" data-texto></p>
+      <dl class="filas" data-filas></dl>
+    </div>
+    <div class="grafico" id="f-histograma" style="min-height: 320px" role="img" aria-label="Distribución de escaños de la coalición"></div>
+  </div>
+</section>
+
+<section class="seccion">
+  <div class="seccion__cabecera"><h2>Escenarios</h2></div>
+  <div class="tarjeta">
+    {{ grafico("f-escenarios", fig_escenarios, "Probabilidad de cada escenario") }}
+  </div>
+  <p class="nota">Las frecuencias son condicionales a los supuestos del modelo; no son una probabilidad electoral calibrada
+    con una serie histórica larga. El bloque de 2023 suma PSOE, Sumar, Podemos (o Frente Amplio), ERC, Junts, EH Bildu, PNV,
+    BNG, Coalición Canaria y Adelante. Que llegue a 176 no garantiza la investidura: harían falta todos los votos, Junts
+    incluido.</p>
+</section>
+<script type="application/json" id="datos-calculadora">{{ datos|safe }}</script>
+{% endblock %}
+{% block final %}<script src="/estatico/mayorias.js?v={{ v }}" defer></script>{% endblock %}

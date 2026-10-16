@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% from "_macros.html" import grafico, cabecera %}
+{% block titulo %}Voto y escaños{% endblock %}
+{% block contenido %}
+{{ cabecera("Voto y escaños", "Cuántos votos y cuántos escaños",
+  "Rango de voto nacional y de escaños de cada candidatura en las " ~ (p.n_sim|miles) ~ " simulaciones. El voto incluye el error de las encuestas medido en 2015–2023: por eso los rangos son mucho más anchos que las diferencias entre encuestas.") }}
+
+<section class="rejilla rejilla--dos">
+  <article class="tarjeta">
+    <h2 class="tarjeta__titulo">Voto nacional</h2>
+    {{ grafico("f-voto", fig_voto, "Rangos de voto nacional por partido") }}
+  </article>
+  <article class="tarjeta">
+    <h2 class="tarjeta__titulo">Escaños</h2>
+    {{ grafico("f-escanos", fig_escanos, "Rangos de escaños por partido") }}
+  </article>
+</section>
+<p class="nota nota--suelta">Barra: el 80 % central de las simulaciones. Línea fina: el 95 %. Círculo y cifra: la mediana.
+  Los dos gráficos tienen los mismos partidos en el mismo orden (por voto) para leerlos fila a fila.</p>
+
+<section class="seccion">
+  <div class="seccion__cabecera">
+    <h2>Los datos</h2>
+    <a class="boton boton--secundario" href="/descargar/simulaciones.csv{{ q }}" download>
+      <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M10 3v10M5.5 8.5L10 13l4.5-4.5M4 16.5h12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Descargar las simulaciones (CSV)
+    </a>
+  </div>
+  <div class="tarjeta tarjeta--tabla">
+    <div class="tabla-scroll">
+      <table class="tabla" data-ordenable>
+        <thead>
+          <tr>
+            <th scope="col" data-orden="texto">Partido</th>
+            <th scope="col" class="num" data-orden="num">Voto estimado</th>
+            <th scope="col" class="num" data-orden="num">Voto, 80 %</th>
+            <th scope="col" class="num" data-orden="num" aria-sort="descending">Escaños, mediana</th>
+            <th scope="col" class="num" data-orden="num">Escaños, 80 %</th>
+            <th scope="col" class="num" data-orden="num">Media</th>
+            <th scope="col" class="num" data-orden="num">Saca algún escaño</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in filas|sort(attribute="media", reverse=True) %}
+          <tr>
+            <th scope="row" data-valor="{{ f.clave|nombre }}"><span class="punto" style="--c: {{ f.clave|color }}"></span>{{ f.clave|nombre }}</th>
+            <td class="num" data-valor="{{ f.voto if f.voto == f.voto else -1 }}">{% if f.voto == f.voto %}{{ f.voto|num }} %{% endif %}</td>
+            <td class="num" data-valor="{{ f.v10 }}">{{ f.v10|num }}–{{ f.v90|num }} %</td>
+            <td class="num fuerte" data-valor="{{ f.mediana }}">{{ f.mediana|num(0) }}</td>
+            <td class="num" data-valor="{{ f.p10 }}">{{ f.p10|num(0) }}–{{ f.p90|num(0) }}</td>
+            <td class="num" data-valor="{{ f.media }}">{{ f.media|num }}</td>
+            <td class="num" data-valor="{{ f.alguno }}">{{ f.alguno|pct }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="nota">Pulsa la cabecera de una columna para ordenar. El CSV tiene una fila por simulación y una columna por
+    candidatura (escaños).</p>
+</section>
+{% endblock %}

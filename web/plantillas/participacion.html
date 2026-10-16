@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "_macros.html" import grafico, cabecera %}
+{% block titulo %}Participación{% endblock %}
+{% block contenido %}
+{{ cabecera("Participación", "¿Y si vota más gente?",
+  "El escenario recalculado para participaciones del 62 % al 75 %. Los votantes que se suman o se restan frente al 65 % de las encuestas se reparten " ~ (NOMBRES_REPARTO[p.reparto]|lower) ~ ": de cada 100 votos extra, " ~ DETALLE_REPARTO[p.reparto] ~ ". " ~ (n_barrido|miles) ~ " simulaciones por punto.") }}
+
+{% if p.participacion == PART_BASE %}
+<p class="aviso aviso--suave">El reparto de los votantes adicionales se elige en <button type="button" class="enlace" data-abrir-escenario>Cambiar escenario</button>
+  (hay que mover antes la participación del {{ PART_BASE }} %).</p>
+{% endif %}
+
+<section class="rejilla rejilla--dos">
+  <article class="tarjeta">
+    <h2 class="tarjeta__titulo">Mayoría de PP + Vox</h2>
+    {{ grafico("f-mayoria", fig_mayoria, "Probabilidad de mayoría de PP y Vox según la participación") }}
+  </article>
+  <article class="tarjeta">
+    <h2 class="tarjeta__titulo">El PSOE queda primero</h2>
+    {{ grafico("f-psoe", fig_psoe, "Probabilidad de que el PSOE quede primero según la participación") }}
+  </article>
+</section>
+<p class="nota nota--suelta">Línea continua con círculos: Sumar y Podemos por separado. Línea discontinua con rombos:
+  Frente Amplio. La participación se modela como un supuesto, no se estima: las encuestas ya incluyen la suya.</p>
+
+<details class="desplegable">
+  <summary>Ver los datos</summary>
+  <div class="tarjeta tarjeta--tabla">
+    <div class="tabla-scroll">
+      <table class="tabla tabla--densa">
+        <thead>
+          <tr>
+            <th scope="col">Candidaturas</th>
+            <th scope="col" class="num">Participación</th>
+            <th scope="col" class="num">Mayoría PP + Vox</th>
+            <th scope="col" class="num">Investidura tipo 2023</th>
+            <th scope="col" class="num">PSOE primero</th>
+            <th scope="col" class="num">PP + Vox, mediana</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in filas %}
+          <tr>
+            <th scope="row">{{ f.candidaturas }}</th>
+            <td class="num">{{ (100 * f.participacion)|round|int }} %</td>
+            <td class="num">{{ f["P(mayoría PP + Vox)"]|pct }}</td>
+            <td class="num">{{ f["P(investidura tipo 2023)"]|pct }}</td>
+            <td class="num">{{ f["P(PSOE primero)"]|pct }}</td>
+            <td class="num">{{ f["PP + Vox (mediana)"]|num(0) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</details>
+{% endblock %}

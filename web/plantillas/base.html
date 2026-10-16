@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block titulo %}{% endblock %} · Congreso 29-N</title>
+<meta name="description" content="Modelo propio de las elecciones generales del 29 de noviembre de 2026: media de encuestas, simulación de escaños y mayorías.">
+<link rel="icon" href="/estatico/icono.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans+Condensed:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="/estatico/estilo.css?v={{ v }}">
+<script src="/estatico/plotly.min.js" defer></script>
+<script src="/estatico/app.js?v={{ v }}" defer></script>
+{% block cabeza %}{% endblock %}
+</head>
+<body>
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+
+<header class="sitio">
+  <div class="envoltura sitio__fila">
+    <a class="marca" href="/{{ q }}" aria-label="Congreso 29-N, resumen">
+      <svg class="marca__logo" viewBox="0 0 32 20" width="34" height="21" aria-hidden="true">
+        <g fill="none" stroke-width="4.2">
+          <path d="M3 18A13 13 0 0 1 6.8 8.8" stroke="#d9649f"/>
+          <path d="M7.5 8.2A13 13 0 0 1 15.4 5" stroke="#b81d33"/>
+          <path d="M16.6 5A13 13 0 0 1 26.9 11" stroke="#2a8fd8"/>
+          <path d="M27.3 11.8A13 13 0 0 1 29 18" stroke="#5fa83a"/>
+        </g>
+      </svg>
+      <span class="marca__nombre">29-N</span>
+      <span class="marca__sub">Modelo del Congreso</span>
+    </a>
+    <nav class="nav" aria-label="Secciones">
+      {% for href, texto in NAV %}
+      <a href="{{ href }}{{ q }}"{% if ruta == href %} aria-current="page"{% endif %}>{{ texto }}</a>
+      {% endfor %}
+    </nav>
+  </div>
+</header>
+
+{% block barra_escenario %}
+<div class="escenario">
+  <div class="envoltura escenario__fila">
+    <div class="escenario__resumen">
+      <span class="escenario__etiqueta">{% if p.es_base %}Escenario base{% else %}Escenario propio{% endif %}</span>
+      {% for t in p.descripcion() %}<span class="chip">{{ t }}</span>{% endfor %}
+      {% if not p.es_base %}<a class="escenario__volver" href="{{ ruta }}">Volver al base</a>{% endif %}
+    </div>
+    <button type="button" class="boton boton--secundario" data-abrir-escenario>
+      <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M3 5h9M16 5h1M3 10h3M10 10h7M3 15h7M14 15h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="14" cy="5" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="10" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="15" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+      Cambiar escenario
+    </button>
+  </div>
+</div>
+{% if dias > DIAS_CALIBRADOS %}
+<div class="envoltura">
+  <p class="aviso">Con encuestas hasta el {{ p.fecha|fecha_larga }} faltan {{ dias }} días para votar: el error de las
+    encuestas sólo está medido hasta {{ DIAS_CALIBRADOS }} días antes y aquí se extrapola. Los rangos son orientativos.</p>
+</div>
+{% endif %}
+{% endblock %}
+
+<main id="contenido" class="envoltura contenido">
+{% block contenido %}{% endblock %}
+</main>
+
+<footer class="pie">
+  <div class="envoltura pie__fila">
+    <div>
+      <p class="pie__marca">29-N · Modelo del Congreso</p>
+      <p>Modelo propio, de uso personal, con encuestas publicadas, resultados oficiales de 2015 a 2023 y encuestas
+        autonómicas. Las frecuencias son condicionales a sus supuestos: no son pronósticos garantizados.</p>
+    </div>
+    <dl class="pie__datos">
+      <div><dt>Elección</dt><dd>29 de noviembre de 2026{% if dias_hoy > 0 %} · faltan {{ dias_hoy }} días{% endif %}</dd></div>
+      <div><dt>Última encuesta</dt><dd>{{ ULTIMA_ENCUESTA|fecha_larga }}</dd></div>
+      <div><dt>Versión del modelo</dt><dd><code>{{ VERSION }}</code></dd></div>
+      <div><dt>Cómo funciona</dt><dd><a href="/metodologia{{ q }}">Metodología y límites</a></dd></div>
+    </dl>
+  </div>
+</footer>
+
+<dialog class="panel" id="panel-escenario" aria-labelledby="panel-titulo">
+  <form class="panel__form" method="get" action="{{ ruta }}" data-form-escenario data-defectos='{{ DEFECTOS|tojson }}'>
+    <header class="panel__cabecera">
+      <h2 id="panel-titulo">Escenario</h2>
+      <button type="button" class="panel__cerrar" data-cerrar aria-label="Cerrar">
+        <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </header>
+    <div class="panel__cuerpo">
+      <div class="campo">
+        <label for="f-fecha">Encuestas hasta el <output id="f-fecha-texto">{{ p.fecha|fecha_larga }}</output></label>
+        <input type="range" id="f-fecha" min="0" max="{{ FECHAS|length - 1 }}" step="1" value="{{ FECHAS.index(p.fecha) }}"
+               data-iso='{{ FECHAS|tojson }}' data-textos='{{ FECHAS|map("fecha_larga")|list|tojson }}'>
+        <input type="hidden" name="fecha" value="{{ p.fecha }}">
+        <div class="campo__extremos"><span>{{ FECHAS[0]|fecha_corta }}</span><span>{{ FECHAS[-1]|fecha_corta }}</span></div>
+        <p class="ayuda">Corte semanal: el modelo sólo usa encuestas con el trabajo de campo terminado ese día o antes.</p>
+      </div>
+
+      <fieldset class="campo">
+        <legend>Candidaturas</legend>
+        <div class="segmentado segmentado--ancho">
+          {% for k, t in NOMBRES_CAND.items() %}
+          <label><input type="radio" name="cand" value="{{ k }}"{% if p.candidaturas == k %} checked{% endif %}><span>{{ t }}</span></label>
+          {% endfor %}
+        </div>
+        <p class="ayuda">Las listas se cierran el 26 de octubre.</p>
+      </fieldset>
+
+      <div class="campo">
+        <label for="f-part">Participación <output id="f-part-texto">{{ p.participacion }} %</output></label>
+        <input type="range" id="f-part" name="part" min="{{ PART_MIN }}" max="{{ PART_MAX }}" step="1" value="{{ p.participacion }}" data-base="{{ PART_BASE }}">
+        <div class="campo__extremos"><span>{{ PART_MIN }} %</span><span>{{ PART_MAX }} %</span></div>
+        <p class="ayuda">Las encuestas suponen de media un {{ PART_BASE }} %. Con otra participación se suman o se restan
+          votantes según el reparto de abajo.</p>
+      </div>
+
+      <div class="campo">
+        <label for="f-reparto">Reparto de los votantes adicionales</label>
+        <select id="f-reparto" name="reparto"{% if p.participacion == PART_BASE %} disabled{% endif %}>
+          {% for k, t in NOMBRES_REPARTO.items() %}
+          <option value="{{ k }}" data-detalle="{{ DETALLE_REPARTO[k] }}"{% if p.reparto == k %} selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+        <p class="ayuda" id="f-reparto-detalle">De cada 100 votos extra: {{ DETALLE_REPARTO[p.reparto] }}.
+          No influye con una participación del {{ PART_BASE }} %.</p>
+      </div>
+
+      <details class="campo campo--avanzado">
+        <summary>Simulación</summary>
+        <div class="campo">
+          <label for="f-sim">Simulaciones</label>
+          <select id="f-sim" name="sim">
+            {% for n in SIMULACIONES %}<option value="{{ n }}"{% if p.n_sim == n %} selected{% endif %}>{{ n|miles }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="campo">
+          <label for="f-semilla">Semilla</label>
+          <input type="number" id="f-semilla" name="semilla" min="0" step="1" value="{{ p.semilla }}">
+          <p class="ayuda">La misma semilla con el mismo escenario da exactamente el mismo resultado.</p>
+        </div>
+      </details>
+      <p class="ayuda">Los escenarios ya calculados se abren al instante; uno nuevo tarda unos segundos la primera vez.</p>
+    </div>
+    <footer class="panel__pie">
+      <a class="boton boton--texto" href="{{ ruta }}">Restablecer</a>
+      <button type="submit" class="boton">Aplicar</button>
+    </footer>
+  </form>
+</dialog>
+{% block final %}{% endblock %}
+</body>
+</html>

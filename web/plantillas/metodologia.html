@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cabecera %}
+{% block titulo %}Metodología{% endblock %}
+{% block barra_escenario %}{% endblock %}
+{% block contenido %}
+{{ cabecera("Metodología", "Cómo funciona el modelo",
+  "De las encuestas a los 350 escaños en cuatro pasos, cuánto se ha equivocado al probarlo con las elecciones de 2015 a 2023 y qué no sabe hacer.") }}
+
+<div class="articulo">
+  <nav class="articulo__indice" aria-label="En esta página">
+    <p class="articulo__indice-titulo">En esta página</p>
+    <ol>
+      <li><a href="#pasos">Qué hace</a></li>
+      <li><a href="#error">Cuánto se equivoca</a></li>
+      <li><a href="#limites">Límites</a></li>
+      <li><a href="#escenario">El panel de escenario</a></li>
+    </ol>
+  </nav>
+
+  <article class="articulo__texto">
+    <h2 id="pasos">Qué hace</h2>
+    <ol class="pasos">
+      <li>
+        <h3>Media de encuestas</h3>
+        <p>Junta todas las encuestas nacionales publicadas, corrige el sesgo propio de cada casa y sigue la tendencia día a
+          día. Excluye las encuestas encargadas por partidos.</p>
+      </li>
+      <li>
+        <h3>Comunidades autónomas</h3>
+        <p>Donde hay encuestas autonómicas recientes (CEO, Sondaxe, GAD3…), corrige el reparto territorial sin cambiar el
+          total nacional.</p>
+      </li>
+      <li>
+        <h3>Provincias</h3>
+        <p>Lleva el voto a cada provincia a partir del resultado de 2023, con un ajuste logístico.</p>
+      </li>
+      <li>
+        <h3>Simulación</h3>
+        <p>Repite la elección miles de veces con los errores medidos en cinco elecciones de 2015 a 2023: error de bloque
+          (izquierda contra derecha), trasvases dentro de cada bloque, desviaciones por comunidad y por provincia. Cada
+          simulación reparte los 350 escaños con D'Hondt y el umbral del 3 %.</p>
+      </li>
+    </ol>
+
+    <h2 id="error">Cuánto se equivoca</h2>
+    <div class="destacados">
+      <div><span class="destacados__cifra">1,92</span><span>puntos de error medio por partido en la elección no vista
+        (calibración dejando fuera una elección cada vez)</span></div>
+      <div><span class="destacados__cifra">76 %</span><span>de los escaños reales dentro del intervalo del 80 %; el 93 %,
+        dentro del 95 %</span></div>
+      <div><span class="destacados__cifra">8</span><span>escaños de error medio por partido, frente a 22 si se repite la
+        elección anterior</span></div>
+    </div>
+    <ul>
+      <li>Según la elección, la media de encuestas falló entre 0,75 y 2,02 puntos por partido la víspera. Al dejar fuera una
+        elección cada vez durante la calibración, el error medio en la elección no vista fue 1,92 puntos.</li>
+      <li>Con el resultado por CCAA perfecto y las candidaturas reales conocidas, el paso a provincias coloca mal unos 7
+        escaños por elección; con sólo el resultado nacional perfecto, unos 18.</li>
+      <li>Probado fuera de muestra en 2016, abril y noviembre de 2019 y 2023 (cada elección con los errores calibrados sin
+        ella, a 30, 14 y 1 días): el escaño real de los partidos estatales cayó dentro del intervalo del 80 % en el 76 % de
+        los casos y dentro del del 95 % en el 93 %. El error medio fue de 8 escaños por partido, frente a 22 si se repite la
+        elección anterior.</li>
+      <li>Fallos más claros: la subida de Vox en noviembre de 2019 (52 escaños; el modelo daba 24–32 a un mes y a dos
+        semanas), y la sobreestimación sistemática del espacio de Podemos (unos 7 escaños de media).</li>
+      <li>A 30 días del 23J el modelo daba un 78 % de mayoría a PP, Vox y UPN, que no se produjo (sacaron 171).</li>
+    </ul>
+
+    <h2 id="limites">Límites</h2>
+    <ul>
+      <li>La calibración nacional usa cinco elecciones: es una mejora grande, pero aún es una serie histórica corta.</li>
+      <li>El backtest cubre cuatro elecciones (2015 no tiene elección base): las frecuencias siguen siendo escenarios
+        condicionados al modelo, no probabilidades validadas en una serie larga.</li>
+      <li>Las candidaturas que no se presentaron en la elección anterior (Teruel Existe, el PRC o Navarra Suma en 2019)
+        quedaron fuera de sus intervalos en el backtest: el modelo no sabe proyectarlas. En 2026 afecta a SALF y Adelante.</li>
+      <li>El error de las encuestas está medido hasta {{ DIAS_CALIBRADOS }} días antes de votar; con fechas anteriores se
+        extrapola y los rangos son sólo orientativos.</li>
+      <li>Los partidos de una sola comunidad (ERC, Junts, PNV, EH Bildu, BNG, CC) no tienen error de campaña propio: su
+        incertidumbre es la autonómica y la provincial, que no crece con los días que faltan. Probablemente se queda corta.</li>
+      <li>La participación se modela como un supuesto, no se estima: las encuestas ya incluyen la suya.</li>
+      <li>El escenario de Frente Amplio supone que la lista conjunta conserva todos los votos de Sumar y Podemos.</li>
+      <li>El voto residual «Otros» ayuda a calcular el umbral, pero no puede obtener escaños: una candidatura nueva con voto
+        territorial concentrado debe incorporarse expresamente al modelo.</li>
+    </ul>
+
+    <h2 id="escenario">El panel de escenario</h2>
+    <p>Todas las páginas comparten el escenario, que se cambia con el botón <strong>Cambiar escenario</strong> y queda escrito
+      en la dirección de la página: se puede guardar como marcador o compartir.</p>
+    <dl class="definiciones">
+      <dt>Encuestas hasta</dt>
+      <dd>Corte semanal: el modelo sólo usa las encuestas con el trabajo de campo terminado ese día o antes. Sirve para ver
+        qué decía el modelo en una fecha pasada.</dd>
+      <dt>Candidaturas</dt>
+      <dd>Sumar y Podemos por separado, o juntos en Frente Amplio (las listas se cierran el 26 de octubre).</dd>
+      <dt>Participación y reparto</dt>
+      <dd>Las encuestas suponen de media un 65 %. Con otra participación se suman o se restan votantes según uno de tres
+        repartos: como en 2015–2023 (57 a la izquierda, 18 a la derecha y 25 al resto de cada 100 votos extra), simétrico
+        como el 10N (49, 45 y 6) o muy asimétrico (80, 5 y 15).</dd>
+      <dt>Simulaciones y semilla</dt>
+      <dd>Más simulaciones dan frecuencias más estables. La misma semilla con el mismo escenario da exactamente el mismo
+        resultado.</dd>
+    </dl>
+    <p class="nota">Elección: {{ ELECCION|fecha_larga }} de 2026. Último dato de encuestas: {{ ULTIMA_ENCUESTA|fecha_larga }}.
+      Los detalles de cada calibración están en el README del proyecto.</p>
+  </article>
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% from "_macros.html" import grafico, cabecera %}
+{% block titulo %}Provincias{% endblock %}
+{% block contenido %}
+{{ cabecera("Provincias", "Las 52 circunscripciones",
+  "El Congreso se reparte provincia a provincia con D'Hondt: dónde gana cada partido y dónde baila el último escaño.") }}
+
+<section class="tarjeta mapa" data-mapa>
+  <div class="mapa__controles">
+    <div class="segmentado" role="group" aria-label="Qué mostrar">
+      <button type="button" data-modo="ganador" aria-pressed="true">Partido más votado</button>
+      <button type="button" data-modo="juego" aria-pressed="false">Escaño en juego</button>
+      <button type="button" data-modo="partido" aria-pressed="false">Voto de un partido</button>
+    </div>
+    <div class="fichas" role="group" aria-label="Partido" data-partidos-mapa hidden>
+      {% for x in partidos %}
+      <button type="button" class="ficha" data-partido="{{ x }}" aria-pressed="{{ 'true' if loop.first else 'false' }}" style="--c: {{ x|color }}"><i></i>{{ x|nombre }}</button>
+      {% endfor %}
+    </div>
+  </div>
+  {{ grafico("f-mapa", mapa.fig, "Mapa de provincias") }}
+  <div class="leyenda" data-leyenda-mapa>
+    {% for l in mapa.leyenda %}<div><i style="background: {{ l.color }}"></i>{{ l.nombre }} <b>{{ l.n }}</b> {{ 'provincia' if l.n == 1 else 'provincias' }}</div>{% endfor %}
+  </div>
+  <p class="nota" data-nota-mapa>{{ mapa.nota }}</p>
+</section>
+
+<section class="seccion">
+  <div class="seccion__cabecera"><h2>Dónde se decide el último escaño</h2></div>
+  <div class="tarjeta">
+    {{ grafico("f-top", fig_top, "Provincias donde más cambia el reparto entre bloques") }}
+  </div>
+  <p class="nota">Las doce provincias donde más cambia el reparto entre bloques. Entre paréntesis, los escaños que reparte:
+    las que reparten muchos cambian más a menudo, porque cualquier movimiento pequeño mueve alguno de sus escaños.</p>
+</section>
+
+<section class="seccion">
+  <div class="seccion__cabecera">
+    <h2>Provincia a provincia</h2>
+    <label class="filtro">Comunidad
+      <select data-filtro-ccaa>
+        <option value="">Todas</option>
+        {% for c in ccaa %}<option>{{ c }}</option>{% endfor %}
+      </select>
+    </label>
+  </div>
+  <div class="tarjeta tarjeta--tabla">
+    <div class="tabla-scroll">
+      <table class="tabla" data-ordenable>
+        <thead>
+          <tr>
+            <th scope="col" data-orden="texto">Provincia</th>
+            <th scope="col" class="num" data-orden="num" aria-sort="descending">Escaños</th>
+            <th scope="col" data-orden="texto">Más votado</th>
+            <th scope="col" data-orden="texto">Reparto más probable</th>
+            <th scope="col" data-orden="num">Frecuencia de ese reparto</th>
+            <th scope="col" data-orden="num">Escaño en juego</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in filas %}
+          <tr data-ccaa="{{ f.ccaa }}">
+            <th scope="row" data-valor="{{ f.provincia }}">{{ f.provincia }}<span class="sub">{{ f.ccaa }}</span></th>
+            <td class="num fuerte" data-valor="{{ f.escanos }}">{{ f.escanos }}</td>
+            <td data-valor="{{ f.primero|nombre }}"><span class="punto" style="--c: {{ f.primero|color }}"></span>{{ f.primero|nombre }}</td>
+            <td class="reparto">{{ f.reparto }}</td>
+            <td data-valor="{{ f.frecuencia }}"><span class="barrita" style="--x: {{ f.frecuencia }}%"><i></i>{{ f.frecuencia }} %</span></td>
+            <td data-valor="{{ f.juego }}"><span class="barrita barrita--bronce" style="--x: {{ f.juego }}%"><i></i>{{ f.juego }} %</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="nota">Reparto más probable: la combinación de escaños que más se repite en las simulaciones, y con qué frecuencia.
+    Escaño en juego: porcentaje de simulaciones en que la derecha (PP, Vox, UPN y SALF) saca un número de escaños distinto
+    del habitual. Pulsa la cabecera de una columna para ordenar.</p>
+</section>
+
+<details class="desplegable">
+  <summary>Voto estimado por provincia (%)</summary>
+  <div class="tarjeta tarjeta--tabla">
+    <div class="tabla-scroll">
+      <table class="tabla tabla--densa" data-ordenable>
+        <thead>
+          <tr>
+            <th scope="col" data-orden="texto">Provincia</th>
+            {% for c in voto_cols %}<th scope="col" class="num" data-orden="num">{{ c|nombre }}</th>{% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for prov, fila in voto_filas %}
+          <tr>
+            <th scope="row" data-valor="{{ prov }}">{{ prov }}</th>
+            {% for c in voto_cols %}<td class="num" data-valor="{{ fila[c] }}">{{ fila[c]|num }}</td>{% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="nota">Proyección central del voto (sin simular), en % de votos válidos.</p>
+</details>
+{% endblock %}
