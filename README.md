@@ -78,6 +78,16 @@ python datos/validar_integridad.py                   # verifica los hashes de lo
 python -m scripts.prediccion_2026 2026-10-12 frente_amplio   # predicción por consola
 ```
 
+**Para desarrollar**, una vez:
+```bash
+pip install -r requirements-dev.txt                  # añade ruff
+git config core.hooksPath .githooks                  # ruff + tests antes de cada commit
+```
+`python -m ruff check .` pasa el lint (configuración en `pyproject.toml`). El hook de `.githooks/pre-commit`
+corre ruff y los tests, y `validacion.validar_motor` si el commit toca `motor/escanos.py`; en GitHub, el workflow
+`.github/workflows/comprobaciones.yml` repite lo mismo más la integridad de los datos. Los cambios del modelo y
+su efecto en las cifras se anotan en `CHANGELOG.md`.
+
 El código requiere Python 3.10 o posterior. `requirements-lock.txt` corresponde al entorno validado con
 Python 3.12; `requirements.txt` conserva rangos mínimos para crear un entorno en otra versión.
 

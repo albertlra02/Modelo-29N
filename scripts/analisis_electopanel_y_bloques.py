@@ -64,8 +64,8 @@ def bloques():
                       "derecha_M": F[DCHA].sum() / 1e6, "izquierda_M": F[IZQ].sum() / 1e6})
     d = pd.DataFrame(filas).set_index("eleccion").round(2)
     print("\n", d.to_string())
-    print("corr. con participación: derecha %.2f | izquierda %.2f"
-          % (d.derecha_M.corr(d.participacion), d.izquierda_M.corr(d.participacion)))
+    print(f"corr. con participación: derecha {d.derecha_M.corr(d.participacion):.2f} | "
+          f"izquierda {d.izquierda_M.corr(d.participacion):.2f}")
 
 
 if __name__ == "__main__":

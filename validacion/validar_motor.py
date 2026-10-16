@@ -7,7 +7,6 @@ columna 'Podemos' del fichero, así que se comparan con el total del grupo.
 """
 import sys
 
-import numpy as np
 import pandas as pd
 
 from scripts.consola import configurar_salida_utf8

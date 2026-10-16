@@ -55,7 +55,8 @@ def dhondt_exacto(
         if siguiente[0] == corte[0] and siguiente[1] == corte[1] and siguiente[2] != corte[2]:
             warnings.warn(
                 f"Empate total entre {corte[2]} y {siguiente[2]} por el último escaño: "
-                "la ley prevé sorteo; resuelto por orden alfabético."
+                "la ley prevé sorteo; resuelto por orden alfabético.",
+                stacklevel=2,
             )
 
     for _, _, p in cocientes[:escanos]:

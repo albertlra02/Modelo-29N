@@ -98,7 +98,7 @@ class Params:
     semilla: int = SEMILLA
 
     @classmethod
-    def de_query(cls, q) -> "Params":
+    def de_query(cls, q) -> Params:
         """Lee el escenario de la URL; cualquier valor no válido vuelve al de por defecto."""
         b = cls()
         part = min(max(_entero(q.get("part"), b.participacion), PARTICIPACION_MIN), PARTICIPACION_MAX)

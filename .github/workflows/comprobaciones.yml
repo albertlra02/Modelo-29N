@@ -1,0 +1,24 @@
+# Se ejecuta en GitHub en cada push y pull request (cuando el repositorio esté subido).
+name: Comprobaciones
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-lock.txt
+      - run: pip install -r requirements-dev.txt
+      - name: Lint
+        run: python -m ruff check . --output-format github
+      - name: Tests
+        run: python -m pytest -q
+      - name: Motor contra el Congreso 2015-2023
+        run: python -m validacion.validar_motor
+      - name: Integridad de los datos
+        run: python datos/validar_integridad.py
