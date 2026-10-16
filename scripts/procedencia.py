@@ -34,11 +34,13 @@ def _git(*args: str) -> str | None:
 
 
 def estado_git() -> dict:
-    """Commit actual y si el árbol tiene cambios sin confirmar (None fuera de un repositorio)."""
+    """Commit actual y si el código o los datos tienen cambios sin confirmar (None fuera de un
+    repositorio). resultados/ no cuenta: son las propias salidas, no lo que las produce."""
     commit = _git("rev-parse", "HEAD")
     if commit is None:
         return {"commit": None, "cambios_sin_confirmar": None}
-    return {"commit": commit, "cambios_sin_confirmar": bool(_git("status", "--porcelain"))}
+    cambios = _git("status", "--porcelain", "--", ".", ":(exclude)resultados")
+    return {"commit": commit, "cambios_sin_confirmar": bool(cambios)}
 
 
 def encuestas_usadas(fecha: str) -> dict:
