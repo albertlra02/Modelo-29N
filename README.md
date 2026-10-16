@@ -72,7 +72,7 @@ python -m venv .venv && .venv\Scripts\activate      # en macOS/Linux: source .ve
 pip install -r requirements-lock.txt                 # entorno reproducible validado con Python 3.12
 python -m scripts.precalcular                        # rejilla de escenarios (≈2 min): controles instantáneos
 python lanzar.py                                     # la web en http://127.0.0.1:8029
-python -m pytest -q                                  # 48 tests
+python -m pytest -q                                  # 66 tests
 python -m validacion.validar_motor                   # el motor reproduce el Congreso 2015–2023
 python datos/validar_integridad.py                   # verifica los hashes de los datos
 python -m scripts.prediccion_2026 2026-10-12 frente_amplio   # predicción por consola
@@ -80,6 +80,16 @@ python -m scripts.prediccion_2026 2026-10-12 frente_amplio   # predicción por c
 
 El código requiere Python 3.10 o posterior. `requirements-lock.txt` corresponde al entorno validado con
 Python 3.12; `requirements.txt` conserva rangos mínimos para crear un entorno en otra versión.
+
+### Versiones y procedencia de las predicciones
+
+El proyecto está bajo git (`.gitattributes` desactiva la conversión de finales de línea para que los hashes de
+`datos/MANIFEST.sha256` sigan valiendo). Cada `scripts.prediccion_2026` escribe, junto a sus CSV,
+`resultados/prediccion/procedencia_<fecha>_<escenario>.json` con el commit (y si el código o los datos tenían
+cambios sin confirmar), la huella del modelo, el escenario completo (semilla y simulaciones), el número de
+encuestas y la última usada, las versiones de Python y librerías y el SHA-256 de cada salida. Con la misma
+semilla y el mismo commit la predicción se reproduce byte a byte. Para publicar una cifra, confirmar antes los
+cambios: una procedencia con `"cambios_sin_confirmar": true` no se puede reproducir desde el historial.
 
 ## La web
 
