@@ -1,8 +1,8 @@
 ,0
-P(PP + Vox ≥ 176),0.8943
-P(PP + Vox + UPN + SALF ≥ 176),0.9061
+P(PP + Vox ≥ 176),0.8942
+P(PP + Vox + UPN + SALF ≥ 176),0.9059
 P(PP solo ≥ 176),0.0063
-P(bloque de investidura 2023 ≥ 176),0.08
-P(PP primero),0.7744
-P(ningún bloque llega),0.0139
-P(PSOE primero),0.2109
+P(bloque de investidura 2023 ≥ 176),0.0799
+P(PP primero),0.7743
+P(ningún bloque llega),0.0142
+P(PSOE primero),0.2111
