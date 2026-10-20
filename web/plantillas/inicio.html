@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% from "_macros.html" import grafico %}
+{% block titulo %}Resumen{% endblock %}
+{% block contenido %}
+<section class="portada">
+  <p class="antetitulo">Elecciones generales · 29 de noviembre de 2026{% if dias_hoy > 0 %} · faltan {{ dias_hoy }} días{% endif %}</p>
+  <h1 class="titular">{{ titular }}</h1>
+  <p class="entradilla">{{ entradilla }}</p>
+</section>
+
+<section class="presenta" aria-label="Qué es este modelo">
+  <div class="presenta__texto">
+    <h2>Qué es esto</h2>
+    <p>Un modelo propio de las generales del 29-N: junta las encuestas publicadas, corrige el sesgo de cada casa y
+      repite la elección miles de veces con los errores que las encuestas han tenido de verdad entre 2015 y 2023. Lo que
+      ves son frecuencias: en cuántas de esas elecciones simuladas pasa cada cosa.</p>
+    <a class="enlace-flecha" href="/metodologia{{ q }}">Cómo funciona y en qué se basa</a>
+  </div>
+  <ul class="presenta__claves">
+    <li><b>Participación y movilización</b><span>Qué pasa si vota más o menos gente, o sólo un bloque.</span></li>
+    <li><b>Voto útil</b><span>Qué pasa si los votantes de un partido pequeño se pasan al grande.</span></li>
+    <li><b>Senado completo</b><span>Voto limitado, islas, coalición Senado de Progreso y designados.</span></li>
+    <li><b>Error medido</b><span>Probado con elecciones que el modelo no había visto: 8 escaños de error por partido.</span></li>
+  </ul>
+  <p class="presenta__accion">Prueba tu propio escenario con el botón <b>Cambiar escenario</b>: todo el sitio se recalcula.</p>
+</section>
+
+<section class="rejilla rejilla--portada">
+  <article class="tarjeta">
+    <h2 class="tarjeta__titulo">Reparto medio de los 350 escaños</h2>
+    {{ grafico("f-hemiciclo", hemiciclo, "Hemiciclo con el reparto medio de escaños") }}
+    {{ leyenda|safe }}
+    <p class="nota">Reparto medio de las simulaciones y, detrás, el % de voto. Quien cruza la línea de puntos tiene
+      mayoría.</p>
+  </article>
+
+  <aside class="tarjeta tarjeta--cifras" aria-label="Probabilidades principales">
+    <p class="cifra">{{ p_may|pct }}</p>
+    <p class="cifra__texto">de las simulaciones dan al menos 176 escaños a PP y Vox</p>
+    {% if hace_un_mes %}
+    <p class="cambio">
+      {% set n = hace_un_mes.cambio|abs %}{% if hace_un_mes.cambio > 0 %}▲ {% elif hace_un_mes.cambio < 0 %}▼ {% endif %}{% if n %}{{ n }} {{ 'punto' if n == 1 else 'puntos' }}{% else %}Sin cambios{% endif %}
+      desde el {{ hace_un_mes.fecha|fecha_larga }} ({{ hace_un_mes.valor|pct }})
+    </p>
+    {% endif %}
+    <dl class="filas">
+      {% for a, b in filas %}<div><dt>{{ a }}</dt><dd>{{ b }}</dd></div>{% endfor %}
+    </dl>
+    <a class="enlace-flecha" href="/mayorias{{ q }}">Calcula cualquier otra mayoría</a>
+  </aside>
+</section>
+
+<section class="seccion">
+  <div class="seccion__cabecera">
+    <h2>Partido a partido</h2>
+    <a class="enlace-flecha" href="/escanos{{ q }}">Rangos de voto y escaños</a>
+  </div>
+  {% set escala = tarjetas|map(attribute="p90")|max %}
+  <div class="partidos">
+    {% for t in tarjetas %}
+    <div class="partido" style="--c: {{ t.clave|color }}">
+      <div class="partido__nombre">{{ t.clave|nombre }}</div>
+      <div class="partido__escanos">{{ t.mediana|num(0) }}<span> escaños</span></div>
+      <div class="rango" style="--a: {{ 100 * t.p10 / escala }}%; --b: {{ 100 * t.p90 / escala }}%; --m: {{ 100 * t.mediana / escala }}%" aria-hidden="true"><i></i><b></b></div>
+      <div class="partido__detalle">
+        <span>80 %: {{ t.p10|num(0) }}–{{ t.p90|num(0) }}</span>
+        {% if t.voto == t.voto %}<span>{{ t.voto|num }} % del voto</span>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <p class="nota">Cifra grande: mediana de escaños de las simulaciones. Barra: el 80 % central de las simulaciones (la marca
+    oscura es la mediana), en la misma escala para todos los partidos.</p>
+</section>
+
+<section class="seccion">
+  <div class="seccion__cabecera"><h2>Más del modelo</h2></div>
+  <div class="accesos">
+    <a class="acceso" href="/mayorias{{ q }}">
+      <span class="acceso__titulo">Mayorías</span>
+      <span class="acceso__cifra">{{ p_bloque|pct }}</span>
+      <span class="acceso__texto">es la frecuencia con que el bloque de la investidura de 2023 llega a 176. Prueba cualquier
+        otra combinación de partidos.</span>
+    </a>
+    <a class="acceso" href="/provincias{{ q }}">
+      <span class="acceso__titulo">Provincias</span>
+      <span class="acceso__cifra">{{ primero_prov.n }}</span>
+      <span class="acceso__texto">provincias donde {{ 'el ' if primero_prov.partido in ('PP', 'PSOE') else '' }}{{ primero_prov.partido|nombre }} es el partido más votado.
+        Mapa y reparto de las 52 circunscripciones, con el detalle de cada una.</span>
+    </a>
+    <a class="acceso" href="/senado{{ q }}">
+      <span class="acceso__titulo">Senado</span>
+      <span class="acceso__cifra">{{ senado_pp|num(0) }}</span>
+      <span class="acceso__texto">senadores del PP, de 208 electos (mediana), con la coalición Senado de Progreso de PSOE y
+        Frente Amplio. Mapa y reparto de las 59 circunscripciones.</span>
+    </a>
+    <a class="acceso" href="/encuestas{{ q }}">
+      <span class="acceso__titulo">Encuestas</span>
+      <span class="acceso__cifra">{{ enc.n }}</span>
+      <span class="acceso__texto">encuestas de {{ enc.casas }} casas desde 2025. La última, de {{ enc.ultima_casa }}, terminó
+        el {{ enc.ultima_fecha }}. Media corregida por el sesgo de cada casa.</span>
+    </a>
+    <a class="acceso" href="/evolucion{{ q }}">
+      <span class="acceso__titulo">Evolución</span>
+      <span class="acceso__cifra">{{ FECHAS|length }}</span>
+      <span class="acceso__texto">semanas de modelo, desde el {{ FECHAS[0]|fecha_larga }}: cómo han cambiado el hemiciclo y
+        las mayorías.</span>
+    </a>
+    <a class="acceso" href="/participacion{{ q }}">
+      <span class="acceso__titulo">Participación</span>
+      <span class="acceso__cifra">62–75 %</span>
+      <span class="acceso__texto">¿Qué pasa si vota más o menos gente de lo que suponen las encuestas?</span>
+    </a>
+    <a class="acceso" href="/metodologia{{ q }}">
+      <span class="acceso__titulo">Metodología</span>
+      <span class="acceso__cifra">2015–2023</span>
+      <span class="acceso__texto">Cómo funciona el modelo, cómo se ha probado en cinco elecciones y en qué falla.</span>
+    </a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,36 @@
+{# Tablas del simulador: escaños por partido y sumas de mayorías (las pide simulador.js a /api/simulador). #}
+<div class="tarjeta tarjeta--tabla">
+  <div class="tabla-scroll">
+    <table class="tabla tabla--densa">
+      <thead>
+        <tr>
+          <th scope="col">Partido</th>
+          <th scope="col" class="num">Voto</th>
+          <th scope="col" class="num">Escaños</th>
+          <th scope="col" class="num">Frente a la proyección</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in res.filas %}
+        <tr>
+          <th scope="row"><span class="punto" style="--c: {{ f.clave|color }}"></span>{{ f.clave|nombre }}{% if f.fijado %} <span class="etiqueta-fijado">fijado</span>{% endif %}</th>
+          <td class="num">{{ f.voto|num }} %</td>
+          <td class="num fuerte">{{ f.escanos }}</td>
+          <td class="num{{ ' sube' if f.cambio > 0 else (' baja' if f.cambio < 0 else '') }}">{% if f.cambio %}{{ '%+d'|format(f.cambio)|replace('-', '−') }}{% else %}<span class="sub">=</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="tarjeta">
+  <h2 class="tarjeta__titulo">¿Llegan a {{ res.mayoria }}?</h2>
+  <dl class="filas filas--sumas">
+    {% for s in res.sumas %}
+    <div>
+      <dt>{{ s.texto }}</dt>
+      <dd class="{{ 'llega' if s.escanos >= res.mayoria else 'no-llega' }}">{{ s.escanos }}<span>{{ 'sí llegan' if s.escanos >= res.mayoria else 'les faltan ' ~ (res.mayoria - s.escanos) }}</span></dd>
+    </div>
+    {% endfor %}
+  </dl>
+</div>

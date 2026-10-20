@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cabecera %}
+{% block titulo %}Cómo funciona{% endblock %}
+{% block barra_escenario %}{% endblock %}
+{% macro supuesto(titulo, porque, evidencia) %}
+<article class="supuesto">
+  <h3>{{ titulo }}</h3>
+  <p class="supuesto__porque">{{ porque }}</p>
+  <p class="supuesto__evidencia">{{ evidencia }}</p>
+</article>
+{% endmacro %}
+{% block contenido %}
+{{ cabecera("Cómo funciona", "Qué hace el modelo, en qué se basa y cuándo fallaría",
+  "De las encuestas a 350 diputados y 208 senadores en cuatro pasos, por qué se tomó cada supuesto, qué palanca mueve qué y cuánto se ha equivocado al probarlo con las elecciones de 2015 a 2023.") }}
+
+<div class="articulo">
+  <nav class="articulo__indice" aria-label="En esta página">
+    <p class="articulo__indice-titulo">En esta página</p>
+    <ol>
+      <li><a href="#pasos">Qué hace</a></li>
+      <li><a href="#predice">Cómo predice</a></li>
+      <li><a href="#supuestos">Por qué estos supuestos</a></li>
+      <li><a href="#palancas">Qué mueve qué</a></li>
+      <li><a href="#error">Cuánto se equivoca</a></li>
+      <li><a href="#limites">Límites</a></li>
+      <li><a href="#escenario">El panel de escenario</a></li>
+      <li><a href="#fuentes">Fuentes</a></li>
+    </ol>
+  </nav>
+
+  <article class="articulo__texto">
+    <h2 id="pasos">Qué hace</h2>
+    <p>El modelo no predice un resultado: repite la elección miles de veces con los errores que las encuestas han tenido de
+      verdad y cuenta cuántas veces sale cada cosa. Los tres primeros pasos dan una proyección central; el cuarto le añade la
+      incertidumbre.</p>
+    <ol class="pasos">
+      <li>
+        <h3>Media de encuestas</h3>
+        <p>Junta todas las encuestas nacionales publicadas y sigue la tendencia de cada partido día a día. Cada encuestadora
+          tiene un sesgo propio y estable, que el modelo estima y descuenta. Excluye las encuestas encargadas por partidos.</p>
+      </li>
+      <li>
+        <h3>Comunidades autónomas</h3>
+        <p>Donde hay encuestas autonómicas recientes (CEO, Sondaxe, GAD3…), corrige el reparto territorial sin cambiar el
+          total nacional. Cuanto más reciente y grande es la encuesta, más pesa.</p>
+      </li>
+      <li>
+        <h3>Provincias</h3>
+        <p>Lleva el voto de cada comunidad a cada provincia desde el resultado de 2023, con un ajuste logístico: un partido muy
+          fuerte en una provincia no puede crecer sin límite. Aquí entran las candidaturas registradas y las palancas del
+          escenario.</p>
+      </li>
+      <li>
+        <h3>Simulación</h3>
+        <p>Repite la elección miles de veces moviendo el voto con cuatro errores medidos entre 2015 y 2023: uno de bloque
+          (izquierda contra derecha), trasvases dentro de cada bloque, desviaciones por comunidad y ruido por provincia. En
+          cada una reparte el Congreso con D'Hondt y el umbral del 3 %, como la ley, y el Senado con voto limitado, isla a isla,
+          con la coalición Senado de Progreso y los 58 senadores designados por los parlamentos autonómicos.</p>
+      </li>
+    </ol>
+
+    <h2 id="predice">Cómo predice</h2>
+    <p>Todo lo que muestra la web sale de contar esos parlamentos simulados. «PP y Vox llegan a 176 en el 92 %» quiere decir
+      que pasa en 92 de cada 100 elecciones simuladas; el rango del 80 % de un partido deja fuera el 10 % de simulaciones más
+      bajas y el 10 % más altas. La incertidumbre crece con los días que faltan: a 40 días de votar, el error de bloque que se
+      simula es un 60 % mayor que la víspera.</p>
+    <p>Son frecuencias condicionadas a los supuestos del modelo, no certezas: en 2023, con las encuestas de entonces, el modelo
+      daba entre un 69 y un 78 % a una mayoría de derechas que no llegó.</p>
+
+    <h2 id="supuestos">Por qué estos supuestos</h2>
+    <p>Cada supuesto sale de un dato medido, de la literatura académica o, cuando no hay ni lo uno ni lo otro, se dice y se
+      deja como palanca para que lo muevas tú.</p>
+    <div class="supuestos">
+      {{ supuesto("Cada encuestadora tiene un sesgo estable",
+        "Es el método estándar para promediar encuestas: el voto real sigue un paseo aleatorio y cada casa lo mide con su desviación propia.",
+        "Jackman (2005). El error común de toda la industria no se corrige aquí: se añade en la simulación.") }}
+      {{ supuesto("Las encuestas fallan en bloque",
+        "Izquierda y derecha se equivocan a la vez en sentido contrario (correlación −0,65), y de vez en cuando mucho: colas gruesas.",
+        "Medido en 2015–2023: la víspera, 2,1 puntos la derecha y 1,8 la izquierda; a 48 días, 3,6. El error de las encuestas no ha bajado en 75 años (Jennings y Wlezien, 2018).") }}
+      {{ supuesto("El voto provincial se mueve en escala logística",
+        "Un partido con el 50 % no puede ganar 20 puntos como uno con el 10 %: la escala logística frena a quien ya es muy fuerte.",
+        "Backtest propio: con el resultado autonómico real, el paso a provincias coloca mal unos 7 escaños por elección.") }}
+      {{ supuesto("Más participación favorece a la izquierda (57 de cada 100 votos extra)",
+        "Es la regresión de los votos de cada bloque sobre el total de votantes en las cinco generales de 2015 a 2023.",
+        "Cinco puntos son pocos y la literatura no da una regla fija: la relación participación–PSOE responde a tres mecanismos distintos (Lago y Montero, 2009) y más participación hace el resultado menos predecible (Hansford y Gomez, 2010). Por eso hay tres repartos para elegir.") }}
+      {{ supuesto("Las listas conjuntas conservan todos sus votos",
+        "Es la hipótesis más simple, pero es optimista: se usa para Compromís-Front Valencià, Unidad del Pueblo Canario, la lista única y la coalición del Senado.",
+        "En 2016, Unidos Podemos conservó el 83 % de los votos que Podemos e IU sacaron por separado en 2015. Quien rechaza al socio deserta de la coalición (Gschwend y Hooghe, 2008).") }}
+      {{ supuesto("El voto útil va donde el partido pequeño no saca escaño",
+        "Es donde su voto se pierde y cambiar de papeleta tiene sentido.",
+        "En España el voto estratégico se concentra en las circunscripciones pequeñas y se forma extrapolando la elección anterior (Lago).") }}
+      {{ supuesto("Podemos en Cataluña: 60 % a ERC, 40 % a los Comuns",
+        "Podemos no presenta lista y pide el voto para ERC; los Comuns son la opción más cercana para quien no siga la consigna.",
+        "Sin precedente con el que calibrarlo, pero pesa poco: del 100 % al 30 % hacia ERC, ERC pasa de 11 a 9 escaños y la mayoría de PP y Vox no se mueve.") }}
+      {{ supuesto("Senado: voto de partido",
+        "Con voto limitado, quien marca a los tres candidatos de su partido da el reparto 3 + 1.",
+        "La mayoría de los electores vota candidatos de un solo partido (Montabes y Ortega). Aplicado al voto real de 2023, acierta 199 de 208 senadores.") }}
+      {{ supuesto("Si Vox no se presenta al Senado, el 80 % de su voto va al PP",
+        "Es una hipótesis aparte del escenario base, a raíz de las informaciones del 18 de octubre.",
+        "Sin precedente directo: se ancla en la única fusión comparable medida en España (83 % en 2016) y en que el votante sigue a su partido hacia un socio cercano.") }}
+    </div>
+
+    <h2 id="palancas">Qué mueve qué</h2>
+    <p>Cada enlace abre la comparación con el escenario base, calculada en el momento.</p>
+    <ul>
+      <li><strong>Más participación, menos mayoría de derechas</strong> (con el reparto histórico): los votantes adicionales
+        son sobre todo de izquierda. Con un reparto simétrico el efecto casi desaparece: todo depende de quién sea el votante
+        nuevo. <a href="/comparar?b_part=75">Participación del 75 %</a> · <a href="/comparar?b_part=75&amp;b_reparto=simetrico">del 75 % con reparto simétrico</a>.</li>
+      <li><strong>Movilización de un bloque</strong>: sube el porcentaje de ese bloque y, por D'Hondt, algo más sus escaños.
+        <a href="/comparar?b_mov_izda=10">Izquierda +10 %</a> · <a href="/comparar?b_mov_dcha=10">derecha +10 %</a>.</li>
+      <li><strong>Voto útil hacia el partido grande</strong>: más escaños para el grande, casi los mismos para el bloque,
+        porque D'Hondt premia al grande dentro del mismo lado. <a href="/comparar?b_util_vox_pp=20&amp;b_util_donde=todas">20 % de Vox al PP en todas partes</a>.</li>
+      <li><strong>Desmovilización del independentismo en Cataluña</strong>: mueve escaños catalanes, pero apenas la mayoría
+        nacional. <a href="/comparar?b_mov_nac=-15&amp;b_ambito=Catalu%C3%B1a">Nacionalistas −15 % en Cataluña</a>.</li>
+    </ul>
+
+    <h2 id="error">Cuánto se equivoca</h2>
+    <div class="destacados">
+      <div><span class="destacados__cifra">350</span><span>escaños reales reproducidos por el reparto D'Hondt en las cinco
+        generales de 2015 a 2023</span></div>
+      <div><span class="destacados__cifra">76 %</span><span>de los escaños reales dentro del intervalo del 80 %; el 93 %,
+        dentro del 95 %</span></div>
+      <div><span class="destacados__cifra">8</span><span>escaños de error medio por partido, frente a 22 si se repite la
+        elección anterior</span></div>
+    </div>
+    <ul>
+      <li>Según la elección, la media de encuestas falló entre 0,75 y 2,02 puntos por partido la víspera; en la elección no
+        vista durante la calibración, 1,92 puntos.</li>
+      <li>Probado fuera de muestra en 2016, abril y noviembre de 2019 y 2023, cada elección con los errores calibrados sin
+        ella, a 30, 14 y 1 días de votar.</li>
+      <li>Simular aporta: frente a dar sólo la proyección central, el error de la distribución es un 28 % menor.</li>
+      <li>Senado: aplicado al voto real de 2023, el método acierta 199 de los 208 senadores (PP 122 frente a 120).</li>
+      <li>Fallos más claros: la subida de Vox en noviembre de 2019 (52 escaños; el modelo daba 24–32 a un mes y a dos
+        semanas) y la sobreestimación sistemática del espacio de Podemos (unos 7 escaños de media).</li>
+    </ul>
+
+    <h2 id="limites">Límites</h2>
+    <ul>
+      <li><strong>Un error de toda la industria</strong> mayor que los de 2015–2023 y en la misma dirección: ningún agregador
+        lo corrige.</li>
+      <li><strong>Serie corta.</strong> Cinco elecciones para calibrar y cuatro para evaluar: lo muy improbable pasa algo más
+        de lo que dice el modelo.</li>
+      <li><strong>Candidaturas nuevas</strong> (SALF, Adelante Andalucía, listas conjuntas) sin base comparable en 2023: en el
+        backtest, casi todos los fallos grandes fueron candidaturas así.</li>
+      <li><strong>Partidos de una sola comunidad</strong> (ERC, Junts, PNV, EH Bildu, BNG, CC): su incertidumbre probablemente
+        se queda corta.</li>
+      <li><strong>Palancas, no estimaciones.</strong> Participación, movilización y voto útil dicen qué pasaría, no qué va a
+        pasar.</li>
+      <li><strong>Senado.</strong> No recoge el voto personal ni el cruzado (en 2023 hicieron fallar Tenerife y La Palma); los
+        designados se suman tal como están hoy.</li>
+      <li><strong>Escaños, no Gobiernos.</strong> Que un bloque sume 176 no garantiza una investidura.</li>
+      <li>El error está medido hasta {{ DIAS_CALIBRADOS }} días antes de votar; con fechas anteriores se extrapola.</li>
+    </ul>
+
+    <h2 id="escenario">El panel de escenario</h2>
+    <p>Todas las páginas comparten el escenario, que se cambia con el botón <strong>Cambiar escenario</strong> y queda escrito
+      en la dirección de la página: se puede guardar como marcador o compartir.</p>
+    <dl class="definiciones">
+      <dt>Encuestas hasta</dt>
+      <dd>Corte semanal: el modelo sólo usa las encuestas con el trabajo de campo terminado ese día o antes. Sirve para ver
+        qué decía el modelo en una fecha pasada.</dd>
+      <dt>Candidaturas</dt>
+      <dd>Las registradas el 16 de octubre (Frente Amplio y Podemos por separado salvo en la C. Valenciana y Canarias; Podemos
+        dentro de ERC en Cataluña) o, para comparar, la hipótesis de una lista única de los dos en toda España.</dd>
+      <dt>Participación y reparto</dt>
+      <dd>Las encuestas suponen de media un 65 %. Con otra participación se suman o se restan votantes según uno de tres
+        repartos: como en 2015–2023 (57 a la izquierda, 18 a la derecha y 25 al resto de cada 100 votos extra), simétrico
+        como el 10N (49, 45 y 6) o muy asimétrico (80, 5 y 15).</dd>
+      <dt>Movilización por bloque</dt>
+      <dd>El voto de la izquierda, la derecha o los nacionalistas y regionalistas sube o baja hasta un 20 % respecto a las
+        encuestas, en toda España o en una sola comunidad.</dd>
+      <dt>Voto útil</dt>
+      <dd>Una parte de los votantes de Podemos, Frente Amplio, Vox o SALF pasa al partido grande de su lado, en todas las
+        provincias o sólo donde su partido no saca escaño.</dd>
+      <dt>Simulaciones y semilla</dt>
+      <dd>Más simulaciones dan frecuencias más estables. La misma semilla con el mismo escenario da exactamente el mismo
+        resultado.</dd>
+    </dl>
+
+    <h2 id="fuentes">Fuentes</h2>
+    <ul class="fuentes">
+      <li>Jackman, S. (2005). «Pooling the polls over an election campaign». <em>Australian Journal of Political Science</em>, 40(4).</li>
+      <li>Jennings, W. y Wlezien, C. (2018). «Election polling errors across time and space». <em>Nature Human Behaviour</em>, 2(4).</li>
+      <li>Hansford, T. G. y Gomez, B. T. (2010). «Estimating the electoral effects of voter turnout». <em>American Political Science Review</em>, 104(2).</li>
+      <li>Lago, I. y Montero, J. R. (2009). «Participación y resultados electorales en España». <em>Revista Española de Investigaciones Sociológicas</em>, 126.</li>
+      <li>Lago, I. «Rational expectations or heuristics? Strategic voting in multimember districts». Universitat Pompeu Fabra.</li>
+      <li>Gschwend, T. y Hooghe, M. (2008). «Should I stay or should I go? An experimental study on voter responses to pre-electoral coalitions». <em>European Journal of Political Research</em>, 47(5).</li>
+      <li>Montabes, J. y Ortega, C. «El voto limitado en las elecciones al Senado español». <em>Revista Española de Ciencia Política</em>, 7.</li>
+      <li>Datos: Ministerio del Interior (infoelectoral), encuestas publicadas recogidas en Wikipedia, web del Senado.</li>
+    </ul>
+    <p class="nota">Elección: {{ ELECCION|fecha_larga }} de 2026. Último dato de encuestas: {{ ULTIMA_ENCUESTA|fecha_larga }}.
+      Los detalles de cada calibración están en el README del proyecto.</p>
+  </article>
+</div>
+{% endblock %}

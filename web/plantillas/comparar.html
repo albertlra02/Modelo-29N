@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cabecera %}
+{% block titulo %}Comparar escenarios{% endblock %}
+{% macro dif(x, dec=0, sufijo="") %}{% if x is none %}<span class="sub">—</span>{% elif x|round(dec) == 0 %}<span class="sub">=</span>{% else %}<span class="{{ 'sube' if x > 0 else 'baja' }}">{{ ('%+.' ~ dec ~ 'f')|format(x)|replace('.', ',')|replace('-', '−') }}{{ sufijo }}</span>{% endif %}{% endmacro %}
+{% macro campos(x, e) %}
+<fieldset class="comparar__escenario">
+  <legend>Escenario {{ x|upper }}</legend>
+  <label>Encuestas hasta
+    <select name="{{ x }}_fecha">{% for f in FECHAS|reverse %}<option value="{{ f }}"{% if f == e.fecha %} selected{% endif %}>{{ f|fecha_larga }}</option>{% endfor %}</select>
+  </label>
+  <label>Candidaturas
+    <select name="{{ x }}_cand">{% for k, t in NOMBRES_CAND.items() %}<option value="{{ k }}"{% if k == e.candidaturas %} selected{% endif %}>{{ t }}</option>{% endfor %}</select>
+  </label>
+  <label>Participación
+    <select name="{{ x }}_part">{% for v in range(PART_MIN, PART_MAX + 1) %}<option value="{{ v }}"{% if v == e.participacion %} selected{% endif %}>{{ v }} %</option>{% endfor %}</select>
+  </label>
+  <label>Votantes extra
+    <select name="{{ x }}_reparto">{% for k, t in NOMBRES_REPARTO.items() %}<option value="{{ k }}"{% if k == e.reparto %} selected{% endif %}>{{ t }}</option>{% endfor %}</select>
+  </label>
+  {# las palancas se eligen en el panel de escenario; aquí viajan tal cual para que cada lado conserve las suyas #}
+  {% for k in NOMBRES_MOV|list + NOMBRES_UTIL|list %}<input type="hidden" name="{{ x }}_{{ k }}" value="{{ e[k] }}">{% endfor %}
+  <input type="hidden" name="{{ x }}_ambito" value="{{ e.mov_ambito }}">
+  <input type="hidden" name="{{ x }}_util_donde" value="{{ e.util_donde }}">
+  {% set pal = e.descripcion()[3:-1] %}
+  {% if pal %}<p class="ayuda">Con {{ pal|join(', ') }}.</p>{% endif %}
+</fieldset>
+{% endmacro %}
+{% block contenido %}
+{{ cabecera("Comparar", "Dos escenarios, lado a lado",
+  "Elige dos escenarios y mira qué cambia en escaños, voto y probabilidades. B menos A: en verde lo que sube, en rojo lo que baja.") }}
+
+<form class="tarjeta comparar__form" method="get" action="/comparar">
+  {{ campos("a", a) }}
+  {{ campos("b", b) }}
+  <div class="comparar__enviar">
+    <button type="submit" class="boton">Comparar</button>
+    <p class="nota">Los escenarios que no estén calculados tardan unos segundos la primera vez. La votación extra sólo
+      cuenta si la participación no es la base ({{ PART_BASE }} %).</p>
+  </div>
+</form>
+
+<section class="seccion">
+  <div class="seccion__cabecera"><h2>Escaños y voto</h2></div>
+  <div class="comparar__chips">
+    <p><b>A</b>{% for t in a.descripcion() %}<span class="chip">{{ t }}</span>{% endfor %}</p>
+    <p><b>B</b>{% for t in b.descripcion() %}<span class="chip">{{ t }}</span>{% endfor %}</p>
+  </div>
+  <div class="tarjeta tarjeta--tabla">
+    <div class="tabla-scroll">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th scope="col">Partido</th>
+            <th scope="col" class="num">Escaños A</th>
+            <th scope="col" class="num">Escaños B</th>
+            <th scope="col" class="num">Diferencia</th>
+            <th scope="col" class="num">Voto A</th>
+            <th scope="col" class="num">Voto B</th>
+            <th scope="col" class="num">Diferencia</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in filas %}
+          <tr>
+            <th scope="row"><span class="punto" style="--c: {{ f.clave|color }}"></span>{{ f.clave|nombre }}</th>
+            <td class="num">{{ f.ma|num(0) if f.ma is not none else '—' }}</td>
+            <td class="num">{{ f.mb|num(0) if f.mb is not none else '—' }}</td>
+            <td class="num fuerte">{{ dif(f.dif) }}</td>
+            <td class="num">{{ (f.va|num ~ ' %') if f.va is not none else '—' }}</td>
+            <td class="num">{{ (f.vb|num ~ ' %') if f.vb is not none else '—' }}</td>
+            <td class="num">{{ dif((f.vb or 0) - (f.va or 0) if f.va is not none and f.vb is not none else none, 1) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="nota">Escaños: mediana de las simulaciones. Voto: estimación central nacional. Con la lista única, Frente
+    Amplio incluye a Podemos.</p>
+</section>
+
+<section class="seccion">
+  <div class="seccion__cabecera"><h2>Probabilidades</h2></div>
+  <div class="rejilla rejilla--dos">
+    <div class="tarjeta tarjeta--tabla">
+      <table class="tabla tabla--densa">
+        <thead><tr><th scope="col">Congreso</th><th scope="col" class="num">A</th><th scope="col" class="num">B</th><th scope="col" class="num">Puntos</th></tr></thead>
+        <tbody>
+          {% for f in probs %}
+          <tr><th scope="row">{{ f.texto }}</th><td class="num">{{ f.a|pct }}</td><td class="num">{{ f.b|pct }}</td><td class="num">{{ dif(100 * (f.b - f.a)) }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="tarjeta tarjeta--tabla">
+      <table class="tabla tabla--densa">
+        <thead><tr><th scope="col">Senado</th><th scope="col" class="num">A</th><th scope="col" class="num">B</th><th scope="col" class="num">Puntos</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Senadores electos del PP (mediana)</th><td class="num">{{ senado_pp[0]|num(0) }}</td><td class="num">{{ senado_pp[1]|num(0) }}</td><td class="num">{{ dif(senado_pp[1] - senado_pp[0]) }}</td></tr>
+          {% for f in sen %}
+          <tr><th scope="row">{{ f.texto }}</th><td class="num">{{ f.a|pct }}</td><td class="num">{{ f.b|pct }}</td><td class="num">{{ dif(100 * (f.b - f.a)) }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="nota">«Puntos»: diferencia en puntos porcentuales, B menos A. El Senado, con Vox presentándose en todas las
+    provincias.</p>
+</section>
+{% endblock %}
