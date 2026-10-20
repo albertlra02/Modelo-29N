@@ -185,7 +185,7 @@ Cuando sale una encuesta nueva, la aplicación la incorpora, comprueba que el mo
 
 ## Cómo se accede y cómo usarla
 
-Se entra desde el navegador con un enlace y una contraseña, sin instalar nada. Cualquier escenario se queda guardado en la dirección de la página, así que se puede mandar a otra persona tal cual.
+Se entra desde el navegador con un enlace, sin instalar nada ni registrarse. Cualquier escenario se queda guardado en la dirección de la página, así que se puede mandar a otra persona tal cual.
 
 Un par de cosas a tener en cuenta. Del 24 al 28 de noviembre la ley electoral prohíbe publicar sondeos y proyecciones, así que esos días la aplicación se cierra sola y vuelve el 29 al cerrar los colegios. Y los porcentajes son frecuencias, no certezas: un 92 % significa que eso pasa en 92 de cada 100 elecciones simuladas con los supuestos del modelo. Lo que cambia el usuario en el panel (participación, voto útil…) son supuestos suyos, no estimaciones.
 
@@ -212,7 +212,7 @@ Está escrito en Python, con numpy y pandas para el cálculo, Plotly para los gr
 
 Hay tres cosas que he cuidado más que el resto. Los datos fuente no se tocan a mano: los resultados oficiales se descargan del Ministerio del Interior y cada fichero está sellado con una huella digital, así que si algo cambia por accidente lo detecto. Cada predicción se puede reproducir, porque junto al resultado se guardan la versión del modelo, las encuestas usadas y la semilla de la simulación. Y la actualización es automática pero con freno: la descarga diaria de encuestas se para si la tabla de Wikipedia cambia de forma, y la versión nueva sólo se publica si pasan todas las pruebas.
 
-La aplicación publicada funciona en un servidor gratuito con poca memoria y poca CPU. Para que vaya rápida, los escenarios habituales (unos 170) están calculados de antemano, las páginas viajan comprimidas y se guardan en memoria una vez generadas. Tiene contraseña y se cierra sola durante la veda electoral.
+La aplicación publicada funciona en un servidor gratuito con poca memoria y poca CPU. Para que vaya rápida, los escenarios habituales (unos 170) están calculados de antemano, las páginas viajan comprimidas y se guardan en memoria una vez generadas. Se cierra sola durante la veda electoral.
 
 He desarrollado el proyecto con ayuda de un asistente de inteligencia artificial (Claude, de Anthropic), que he usado para programar, revisar el código, buscar y contrastar fuentes y redactar la documentación. La IA no produce las cifras: todas salen de ejecutar el modelo sobre datos públicos, y cada decisión de este documento está respaldada por una prueba reproducible o por una referencia que se puede consultar. Usarla me ha permitido llegar mucho más lejos en el tiempo que tenía; lo que no cambia es que cada elección del método tiene que poder explicarse y defenderse, y eso es lo que he intentado hacer en estas páginas.
 

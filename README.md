@@ -4,7 +4,7 @@ Modelo propio de las elecciones generales del 29 de noviembre de 2026. Convierte
 parlamentos posibles, para el Congreso y el Senado, y deja probar escenarios desde una web propia. Datos públicos, sin
 trabajo de campo.
 
-**Aplicación:** [modelo-29n.onrender.com](https://modelo-29n.onrender.com) (con contraseña; pídemela) ·
+**Aplicación:** [modelo-29n.onrender.com](https://modelo-29n.onrender.com) ·
 **Documentos:** el técnico y el de análisis, en PDF, se generan con [docs/pdf/construir.py](docs/pdf/construir.py) ·
 **Pruebas:** 101, con integración continua · **Autor:** Alberto ([albertlra02](https://github.com/albertlra02))
 
@@ -145,8 +145,8 @@ cambios: una procedencia con `"cambios_sin_confirmar": true` no se puede reprodu
 
 ## Publicar la web (gratis)
 
-**En Render** (enlace fijo, plan gratuito, sin tarjeta). Se entrega la aplicación, no el código: el repositorio es
-privado y la web pide contraseña.
+**En Render** (enlace fijo, plan gratuito, sin tarjeta). La contraseña es opcional: la web sólo la pide si existe la
+variable `CLAVE`.
 
 1. Una vez: crea un repositorio **privado** vacío en github.com y conéctalo: `git remote add origin <url>`.
 2. Cada publicación: `python -m scripts.desplegar`. Pasa los tests y sube el código actual y los escenarios ya
