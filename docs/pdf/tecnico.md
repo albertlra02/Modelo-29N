@@ -56,7 +56,7 @@ Con cada una de esas elecciones simuladas reparto el Congreso con D’Hondt y el
 
 ## Las decisiones, una a una
 
-Un modelo electoral es una cadena de decisiones, y en casi todas hay varias opciones razonables. En esta sección explico las que he tomado, qué alternativas había y cómo he comprobado que la elegida funciona. La regla que he seguido es sencilla: cada opción se prueba contra las generales de 2015 a 2023, y si no mejora el resultado en elecciones pasadas, no entra. Cuando no hay forma de probarla, lo digo y la dejo como algo que el usuario puede cambiar.
+Un modelo electoral es una cadena de decisiones, y en casi todas hay varias opciones razonables. No todas pesan igual: si sólo tienes tiempo para tres, lee la 2, la 6 y la 10. En esta sección explico las que he tomado, qué alternativas había y cómo he comprobado que la elegida funciona. La regla que he seguido es sencilla: cada opción se prueba contra las generales de 2015 a 2023, y si no mejora el resultado en elecciones pasadas, no entra. Cuando no hay forma de probarla, lo digo y la dejo como algo que el usuario puede cambiar.
 
 ### 1. De dónde salen las encuestas
 
@@ -132,7 +132,7 @@ El Senado tiene un sistema muy distinto: en cada provincia se eligen cuatro sena
 
 La opción más sencilla es suponer voto de partido: que cada lista saca en el Senado lo mismo que su partido en el Congreso y que la gente marca a los tres candidatos de su partido. La investigación confirma que es lo que hace la mayoría de los electores (Montabes y Ortega, *Revista Española de Ciencia Política*, n.º 7). Pero no quise quedarme en eso, y lo probé con datos: apliqué el método al voto real al Congreso de 2023 y lo comparé con los senadores que salieron. Acertó 199 de 208 (al PP le daba 122 y sacó 120).
 
-Los nueve fallos enseñan dónde están los límites del método. Cuatro eran provincias muy igualadas que acabaron dos y dos (Badajoz, Cáceres, Huelva y Valencia), porque el tercer candidato de la lista ganadora saca algo menos que el primero y el segundo de la otra lista lo adelanta. Eso sí lo he incorporado: medí esa caída entre candidatos en las 47 provincias de 2023 y ahora se sortea en cada simulación (en 2023 el dos y dos salió con márgenes del 1 al 2 %, y nunca con más del 3,5 %). Otros tres fallos fueron provincias donde las listas al Senado no coincidieron con las del Congreso (Barcelona, Gipuzkoa y Navarra), y los dos últimos, islas donde el voto al Senado se apartó del del Congreso (Tenerife y La Palma); esos no los puedo prever con este método.
+Los nueve fallos fueron lo más útil de la prueba, porque enseñan dónde están los límites del método. La regla de los «dos y dos» que cuento a continuación, por cierto, no me salió bien a la primera: la condición estaba mal planteada y me di cuenta al comparar provincia por provincia con 2023. Cuatro eran provincias muy igualadas que acabaron dos y dos (Badajoz, Cáceres, Huelva y Valencia), porque el tercer candidato de la lista ganadora saca algo menos que el primero y el segundo de la otra lista lo adelanta. Eso sí lo he incorporado: medí esa caída entre candidatos en las 47 provincias de 2023 y ahora se sortea en cada simulación (en 2023 el dos y dos salió con márgenes del 1 al 2 %, y nunca con más del 3,5 %). Otros tres fallos fueron provincias donde las listas al Senado no coincidieron con las del Congreso (Barcelona, Gipuzkoa y Navarra), y los dos últimos, islas donde el voto al Senado se apartó del del Congreso (Tenerife y La Palma); esos no los puedo prever con este método.
 
 Hay dos islas que trato aparte desde el principio: La Gomera y El Hierro, donde ganan partidos que no se presentan al Congreso (ASG y AHI). Como no hay encuesta que los mida, les dejo su voto al Senado de 2023, y por eso esos dos escaños salen bien en la validación de forma automática.
 
@@ -159,7 +159,7 @@ Para saber si el modelo sirve de algo lo probé con las generales de 2016, las d
 | Simular frente a dar sólo una cifra central | Error de la distribución un 28 % menor |
 | Senado, con el voto real de 2023 | 199 de 208 senadores bien asignados |
 
-Para mí lo más importante no es el error medio, sino que los rangos digan la verdad. Si el modelo dice que un partido sacará entre 47 y 85 escaños el 80 % de las veces, eso debería cumplirse más o menos 8 de cada 10 veces:
+Lo que más me importa no es el error medio, sino que los rangos digan la verdad. Si el modelo dice que un partido sacará entre 47 y 85 escaños el 80 % de las veces, eso debería cumplirse más o menos 8 de cada 10 veces:
 
 &#91;embedded content: Backtest fuera de muestra · generales de 2016, abril y noviembre de 2019 y 2023 · partidos estatales\]
 
@@ -206,13 +206,11 @@ Lo siguiente que quiero hacer es comparar la proyección final con el resultado 
 
 ## Cómo lo he construido
 
-Lo construí por etapas, y no pasaba a la siguiente hasta que la anterior aguantaba una prueba con datos reales. Primero, el reparto de escaños, hasta que reprodujo los 350 de las cinco generales de 2015 a 2023. Después, la media de encuestas, probada dejando fuera cada vez una elección; luego el paso a provincias, comparando métodos con el resultado real; después la simulación, calibrada con los errores de esas cinco elecciones y probada fuera de muestra. El Senado vino al final, validado con los 208 senadores de 2023, y la aplicación web se apoya en todo lo anterior sin añadir cálculos propios.
+Lo construí por etapas, y me impuse una regla: no pasar a la siguiente hasta que la anterior aguantara una prueba con datos reales. No siempre fue rápido. Primero, el reparto de escaños, hasta que reprodujo los 350 de las cinco generales de 2015 a 2023. Después, la media de encuestas, probada dejando fuera cada vez una elección; luego el paso a provincias, comparando métodos con el resultado real; después la simulación, calibrada con los errores de esas cinco elecciones y probada fuera de muestra. El Senado vino al final, validado con los 208 senadores de 2023, y la aplicación web se apoya en todo lo anterior sin añadir cálculos propios.
 
-Está escrito en Python, con numpy y pandas para el cálculo, Plotly para los gráficos y un servidor web ligero, sin base de datos. Son unas 6.300 líneas de código y 101 pruebas automáticas que se ejecutan con cada cambio. Hay tres cosas que cuido especialmente:
+Está escrito en Python, con numpy y pandas para el cálculo, Plotly para los gráficos y un servidor web ligero, sin base de datos. Son unas 6.300 líneas de código y 101 pruebas automáticas que se ejecutan con cada cambio. El código está en [github.com/albertlra02/Modelo-29N](https://github.com/albertlra02/Modelo-29N).
 
-- **Los datos fuente no se tocan a mano.** Los resultados oficiales se descargan del Ministerio del Interior y cada fichero está sellado con una huella digital, así que cualquier cambio accidental se detecta.
-- **Cada predicción es reproducible.** Junto a cada resultado se guarda la versión del modelo, las encuestas usadas y la semilla de la simulación, de modo que cualquier cifra se puede volver a obtener exactamente.
-- **Se actualiza solo, pero con freno.** La descarga diaria de encuestas se detiene si la tabla de origen cambia de forma, y la versión nueva sólo se publica si pasan todas las pruebas.
+Hay tres cosas que he cuidado más que el resto. Los datos fuente no se tocan a mano: los resultados oficiales se descargan del Ministerio del Interior y cada fichero está sellado con una huella digital, así que si algo cambia por accidente lo detecto. Cada predicción se puede reproducir, porque junto al resultado se guardan la versión del modelo, las encuestas usadas y la semilla de la simulación. Y la actualización es automática pero con freno: la descarga diaria de encuestas se para si la tabla de Wikipedia cambia de forma, y la versión nueva sólo se publica si pasan todas las pruebas.
 
 La aplicación publicada funciona en un servidor gratuito con poca memoria y poca CPU. Para que vaya rápida, los escenarios habituales (unos 170) están calculados de antemano, las páginas viajan comprimidas y se guardan en memoria una vez generadas. Tiene contraseña y se cierra sola durante la veda electoral.
 

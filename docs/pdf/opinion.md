@@ -4,11 +4,11 @@ Oct 20, 2026 · @Alberto
 
 ## La idea en pocas palabras
 
-Todas las encuestas dan a PP y Vox mayoría absoluta, y holgada. He montado un modelo que las promedia y simula la elección miles de veces, y sale lo mismo: PP y Vox llegan a 176 escaños en el 92 % de las simulaciones. Hasta aquí, nada que no diga cualquier agregador.
+Todas las encuestas dan a PP y Vox mayoría absoluta, y holgada. Cuando monté mi propio modelo, lo primero que comprobé fue si salía lo mismo, y sí: PP y Vox llegan a 176 escaños en el 92 % de las simulaciones. Hasta aquí, nada que no diga cualquier agregador.
 
-Lo interesante está en lo que hay debajo de ese 92 %. Las encuestas que publican su estimación de participación suponen, de media, que votará el 65 % del censo. Si en vez de eso vota el 74 %, y los que se suman se comportan como en las generales de 2015 a 2023, la mayoría de PP y Vox se queda en un 60 % y el PSOE sale primero en la mitad de las simulaciones. En el Senado el cambio es todavía más brusco: el PP pasa de 104 senadores electos a 74.
+Lo que me hizo seguir tirando del hilo fue lo que hay debajo de ese 92 %. Las encuestas que publican su estimación de participación suponen, de media, que votará el 65 % del censo. Si en vez de eso vota el 74 %, y los que se suman se comportan como en las generales de 2015 a 2023, la mayoría de PP y Vox se queda en un 60 % y el PSOE sale primero en la mitad de las simulaciones. En el Senado el cambio es todavía más brusco: el PP pasa de 104 senadores electos a 74.
 
-Y la participación es justo lo que se juega en una campaña. Todos los partidos intentan movilizar a los suyos, y las encuestas calculan quién va a votar mirando cómo se votó la última vez, así que una movilización fuera de lo normal es lo que peor ven. Ya ha pasado: en las generales de 2015 a 2023 con más participación, la media de encuestas sobrestimó a la derecha.
+Y la participación es, al final, lo que se juega en una campaña. Todos los partidos intentan movilizar a los suyos, y las encuestas calculan quién va a votar mirando cómo se votó la última vez, así que una movilización fuera de lo normal es lo que peor ven. Ya ha pasado: en las generales de 2015 a 2023 con más participación, la media de encuestas sobrestimó a la derecha.
 
 No digo que las encuestas estén mal. Digo que la mayoría que dan depende de un supuesto del que casi nadie habla. Y depende sobre todo de quién se movilice: si los dos bloques se mueven por igual, el efecto prácticamente desaparece. En el Senado hay además otra incógnita que puede pesar todavía más: si Vox retira sus listas en algunas provincias.
 
@@ -20,7 +20,7 @@ Con las encuestas publicadas hasta el 17 de octubre, este es el reparto que sale
 
 &#91;embedded content: escaños\]
 
-Ninguna mayoría sale con un solo partido. El PP solo llega a 176 en menos del 1 % de las simulaciones, así que cualquier mayoría del PP pasa por Vox. El bloque que apoyó la investidura de 2023 llega en el 6 %.
+Un par de cosas que se ven enseguida. El PP solo llega a 176 en menos del 1 % de las simulaciones, así que cualquier mayoría del PP pasa por Vox. El bloque que apoyó la investidura de 2023 llega en el 6 %.
 
 En el Senado, el PP saca 103 de los 208 senadores electos; sin la coalición de PSOE y Frente Amplio sacaría 123. Sumando los 58 que designan los parlamentos autonómicos, tiene mayoría absoluta en el 40 % de las simulaciones.
 
@@ -42,11 +42,11 @@ Ahora bien, la línea discontinua es la otra cara de la moneda. Si los votantes 
 
 Los tres partidos grandes han planteado campañas de movilización. Sánchez ha presentado la elección como una elección entre bloques ([Moncloa.com](https://www.moncloa.com/2026/10/05/sanchez-convoca-elecciones-3442686/)) y ha pedido concentrar el voto en el PSOE ([Diario Sabemos](https://diariosabemos.com/politica/sanchez-fragmentacion-izquierda-en-llamamiento-voto-util-todo-rojo_519443_102.html)); el PP ha anunciado una campaña «sin complejos» centrada en el Gobierno ([Vozpópuli](https://www.vozpopuli.com/espana/politica/el-pp-convence-a-feijoo-para-hacer-una-campana-sin-complejos-y-neutralizar-el-fango-del-sanchismo.html)), y Vox ha llamado a una [movilización masiva](https://www.eldebate.com/espana/20261017/vox-insta-movilizacion-masiva-29n-ante-ultima-oportunidad-reconstruir-derribado-psoe_470790.html). [Agenda Pública](https://agendapublica.es/noticia/21538/sanchez-feijoo-ante-29n-claves-dos-discursos-campana) analiza los dos discursos principales.
 
-La pregunta que me interesa no es quién hace mejor campaña, sino dónde quedan votantes por movilizar. Según las transferencias de voto de Target Point, Vox mantiene a cerca del 80 % de sus votantes de 2023 y el PP a más del 60 %, mientras que una parte de los votantes de PSOE y Sumar de 2023 dice ahora que no votará ([El Debate](https://www.eldebate.com/espana/20260228/asi-evolucionado-lealtad-votantes-cada-partido-desde-elecciones-23j_390019.html)). Eso deja más abstencionistas recuperables en un bloque que en el otro, y se nota en el modelo: si la izquierda vota un 10 % más, la mayoría de PP y Vox baja del 92 % al 80 %; si lo hace la derecha, sube al 97 %, porque ya está cerca del techo.
+No me interesa tanto quién hace mejor campaña (eso no lo sabe nadie hasta el día 29) como dónde quedan votantes por movilizar. Según las transferencias de voto de Target Point, Vox mantiene a cerca del 80 % de sus votantes de 2023 y el PP a más del 60 %, mientras que una parte de los votantes de PSOE y Sumar de 2023 dice ahora que no votará ([El Debate](https://www.eldebate.com/espana/20260228/asi-evolucionado-lealtad-votantes-cada-partido-desde-elecciones-23j_390019.html)). Eso deja más abstencionistas recuperables en un bloque que en el otro, y se nota en el modelo: si la izquierda vota un 10 % más, la mayoría de PP y Vox baja del 92 % al 80 %; si lo hace la derecha, sube al 97 %, porque ya está cerca del techo.
 
 La investigación ayuda a entender por qué estas campañas movilizan. [Hobolt y Hoerner (2020)](https://researchonline.lse.ac.uk/id/eprint/100529/), con datos de 80 elecciones, encuentran que cuanto más diferentes son los partidos, más gente vota. [Harteveld y Wagner (2023)](https://dare.uva.nl/id/4d0dc46d-f01d-4429-9227-2e941dfcd6a1), con datos de Alemania, Países Bajos y España, ven que el rechazo al partido contrario aumenta la participación por sí mismo, y algo más entre los que menos siguen la política, que son justo los que hacen que una participación sea alta o baja. En España, abril de 2019 tuvo la participación más alta de las cinco generales desde 2015, y en 2023 [Riera y Garmendia (2024)](https://researchportal.uc3m.es/display/act569090) relacionan el resultado con la polarización.
 
-Pero el efecto no tiene dirección fija. Hobolt y Hoerner lo muestran con la llegada de AfD a Alemania, que movilizó sobre todo a sus propios simpatizantes. Una campaña polarizada puede movilizar a los dos lados a la vez, y entonces el efecto se compensa.
+Ojo, porque el efecto no tiene dirección fija. Hobolt y Hoerner lo muestran con la llegada de AfD a Alemania, que movilizó sobre todo a sus propios simpatizantes. Una campaña polarizada puede movilizar a los dos lados a la vez, y entonces el efecto se compensa.
 
 ## La fragmentación a la izquierda del PSOE
 
@@ -60,7 +60,7 @@ Aliança Catalana no se presenta a las generales, pero en Cataluña ya aparece e
 
 ## Quién queda primero
 
-La mayoría y el primer puesto son preguntas distintas. Con lo que dicen hoy las encuestas, el PSOE queda primero en el 22 % de las simulaciones (en un 14 %, incluso con PP y Vox sumando mayoría) y se queda a menos de 10 escaños del PP en el 36 %. Si sube la participación o funciona el voto útil, la cosa cambia bastante:
+Algo que tardé en ver: la mayoría y el primer puesto son preguntas distintas. Con lo que dicen hoy las encuestas, el PSOE queda primero en el 22 % de las simulaciones (en un 14 %, incluso con PP y Vox sumando mayoría) y se queda a menos de 10 escaños del PP en el 36 %. Si sube la participación o funciona el voto útil, la cosa cambia bastante:
 
 | Escenario | PSOE (mediana) | PSOE primero | PSOE con 110 o más | PSOE mejora sus 121 de 2023 | PP y Vox llegan a 176 |
 | --- | --- | --- | --- | --- | --- |
@@ -72,7 +72,7 @@ La mayoría y el primer puesto son preguntas distintas. Con lo que dicen hoy las
 
 *5.000 simulaciones por escenario, encuestas hasta el 17 de octubre. Participación con el reparto histórico de los votantes adicionales; voto útil aplicado en todas las provincias.*
 
-La fila del voto útil es la más reveladora. Si un 30 % de los votantes del Frente Amplio acaba votando al PSOE, quién suma 176 casi no cambia (del 92 % al 90 %), porque los votos se mueven dentro del mismo bloque. Lo que cambia es el reparto interno: el PSOE gana unos diez escaños y casi duplica sus opciones de mejorar los 121 de 2023. Es un buen ejemplo de por qué conviene mirar algo más que la probabilidad de mayoría.
+La fila del voto útil es la que más me sorprendió cuando la saqué. Si un 30 % de los votantes del Frente Amplio acaba votando al PSOE, quién suma 176 casi no cambia (del 92 % al 90 %), porque los votos se mueven dentro del mismo bloque. Lo que cambia es el reparto interno: el PSOE gana unos diez escaños y casi duplica sus opciones de mejorar los 121 de 2023. Es un buen ejemplo de por qué conviene mirar algo más que la probabilidad de mayoría.
 
 ## Por qué las encuestas podrían no estar viéndolo
 
@@ -82,9 +82,9 @@ Para ver si esto tenía alguna base, miré cuánto se equivocó la media de encu
 
 Con cinco elecciones no se puede demostrar nada, pero el patrón es bastante claro (la correlación es de 0,8): cuanto más se votó, más sobrestimaron las encuestas a la derecha. En las dos elecciones con más participación, 2015 y abril de 2019, el error fue de casi 3 puntos. Y en 2023 la media de encuestas daba al PSOE 3,1 puntos menos de lo que sacó la víspera, y 5,2 menos un mes antes.
 
-Hay varias razones posibles. Para una encuesta, la participación es un supuesto: para decidir quién es «votante probable» se pregunta a la gente qué votó la última vez y si piensa ir, y el que se quedó en casa en 2023 y ahora va a votar es justo el que peor se mide. Además, las muestras se suelen ajustar con lo que cada uno recuerda haber votado en la elección anterior, lo que corrige muchos sesgos pero ancla la estimación en el electorado de 2023.
+Se me ocurren unas cuantas razones, y ninguna es concluyente por sí sola. Para una encuesta, la participación es un supuesto: para decidir quién es «votante probable» se pregunta a la gente qué votó la última vez y si piensa ir, y el que se quedó en casa en 2023 y ahora va a votar es justo el que peor se mide. Además, las muestras se suelen ajustar con lo que cada uno recuerda haber votado en la elección anterior, lo que corrige muchos sesgos pero ancla la estimación en el electorado de 2023.
 
-La movilización, además, suele llegar tarde. Cada vez más gente decide en la última semana y cada vez hay menos encuestas, unas ocho al mes según [Bartomeus](https://agendapublica.es/noticia/21539/29n-empieza-baile). Y del 24 al 28 de noviembre la ley no deja publicarlas, así que si la movilización llega esa semana no la vamos a ver en ningún sitio.
+Además, la movilización suele llegar tarde. Cada vez más gente decide en la última semana y cada vez hay menos encuestas, unas ocho al mes según [Bartomeus](https://agendapublica.es/noticia/21539/29n-empieza-baile). Y del 24 al 28 de noviembre la ley no deja publicarlas, así que si la movilización llega esa semana no la vamos a ver en ningún sitio.
 
 Por último, promediar encuestas sólo corrige el sesgo de cada empresa frente a las demás. Si todas fallan hacia el mismo lado, la media falla con ellas, y según [Jennings y Wlezien (2018)](https://phys.org/news/2018-03-pre-election-polls-reliable.html) ese error no ha bajado en 75 años.
 
@@ -118,17 +118,17 @@ Esto es lo que sale según lo que haga Vox:
 
 ### Qué provincias mueven más el resultado
 
-Con tres quintos del Senado (160 de 266) se pueden elegir los magistrados del Constitucional y los vocales del CGPJ que corresponden a la cámara sin pactar con el otro gran partido. Por eso me hice una pregunta de cálculo: si Vox no se presentara en algunas provincias, ¿en cuáles cambiaría más la probabilidad de llegar a esa cifra? Para responderla probé cada provincia por separado y luego las fui añadiendo de una en una, empezando siempre por la que más movía el resultado.
+Con tres quintos del Senado (160 de 266) se pueden elegir los magistrados del Constitucional y los vocales del CGPJ que corresponden a la cámara sin pactar con el otro gran partido. Por eso me hice una pregunta de cálculo: si Vox no se presentara en algunas provincias, ¿en cuáles cambiaría más la probabilidad de llegar a esa cifra? Probar todas las combinaciones no era posible (con 52 provincias salen billones), así que probé cada provincia por separado y luego las fui añadiendo de una en una, empezando siempre por la que más movía el resultado.
 
 &#91;embedded content: retiradas\]
 
 Las 16 provincias que más mueven el resultado, por orden, son Las Palmas, Tarragona, Sevilla, Valencia, Asturias, Zaragoza, Huesca, Baleares, Badajoz, Castellón, Cáceres, Barcelona, Cádiz, Huelva, Álava y Alicante. Con ellas, la probabilidad de los tres quintos pasa del 17 % al 51 %.
 
-La lista de 15 provincias que se ha publicado no coincide con esta. Incluye Jaén, Córdoba, Granada, Guadalajara y Cuenca, donde el efecto es pequeño, y no incluye Las Palmas, Baleares, Tarragona y Barcelona, que están entre las que más pesan. Con esa lista los tres quintos salen en el 33 % de las simulaciones; con las 15 de mayor efecto, en el 49 %.
+Me llamó la atención que la lista de 15 provincias que se ha publicado no coincide con esta. Incluye Jaén, Córdoba, Granada, Guadalajara y Cuenca, donde el efecto es pequeño, y no incluye Las Palmas, Baleares, Tarragona y Barcelona, que están entre las que más pesan. Con esa lista los tres quintos salen en el 33 % de las simulaciones; con las 15 de mayor efecto, en el 49 %.
 
 Tampoco todas las retiradas actúan igual. En las provincias igualadas (Valencia, Sevilla, Asturias, Zaragoza, Badajoz) cambian quién queda primero y, con ello, tres senadores. En Cataluña y Álava lo que se juega es el cuarto senador, el de la minoría.
 
-Hay dos límites. Aunque Vox se retirara en todas partes, los tres quintos se quedan en el 88 % de las simulaciones. Y otra vez aparece la participación: con un 72 %, como en abril de 2019, se parte del 4 %, harían falta 36 retiradas para llegar a la mitad y el máximo sería el 60 %.
+Antes de sacar conclusiones, dos matices. Aunque Vox se retirara en todas partes, los tres quintos se quedan en el 88 % de las simulaciones. Y otra vez aparece la participación: con un 72 %, como en abril de 2019, se parte del 4 %, harían falta 36 retiradas para llegar a la mitad y el máximo sería el 60 %.
 
 El punto más débil de esta parte es cuánto del voto de Vox se iría al PP donde Vox no se presente. He usado un 80 %, que no tiene un precedente directo; lo más parecido que hay medido en España es Unidos Podemos en 2016, que conservó el 83 % de los votos que Podemos e IU habían sacado por separado.
 

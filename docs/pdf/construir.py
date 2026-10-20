@@ -37,6 +37,7 @@ def figura(titulo, subtitulo, cuerpo, fuente):
 
 
 WEB = "modelo-29n.onrender.com"
+GITHUB = "github.com/albertlra02/Modelo-29N"
 
 
 def captura(nombre, ruta, titulo, pie):
@@ -145,12 +146,16 @@ def opinion(paginas=None):
   <p class="p-sub">El 29-N visto desde la participación, y un Senado que puede cambiarlo todo</p>
 </div>
 <div class="p-abajo">
-  <div class="p-cifras">
-    <div><span class="p-num">92 %</span><span class="p-lbl">participación del 65 %,<br>la que suponen las encuestas</span></div>
-    <div class="p-flecha">→</div>
-    <div><span class="p-num">60 %</span><span class="p-lbl">participación del 74 %,<br>con el reparto de 2015–2023</span></div>
+  <p class="p-tesis-k">La tesis, en un gráfico</p>
+  <div class="p-tesis">
+    <div class="p-graf">{g.portada_tesis()}</div>
+    <ol class="p-pasos">
+      <li>Las encuestas dan mayoría a PP y Vox suponiendo que <b>vota el 65 %</b>: sale en el 92 % de las simulaciones.</li>
+      <li>Si vota el 74 % y los nuevos votantes se reparten como entre 2015 y 2023, <b>baja al 60 %</b>. Si se reparten
+      por igual, apenas cambia: <b>importa quién vota</b>.</li>
+      <li>En el Senado, que Vox se presente o no en <b>16 provincias</b> decide los tres quintos.</li>
+    </ol>
   </div>
-  <p class="p-que">Probabilidad de que PP y Vox sumen 176 escaños, según mi modelo</p>
   <p class="p-web">Todos los escenarios, en la aplicación que acompaña a este documento: <b>{WEB}</b></p>
   <p class="p-firma"><b>{AUTOR}</b> · {FECHA} · encuestas publicadas hasta el 17 de octubre</p>
 </div></section>"""
@@ -190,13 +195,14 @@ def tecnico(paginas=None):
   <h1>Modelo 29-N</h1>
   <p class="p-sub">Cómo funciona la aplicación y por qué está hecha así: doce decisiones, cómo se tomaron y cómo se
   comprobaron</p>
+  <div class="p-flujo">{g.portada_flujo()}</div>
   <div class="p-datos">
     <div><span class="d-num">350/350</span><span class="d-lbl">escaños reproducidos en cada general de 2015 a 2023</span></div>
     <div><span class="d-num">10.000</span><span class="d-lbl">elecciones simuladas por escenario, Congreso y Senado</span></div>
     <div><span class="d-num">8 <small>vs 22</small></span><span class="d-lbl">escaños de error por partido, frente a repetir la elección anterior</span></div>
     <div><span class="d-num">199/208</span><span class="d-lbl">senadores bien asignados con el voto real de 2023</span></div>
   </div>
-  <p class="p-web">Pruébala: <b>{WEB}</b></p>
+  <p class="p-web">Pruébala: <b>{WEB}</b> · Código: <b>{GITHUB}</b></p>
   <p class="p-firma"><b>{AUTOR}</b> · {FECHA}<br>Acompaña al documento de análisis «Una mayoría que depende de quién vote»</p>
 </div></section>"""
     cuerpo = portada + indice(lista, paginas or {}) + f'<main>{html}</main>'
@@ -278,13 +284,21 @@ body{margin:0;font:10.6pt/1.58 'Source Serif 4',Georgia,serif;color:var(--tinta)
  hyphens:auto;-webkit-hyphens:auto;text-align:justify;font-variant-numeric:oldstyle-nums proportional-nums}
 a{color:inherit;text-decoration:underline;text-decoration-color:var(--ocre);text-decoration-thickness:.6pt;text-underline-offset:2pt}
 .portada{height:297mm;width:210mm;display:flex;flex-direction:column;break-after:page;text-align:left}
-.p-arriba{flex:1;padding:30mm 24mm 12mm;display:flex;flex-direction:column;justify-content:flex-end;
+.p-arriba{flex:1;padding:22mm 24mm 10mm;display:flex;flex-direction:column;justify-content:flex-end;
  border-top:6mm solid var(--ocre)}
 .p-kicker{font:600 8.5pt Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--ocre);margin:0 0 10mm}
-.portada h1{font:800 54pt/0.98 Fraunces,serif;font-variation-settings:"opsz" 144;letter-spacing:-.02em;margin:0;
+.portada h1{font:800 48pt/0.98 Fraunces,serif;font-variation-settings:"opsz" 144;letter-spacing:-.02em;margin:0;
  color:var(--tinta);max-width:160mm;hyphens:none}
 .p-sub{font:italic 15pt/1.35 'Source Serif 4',serif;color:var(--suave);margin:9mm 0 0;max-width:140mm}
-.p-abajo{background:var(--noche);color:#F2EBDD;padding:16mm 24mm 18mm}
+.p-abajo{background:var(--noche);color:#F2EBDD;padding:12mm 24mm 14mm}
+.p-tesis-k{font:600 8pt Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#E2B65C;margin:0 0 4mm}
+.p-tesis{display:grid;grid-template-columns:57% 1fr;gap:7mm;align-items:center}
+.p-graf svg{width:100%;height:auto;display:block}
+.p-graf text{font-family:Inter,sans-serif}
+.p-pasos{list-style:none;margin:0;padding:0;counter-reset:p}
+.p-pasos li{counter-increment:p;position:relative;padding:0 0 3.5mm 8mm;font:400 9.4pt/1.45 Inter,sans-serif;color:#CFC6B6}
+.p-pasos li::before{content:counter(p);position:absolute;left:0;top:-.5mm;font:800 13pt Fraunces,serif;color:#E2B65C}
+.p-pasos b{color:#F2EBDD;font-weight:600}
 .p-cifras{display:flex;align-items:flex-end;gap:10mm}
 .p-cifras>div{display:flex;flex-direction:column}
 .p-num{font:800 68pt/1 Fraunces,serif;color:#E2B65C;font-variant-numeric:lining-nums;letter-spacing:-.02em}
@@ -292,7 +306,7 @@ a{color:inherit;text-decoration:underline;text-decoration-color:var(--ocre);text
 .p-lbl{font:400 8.5pt/1.4 Inter,sans-serif;color:#BDB3A3;margin-top:3mm}
 .p-flecha{font:400 40pt Fraunces,serif;color:#7C7366;padding-bottom:12mm}
 .p-que{font:italic 12pt 'Source Serif 4',serif;margin:9mm 0 0;color:#F2EBDD}
-.p-web{font:400 10pt Inter,sans-serif;color:#BDB3A3;margin:6mm 0 0}.p-web b{color:#E2B65C;font-weight:600}
+.p-web{font:400 10pt Inter,sans-serif;color:#BDB3A3;margin:6mm 0 0}.p-web b{color:#E2B65C;font-weight:600;white-space:nowrap}
 .p-firma{font:400 8.5pt Inter,sans-serif;color:#BDB3A3;margin:7mm 0 0;border-top:.5pt solid #4A443B;padding-top:4mm}
 .gancho{break-after:page;text-align:left;padding-top:4mm}
 .g-kicker{font:600 8.5pt Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--ocre);margin:0 0 3mm}
@@ -380,8 +394,9 @@ a{color:inherit;text-decoration:underline;text-decoration-color:var(--naranja);t
 .d-num{font:700 26pt/1 'Space Grotesk',sans-serif;letter-spacing:-.02em}
 .d-num small{font-size:13pt;color:var(--suave);font-weight:500}
 .d-lbl{font:400 8.5pt/1.4 'IBM Plex Sans',sans-serif;color:var(--suave)}
-.p-web{font:400 10pt 'IBM Plex Mono',monospace;color:var(--suave);margin:8mm 0 0}.p-web b{color:var(--naranja);font-weight:500}
+.p-web{font:400 10pt 'IBM Plex Mono',monospace;color:var(--suave);margin:8mm 0 0}.p-web b{color:var(--naranja);font-weight:500;white-space:nowrap}
 .p-firma{font:400 8.5pt/1.6 'IBM Plex Mono',monospace;color:var(--suave);margin:4mm 0 0}
+.p-flujo{margin:14mm 0 0}.p-flujo svg{width:100%;height:auto;display:block}
 figure.captura{background:none;padding:0}
 .captura .navegador{border:.7pt solid #C9CDD3;border-radius:1.5mm;overflow:hidden;background:#fff}
 .barra{display:flex;align-items:center;gap:1.4mm;background:#EEF0F3;padding:1.8mm 3mm;border-bottom:.7pt solid #DADDE2}

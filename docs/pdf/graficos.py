@@ -271,3 +271,61 @@ def calibracion():
     c.append(t(420, 304, "Partidos estatales, 2016–2023,", "q"))
     c.append(t(420, 322, "fuera de muestra.", "q"))
     return svg(640, 380, "".join(c), "Calibración de los rangos")
+
+
+# ---------------------------------------------------------------- portadas
+def portada_tesis():
+    """La tesis en un gráfico, para el fondo oscuro de la portada (colores explícitos, no de clase)."""
+    hist = [(60, 97.3), (62, 95.7), (64, 93.2), (65, 91.8), (66, 89.7), (68, 84.2), (70, 77.1), (72, 69.6), (74, 60.1),
+            (76, 49.8)]
+    sim = [(60, 93.6), (62, 92.8), (64, 92.1), (65, 91.8), (66, 91.4), (68, 90.1), (70, 89.1), (72, 87.9), (74, 86.6),
+           (76, 85.9)]
+
+    def X(v):
+        return 40 + (v - 60) / 16 * 380
+
+    def Y(v):
+        return 200 - (v - 40) / 60 * 180
+
+    gris, crema, oro, tenue = "#7C7366", "#F2EBDD", "#E2B65C", "#4A443B"
+    c = []
+    for v in (50, 75, 100):
+        c.append(f'<line x1="40" y1="{Y(v):.1f}" x2="{X(76):.1f}" y2="{Y(v):.1f}" stroke="{tenue}"/>')
+        c.append(f'<text x="32" y="{Y(v) + 4:.1f}" fill="{gris}" text-anchor="end" font-size="11">{v} %</text>')
+    for v in (60, 65, 70, 74):
+        c.append(f'<text x="{X(v):.1f}" y="222" fill="{gris}" text-anchor="middle" font-size="11">{v} %</text>')
+    c.append(f'<text x="{X(76):.1f}" y="240" fill="{gris}" text-anchor="end" font-size="11">participación</text>')
+    for v in (65, 74):
+        c.append(f'<line x1="{X(v):.1f}" y1="20" x2="{X(v):.1f}" y2="200" stroke="{gris}" stroke-dasharray="3 4"/>')
+    d = lambda pts: "".join(f"{'L' if i else 'M'}{X(a):.1f} {Y(b):.1f}" for i, (a, b) in enumerate(pts))  # noqa: E731
+    c.append(f'<path d="{d(sim)}" fill="none" stroke="{gris}" stroke-width="2" stroke-dasharray="5 4"/>')
+    c.append(f'<path d="{d(hist)}" fill="none" stroke="{oro}" stroke-width="3.5"/>')
+    for v, p, txt, dx, anc in ((65, 91.8, "92 %", -10, "end"), (74, 60.1, "60 %", 12, "start")):
+        c.append(f'<circle cx="{X(v):.1f}" cy="{Y(p):.1f}" r="7" fill="{oro}" stroke="#1F1C18" stroke-width="2"/>')
+        c.append(f'<text x="{X(v) + dx:.1f}" y="{Y(p) + 30:.1f}" fill="{crema}" text-anchor="{anc}" font-size="30" '
+                 f'font-weight="800" font-family="Fraunces, serif">{txt}</text>')
+    c.append(f'<text x="{X(65) + 6:.1f}" y="16" fill="{gris}" font-size="11">lo que suponen las encuestas</text>')
+    c.append(f'<text x="{X(76) + 6:.1f}" y="{Y(85.9) + 4:.1f}" fill="{gris}" font-size="11">si se reparten</text>')
+    c.append(f'<text x="{X(76) + 6:.1f}" y="{Y(85.9) + 18:.1f}" fill="{gris}" font-size="11">por igual</text>')
+    c.append(f'<text x="{X(76) + 6:.1f}" y="{Y(49.8) + 4:.1f}" fill="{oro}" font-size="11">como en</text>')
+    c.append(f'<text x="{X(76) + 6:.1f}" y="{Y(49.8) + 18:.1f}" fill="{oro}" font-size="11">2015–2023</text>')
+    return svg(500, 246, "".join(c), "Probabilidad de mayoría de PP y Vox según la participación")
+
+
+def portada_flujo():
+    """Tira del proceso para la portada del documento técnico."""
+    pasos = ["Encuestas", "Media de encuestas", "17 CCAA", "52 provincias", "10.000 simulaciones", "Congreso y Senado"]
+    c, x = [], 0
+    for i, p in enumerate(pasos):
+        w = 14 + len(p) * 7.4
+        clave = i == 4
+        c.append(f'<rect x="{x:.1f}" y="4" width="{w:.1f}" height="30" rx="3" fill="{"#FFE8D9" if clave else "#fff"}" '
+                 f'stroke="{"#E8590C" if clave else "#9AA0AA"}" stroke-width="{1.6 if clave else 1}"/>')
+        c.append(f'<text x="{x + w / 2:.1f}" y="24" text-anchor="middle" font-size="12" fill="#14161A" '
+                 f'font-family="IBM Plex Sans, sans-serif" font-weight="500">{p}</text>')
+        x += w
+        if i < len(pasos) - 1:
+            c.append(f'<path d="M{x + 4:.1f} 19H{x + 16:.1f}" stroke="#E8590C" stroke-width="1.6"/>'
+                     f'<path d="M{x + 13:.1f} 15L{x + 18:.1f} 19L{x + 13:.1f} 23" fill="none" stroke="#E8590C" stroke-width="1.6"/>')
+            x += 22
+    return svg(int(x) + 2, 38, "".join(c), "Proceso del modelo")
