@@ -10,7 +10,7 @@ from urllib.parse import urlsplit
 import pytest
 
 from web import datos as D
-from web.servidor import NAV, app
+from web.servidor import NAV, OTRAS, app
 
 
 def pedir(url: str, metodo: str = "GET") -> tuple[int, str]:
@@ -41,11 +41,11 @@ def escenario_calculado():
     D.correr(D.Params().escenario())
 
 
-@pytest.mark.parametrize("ruta", [r for r, _ in NAV if r not in ("/evolucion", "/participacion")])
+@pytest.mark.parametrize("ruta", [r for r, _ in NAV if r not in ("/evolucion", "/participacion")] + OTRAS)
 def test_paginas_responden(ruta):
     codigo, html = pedir(ruta)
     assert codigo == 200
-    assert 'aria-current="page"' in html
+    assert ('aria-current="page"' in html) == (ruta not in OTRAS)       # las de fuera del menú no se marcan
     assert "Hay que calcular" not in html
 
 
@@ -61,11 +61,11 @@ def test_parametros_no_validos_vuelven_al_escenario_por_defecto():
     assert p == D.Params(participacion=D.PARTICIPACION_MAX, semilla=0)
     assert D.Params.de_query({"reparto": "simetrico"}).reparto == "historico"   # sin efecto al 65 %
     assert D.Params().query() == ""
-    assert D.Params().query(candidaturas="frente_amplio") == "?cand=frente_amplio"
+    assert D.Params().query(candidaturas="lista_unica") == "?cand=lista_unica"
 
 
 def test_api_mapa_y_encuestas():
-    for modo in ("ganador", "juego", "partido"):
+    for modo in ("ganador", "partido", "cambios"):
         codigo, cuerpo = pedir(f"/api/mapa?modo={modo}&partido=VOX")
         assert codigo == 200
         assert json.loads(json.loads(cuerpo)["fig"])["data"]
@@ -73,6 +73,24 @@ def test_api_mapa_y_encuestas():
     assert codigo == 200 and json.loads(json.loads(cuerpo)["fig"])["data"]
     codigo, _ = pedir("/api/casas?partido=PSOE")
     assert codigo == 200
+
+
+def test_api_provincia():
+    codigo, cuerpo = pedir("/api/provincia?nombre=Madrid")
+    assert codigo == 200
+    html = json.loads(cuerpo)["html"]
+    assert "Madrid" in html and "dist__barra" in html
+    # en Madrid ningún reparto concreto se repite lo bastante: no se enseñan; en Soria (4 escaños), sí
+    assert "Repartos más probables" not in html
+    assert "Repartos más probables" in json.loads(pedir("/api/provincia?nombre=Soria")[1])["html"]
+    codigo, _ = pedir("/api/provincia?nombre=Atlantis")
+    assert codigo == 404
+
+
+def test_resultados_2023_reproducen_el_congreso():
+    _, esc = D.resultados_2023()
+    assert esc.to_numpy().sum() == 350
+    assert esc["PP"].sum() == 137 and esc["PSOE"].sum() == 121
 
 
 def test_api_calcular_sin_pendientes():
@@ -86,3 +104,14 @@ def test_descarga_y_errores():
     assert codigo == 200 and len(csv.splitlines()) == D.N_SIM + 1
     assert pedir("/no-existe")[0] == 404
     assert pedir("/estatico/plotly.min.js")[0] == 200
+
+
+def test_api_simulador_y_paginas_nuevas():
+    codigo, cuerpo = pedir("/api/simulador?v_PP=36&v_VOX=15")
+    assert codigo == 200
+    j = json.loads(cuerpo)
+    assert abs(j["votos"]["PP"] - 36) < 0.05 and "Frente a la proyección" in j["html"]
+    codigo, html = pedir("/simulador?v_PP=36")
+    assert codigo == 200 and "fijado" in html
+    codigo, html = pedir("/comparar?b_cand=lista_unica")
+    assert codigo == 200 and "Escenario B" in html

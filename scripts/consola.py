@@ -6,5 +6,6 @@ import sys
 
 def configurar_salida_utf8() -> None:
     """Permite imprimir acentos y símbolos matemáticos en consolas de Windows."""
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    for flujo in (sys.stdout, sys.stderr):
+        if hasattr(flujo, "reconfigure"):
+            flujo.reconfigure(encoding="utf-8", errors="replace")

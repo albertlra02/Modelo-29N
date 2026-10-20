@@ -53,6 +53,26 @@ cuarto le añade la incertidumbre.
 
 El resultado no es un número, sino 5.000 parlamentos posibles. Todo lo que muestra la web sale de contarlos.
 
+**El Senado sale de las mismas simulaciones** (`motor/senado.py`). En cada una, el voto al Congreso de cada provincia se
+lleva a las 59 circunscripciones del Senado (las islas con su patrón de 2023) y se reparten los 208 senadores electos
+como manda el voto limitado: con voto de partido, 3 para la lista más votada y 1 para la segunda en cada provincia (o
+2 + 2 si quedan casi empatadas). PSOE y Frente Amplio van juntos (Senado de Progreso) en todas las provincias salvo
+Cataluña y Canarias, más La Gomera. Con el voto de 2023, el método acierta 199 de los 208 senadores que salieron.
+
+**¿Y si Vox no se presenta al Senado?** Vox estudia retirar sus listas donde divide el voto de la derecha y meter
+candidatos en las del PP (lo decide el 19 de octubre). La página del Senado compara dos hipótesis sobre las mismas
+simulaciones: Vox ausente en las 15 provincias que publicó El Español el 18 de octubre, o sólo donde hace falta (mantiene
+lista en Murcia, Almería y Ceuta y donde el PP queda primero de todos modos en el 95 % de las simulaciones). Donde no va,
+el 80 % de su voto pasa al PP; y donde tiene al menos un tercio del voto de PP + Vox, uno de los tres nombres de la lista
+del PP es suyo, así que si esa lista gana sus tres senadores, uno es de Vox. Es lo que más mueve el Senado: con el corte
+del 12 de octubre, PP y Vox suman la mitad de los electos en el 62 % de las simulaciones si Vox va en todas, en el 87 %
+con la retirada de las 15 y en el 98 % con la amplia (el PP solo, 106, 112 y 112 senadores; Vox, 5, 15 y 27, la
+mayoría dentro de listas del PP). Apenas depende del 80 %: entre el 50 y el 100 %, el PP cambia en dos o tres senadores.
+
+**Candidaturas.** Desde el 16 de octubre el escenario por defecto son las candidaturas registradas: Frente Amplio
+(el espacio que las encuestas llaman Sumar) y Podemos por separado; Podemos dentro de las listas de ERC en Cataluña; y
+listas conjuntas de los dos en la C. Valenciana y Canarias.
+
 ---
 
 ## 3. Cómo leer los resultados
@@ -75,6 +95,21 @@ Tres avisos al leerlas:
   histórica larga.
 - **El hemiciclo y las medianas no suman lo mismo.** La mediana de cada partido se calcula por separado, así que las
   medianas no tienen por qué sumar 350.
+
+### Las herramientas que no son predicciones
+
+Tres páginas usan el modelo, pero lo que enseñan no es una frecuencia de las simulaciones:
+
+- **«¿Y si…?» (simulador).** Un solo reparto, sin incertidumbre: el voto que pide el usuario se lleva a cada provincia
+  con el mismo desplazamiento en escala logit y se reparte con D'Hondt. Responde a «si esta encuesta acierta, ¿qué
+  sale?», no a «qué es probable». Sin tocar nada puede diferir en uno o dos escaños de las medianas.
+- **Investidura.** Los escaños sí son los simulados, pero las posturas (quién vota sí, abstención o no) son supuestos
+  del usuario. Por defecto, las de 2023, salvo Junts, que rompió con el PSOE en 2025. Es útil para ver que la segunda
+  votación (más síes que noes) abre caminos que la suma de 176 no ve.
+- **Noche electoral.** Mezcla lo escrutado con la predicción según el porcentaje contado en cada provincia. No corrige
+  el orden del recuento (las mesas rurales suelen llegar antes), así que con poco escrutado la proyección se fía
+  demasiado de un recuento sesgado: con poco escrutado, mejor mirar la predicción (no está medido a partir de qué
+  porcentaje el recuento ya es fiable).
 
 ---
 
@@ -203,6 +238,22 @@ Como un **análisis de sensibilidad**, no como una afirmación:
 > «Si la participación supera el 65 % que suponen las encuestas y los votantes adicionales se reparten como entre 2015 y
 > 2023, la mayoría de PP y Vox baja del X % al Y %. Con un reparto simétrico, apenas cambia.»
 
+### Movilización por bloque y voto útil
+
+Dos palancas más del panel (`motor/palancas.py`), también supuestos y no estimaciones:
+
+- **Movilización por bloque.** El voto de un bloque sube o baja un porcentaje (hasta ±20 %) en toda España o en una
+  comunidad, con el resto igual. Sirve para preguntas que el reparto nacional no recoge, como «¿y si el independentismo
+  se queda en casa en Cataluña?».
+- **Voto útil.** Una parte de los votantes de un partido pequeño pasa al grande de su bloque (Podemos → Frente Amplio,
+  Frente Amplio → PSOE, Vox → PP, SALF → Vox). Por defecto sólo donde el pequeño no saca escaño, que es el voto útil de
+  verdad; también puede aplicarse en todas partes.
+
+Se aplican antes de simular, así que mueven Congreso, Senado y mayorías a la vez. La página Comparar enfrenta el
+escenario con y sin ellas. Una lectura útil: el voto útil donde el partido pequeño no saca escaño mueve pocos escaños
+(los votos que se trasvasan no servían, pero suelen ser pocos); aplicado en todas partes, mueve escaños de un partido a
+otro del mismo bloque sin cambiar casi el total del bloque.
+
 ---
 
 ## 6. Cómo presentarlo
@@ -235,7 +286,16 @@ Texto corto de presentación:
 - **Partidos de una sola comunidad** (ERC, Junts, PNV, EH Bildu, BNG, CC). No tienen error de campaña propio; su
   incertidumbre probablemente se queda corta.
 - **Participación.** Es un supuesto, no una estimación (ver sección 5).
-- **Frente Amplio.** El escenario supone que la lista conjunta conserva todos los votos de Sumar y Podemos.
+- **Listas conjuntas.** Compromís-Front Valencià, Unidad del Pueblo Canario y la hipótesis de lista única conservan
+  todos los votos de sus partes.
+- **Podemos en Cataluña.** Que el 60 % de sus votantes siga a ERC y el 40 % vaya a los Comuns es un supuesto: no hay
+  precedente con el que calibrarlo.
+- **Senado.** Supone voto de partido: no recoge el voto personal ni el cruzado (en 2023 hizo fallar Tenerife y La
+  Palma), ni listas del Senado distintas de las del Congreso. La coalición suma íntegros los votos de PSOE y Frente
+  Amplio. La retirada de Vox es una hipótesis aparte, no el escenario base, y su trasvase del 80 % al PP no está
+  calibrado (no hay precedente). Los 58 designados por los parlamentos autonómicos se suman fijos, tal como están hoy:
+  si algún parlamento cambia su designación (por ejemplo tras unas autonómicas), hay que actualizar
+  `datos/senado_designados.csv`.
 - **«Otros».** Ayuda a calcular el umbral, pero no puede obtener escaños: una candidatura nueva con voto concentrado
   tendría que añadirse al modelo a mano.
 - **Investidura.** Sumar 176 escaños no garantiza un Gobierno: el modelo cuenta escaños, no negociaciones.

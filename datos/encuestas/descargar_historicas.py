@@ -193,7 +193,7 @@ def _expandir_fila(
     return salida
 
 
-def extraer_tsv(html: str, anio: int, partidos: tuple[str, ...] | None = None) -> str:
+def extraer_tsv(html: str, anio: int, partidos: tuple[str, ...] | None = None, min_filas: int = 20) -> str:
     """Convierte la primera tabla nacional de la página a TSV estable."""
     p = _PrimeraTablaEncuestas()
     p.feed(html)
@@ -232,7 +232,7 @@ def extraer_tsv(html: str, anio: int, partidos: tuple[str, ...] | None = None) -
         # La última columna es sólo la ventaja del ganador; el motor no la usa.
         valores = [re.sub(r"\s+", " ", x).strip() for x in valores[:-1]]
         lineas.append(str(anio) + "\t" + "\t".join(valores))
-    if len(lineas) < 20:
+    if len(lineas) - 1 < min_filas:
         raise ValueError(f"tabla anormalmente corta: {len(lineas) - 1} filas")
     return "\n".join(lineas)
 

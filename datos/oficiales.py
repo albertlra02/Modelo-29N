@@ -16,6 +16,11 @@ Congreso: cada candidatura oficial se lleva a una columna con datos/candidaturas
 (p. ej. las confluencias de Podemos a 'Podemos'), que mantiene los nombres que usa el modelo.
 Europeas: las marcas regionales de una misma lista (Comuns Sumar, Sumar Galicia…) se suman a su
 cabecera nacional.
+
+Senado (03aaaamm_MUNI.zip): cada lista se mide por el voto de su candidato más votado en la
+circunscripción (provincia o isla), con el número de electos. Del mismo ZIP sale qué municipio
+pertenece a qué isla, y con eso el Congreso de 2023 se agrega por isla (06xxaamm.DAT, municipal):
+es lo que usa el modelo para pasar del voto provincial al de cada isla.
 """
 from __future__ import annotations
 
@@ -38,6 +43,8 @@ URL = "https://infoelectoral.interior.gob.es/estaticos/docxl/apliextr/{}_MUNI.zi
 CONGRESO = {"2015-12": "02201512", "2016-06": "02201606", "2019-04": "02201904",
             "2019-11": "02201911", "2023-07": "02202307"}
 EUROPEAS = {"2024-06": "07202406"}
+SENADO = {"2023-07": "03202307"}
+PROV_ISLAS = ("07", "35", "38")   # Illes Balears, Las Palmas, Santa Cruz de Tenerife
 # Columnas de las europeas que usa el modelo (siglas oficiales de la cabecera nacional -> nombre)
 COLUMNAS_EUROPEAS = {"PP": "PP", "PSOE": "PSOE", "VOX": "Vox", "SUMAR": "Sumar", "PODEMOS": "Podemos",
                      'AGRUPACIÓN DE ELECTORES "SE ACABÓ LA FIESTA"': "SALF"}
@@ -147,6 +154,77 @@ def escribir_europeas(eleccion: str = "2024-06") -> Path:
     return ruta
 
 
+def _lineas(z: zipfile.ZipFile, tipo: str) -> list[str]:
+    nombre = next(n for n in z.namelist() if n.upper().endswith(".DAT") and n.startswith(tipo))
+    return [x for x in z.read(nombre).decode("latin-1").splitlines() if x.strip()]
+
+
+def senado(eleccion: str) -> tuple[pd.DataFrame, dict[str, str]]:
+    """(listas por circunscripción, municipio -> isla) de una elección al Senado.
+
+    Circunscripción: la provincia, o la isla en Baleares y Canarias (código prov + distrito).
+    Cada lista: siglas, voto de su candidato más votado y senadores electos.
+    """
+    z = zipfile.ZipFile(descargar(SENADO[eleccion]))
+    siglas = {x[8:14]: x[14:64].strip() for x in _lineas(z, "03")}
+    lista_de = {}                         # código de senador -> código de candidatura
+    for x in _lineas(z, "04"):
+        if x[24] == "T":
+            lista_de[x[9:12] + x[12:15]] = x[15:21]
+    ambitos = {x[11:14]: x[14:64].strip() for x in _lineas(z, "07") if x[11:13] != "99"}
+    escanos = {x[11:14]: int(x[149:155]) for x in _lineas(z, "07") if x[11:13] != "99"}
+    votos, electos = defaultdict(list), defaultdict(int)
+    for x in _lineas(z, "08"):
+        codigo = x[14:20]
+        if x[11:13] == "99" or x[11:13] != codigo[:2] or x[13] != codigo[2]:
+            continue                      # totales de CCAA o agregados provinciales de las islas
+        clave = (codigo[:3], lista_de[codigo])
+        votos[clave].append(int(x[20:28]))
+        electos[clave] += int(x[28:33])
+    filas = []
+    for (c, cod), v in votos.items():
+        v = sorted(v, reverse=True) + [0, 0]
+        # votos: el candidato más votado de la lista; votos_2 y votos_3, el segundo y el tercero
+        filas.append({"circ": c, "provincia": INE_PROVINCIA[c[:2]], "circunscripcion": ambitos[c],
+                      "escanos": escanos[c], "siglas": siglas[cod], "votos": v[0], "votos_2": v[1],
+                      "votos_3": v[2], "electos": electos[(c, cod)]})
+    out = pd.DataFrame(filas)
+    out = out.sort_values(["circ", "votos"], ascending=[True, False])
+    # municipio (prov + código INE) -> isla, por los senadores que reciben votos en él
+    isla = {}
+    for x in _lineas(z, "06"):
+        if x[9:11] in PROV_ISLAS and x[14:16] == "99":
+            isla[x[9:14]] = ambitos[x[16:19]]
+    return out, isla
+
+
+def congreso_por_isla(eleccion: str, isla: dict[str, str]) -> pd.DataFrame:
+    """Votos al Congreso por isla (columnas del modelo), sumando los municipios (sin CERA)."""
+    z = zipfile.ZipFile(descargar(CONGRESO[eleccion]))
+    m = mapa_congreso(eleccion)
+    votos = defaultdict(lambda: defaultdict(int))
+    for x in _lineas(z, "06"):
+        mun = x[9:14]
+        if x[14:16] == "99" and mun in isla:
+            votos[isla[mun]][m.at[x[16:22], "columna"]] += int(x[22:30])
+    df =pd.DataFrame(votos).T.fillna(0).astype(int)
+    df.index.name = "isla"
+    return df[sorted(df.columns, key=str.lower)]
+
+
+def escribir_senado(eleccion: str = "2023-07") -> list[Path]:
+    """datos/raw/senado_AAAA-MM.csv y datos/raw/congreso_AAAA-MM_islas.csv."""
+    listas, isla = senado(eleccion)
+    r1 = RAW / f"senado_{eleccion}.csv"
+    listas.to_csv(r1, index=False, encoding="utf-8")
+    islas = congreso_por_isla(eleccion, isla)
+    prov = {i: INE_PROVINCIA[m[:2]] for m, i in isla.items()}
+    islas.insert(0, "provincia", [prov[i] for i in islas.index])
+    r2 = RAW / f"congreso_{eleccion}_islas.csv"
+    islas.sort_values(["provincia"]).to_csv(r2, encoding="utf-8")
+    return [r1, r2]
+
+
 def comparar(eleccion: str) -> pd.DataFrame:
     """Casillas (provincia, columna) en que el CSV actual difiere del oficial."""
     sys.path.insert(0, str(DATOS.parent))
@@ -177,6 +255,9 @@ def main() -> int:
         print("escrito", escribir_congreso(e).relative_to(DATOS.parent))
     for e in EUROPEAS:
         print("escrito", escribir_europeas(e).relative_to(DATOS.parent))
+    for e in SENADO:
+        for ruta in escribir_senado(e):
+            print("escrito", ruta.relative_to(DATOS.parent))
     return 0
 
 

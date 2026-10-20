@@ -29,14 +29,24 @@
         </g>
       </svg>
       <span class="marca__nombre">29-N</span>
-      <span class="marca__sub">Modelo del Congreso</span>
+      <span class="marca__sub">Congreso y Senado</span>
     </a>
     <nav class="nav" aria-label="Secciones">
-      {% for href, texto in NAV %}
-      <a href="{{ href }}{{ q }}"{% if ruta == href %} aria-current="page"{% endif %}>{{ texto }}</a>
+      {% for nombre_seccion, pags in SECCIONES %}
+      {% set dentro = pags|selectattr(0, "equalto", ruta)|list %}
+      <a href="{{ pags[0][0] }}{{ q }}"{% if dentro %} aria-current="{{ 'page' if pags|length == 1 else 'true' }}"{% endif %}>{{ nombre_seccion }}</a>
       {% endfor %}
     </nav>
   </div>
+  {% if PESTANAS %}
+  <nav class="pestanas" aria-label="Páginas de la sección">
+    <div class="envoltura pestanas__fila">
+      {% for href, texto in PESTANAS %}
+      <a href="{{ href }}{{ q }}"{% if ruta == href %} aria-current="page"{% endif %}>{{ texto }}</a>
+      {% endfor %}
+    </div>
+  </nav>
+  {% endif %}
 </header>
 
 {% block barra_escenario %}
@@ -46,6 +56,7 @@
       <span class="escenario__etiqueta">{% if p.es_base %}Escenario base{% else %}Escenario propio{% endif %}</span>
       {% for t in p.descripcion() %}<span class="chip">{{ t }}</span>{% endfor %}
       {% if not p.es_base %}<a class="escenario__volver" href="{{ ruta }}">Volver al base</a>{% endif %}
+      {% if ruta != "/comparar" %}<a class="escenario__volver" href="/comparar{{ q }}">Comparar con otro</a>{% endif %}
     </div>
     <button type="button" class="boton boton--secundario" data-abrir-escenario>
       <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M3 5h9M16 5h1M3 10h3M10 10h7M3 15h7M14 15h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="14" cy="5" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="10" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="15" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
@@ -68,7 +79,7 @@
 <footer class="pie">
   <div class="envoltura pie__fila">
     <div>
-      <p class="pie__marca">29-N · Modelo del Congreso</p>
+      <p class="pie__marca">29-N · Congreso y Senado</p>
       <p>Modelo propio, de uso personal, con encuestas publicadas, resultados oficiales de 2015 a 2023 y encuestas
         autonómicas. Las frecuencias son condicionales a sus supuestos: no son pronósticos garantizados.</p>
     </div>
@@ -106,7 +117,7 @@
           <label><input type="radio" name="cand" value="{{ k }}"{% if p.candidaturas == k %} checked{% endif %}><span>{{ t }}</span></label>
           {% endfor %}
         </div>
-        <p class="ayuda">Las listas se cierran el 26 de octubre.</p>
+        <p class="ayuda">{% for k, t in DETALLE_CAND.items() %}<b>{{ NOMBRES_CAND[k] }}:</b> {{ t }} {% endfor %}</p>
       </fieldset>
 
       <div class="campo">
@@ -127,6 +138,46 @@
         <p class="ayuda" id="f-reparto-detalle">De cada 100 votos extra: {{ DETALLE_REPARTO[p.reparto] }}.
           No influye con una participación del {{ PART_BASE }} %.</p>
       </div>
+
+      <details class="campo campo--avanzado"{% if p.mov_izda or p.mov_dcha or p.mov_nac %} open{% endif %}>
+        <summary>Movilización por bloque</summary>
+        <p class="ayuda">Cuánto sube o baja el voto de cada bloque respecto a las encuestas, con el resto igual:
+          participación diferencial.</p>
+        {% for k, t in NOMBRES_MOV.items() %}
+        <div class="campo">
+          <label for="f-{{ k }}">{{ t }} <output id="f-{{ k }}-texto">{{ '%+d'|format(p[k]) }} %</output></label>
+          <input type="range" id="f-{{ k }}" name="{{ k }}" min="-{{ LIMITE_MOV }}" max="{{ LIMITE_MOV }}" step="1"
+                 value="{{ p[k] }}" data-salida="f-{{ k }}-texto" data-signo>
+          <p class="ayuda">{{ DETALLE_MOV[k] }}.</p>
+        </div>
+        {% endfor %}
+        <div class="campo">
+          <label for="f-ambito">Dónde</label>
+          <select id="f-ambito" name="ambito">
+            {% for a in AMBITOS %}<option value="{{ a }}"{% if p.mov_ambito == a %} selected{% endif %}>{{ 'Toda España' if a == 'España' else a }}</option>{% endfor %}
+          </select>
+        </div>
+      </details>
+
+      <details class="campo campo--avanzado"{% if p.util_pod_fa or p.util_fa_psoe or p.util_vox_pp or p.util_salf_vox %} open{% endif %}>
+        <summary>Voto útil</summary>
+        <p class="ayuda">Porcentaje de los votantes del primer partido que acaban votando al segundo.</p>
+        {% for k, t in NOMBRES_UTIL.items() %}
+        <div class="campo">
+          <label for="f-{{ k }}">{{ t }} <output id="f-{{ k }}-texto">{{ p[k] }} %</output></label>
+          <input type="range" id="f-{{ k }}" name="{{ k }}" min="0" max="{{ LIMITE_UTIL }}" step="5"
+                 value="{{ p[k] }}" data-salida="f-{{ k }}-texto">
+        </div>
+        {% endfor %}
+        <div class="campo">
+          <label for="f-util-donde">Dónde</label>
+          <select id="f-util-donde" name="util_donde">
+            {% for k, t in NOMBRES_DONDE.items() %}<option value="{{ k }}"{% if p.util_donde == k %} selected{% endif %}>{{ t }}</option>{% endfor %}
+          </select>
+          <p class="ayuda">«Donde no saca escaño» se decide con el voto central de cada provincia: es el voto útil clásico,
+            el de quien cambia de papeleta porque la suya no llega.</p>
+        </div>
+      </details>
 
       <details class="campo campo--avanzado">
         <summary>Simulación</summary>

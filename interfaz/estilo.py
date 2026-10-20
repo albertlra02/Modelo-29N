@@ -13,6 +13,9 @@ extremo claro (mezcla con el fondo, validado a >= 2:1 sobre FONDO) al color del
 partido y a dos pasos oscuros; ERC, BNG o CC no tienen rampa válida y no se ofrecen.
 Frente Amplio pasó de #b9468a a #874aa6: el rosa quedaba a ΔE 12 del PSOE (mínimo 15)
 incluso con visión normal; el morado pasa con PP, PSOE y Vox en todos los pares.
+Senado de Progreso (PSOE + Frente Amplio) es un rojo más oscuro que el PSOE: en el mapa del Senado
+nunca coinciden en la misma provincia (la coalición no va en Cataluña ni en Canarias) y la
+leyenda y el texto emergente siempre dicen el nombre.
 """
 
 TINTA = "#15202B"
@@ -37,7 +40,12 @@ PARTIDOS = {
     "BNG": ("BNG", "#7fb4d6", 5),
     "ADELANTE": ("Adelante Andalucía", "#1f8a5a", 6),
     "PSOE": ("PSOE", "#b81d33", 7),
+    "PROGRESO": ("Senado de Progreso", "#7e1426", 7.5),   # PSOE + Frente Amplio (sólo Senado)
+    "NC": ("Nueva Canarias", "#c75b2a", 8.5),
+    "ASG": ("ASG", "#4f8f3a", 9.2),
+    "AHI": ("AHI", "#2f7f8a", 9.4),
     "PNV": ("PNV", "#2f6b3b", 8),
+    "GBAI": ("Geroa Bai", "#c4402f", 6.5),
     "CC": ("Coalición Canaria", "#e7c94a", 9),
     "JUNTS": ("Junts", "#22a39a", 10),
     "TERUEL": ("Teruel Existe", "#8d6e4f", 11),

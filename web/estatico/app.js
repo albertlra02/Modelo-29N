@@ -4,6 +4,7 @@
 
 (() => {
   const CONFIG = { displayModeBar: false, responsive: true, locale: "es" };
+  const ASPECTO_MAPA = 1.5;      // ancho / alto del encuadre de España en interfaz/graficos.py (Mercator)
 
   Plotly.register({
     moduleType: "locale", name: "es", dictionary: {},
@@ -20,6 +21,10 @@
   /** Pinta una figura (objeto o JSON de Plotly) en un elemento. */
   function pintar(div, fig) {
     const f = typeof fig === "string" ? JSON.parse(fig) : fig;
+    // Mapas: la proyección conserva la forma, así que en pantallas estrechas sobra alto; se ajusta al ancho
+    if (f.layout && f.layout.geo && f.layout.height && div.clientWidth) {
+      f.layout.height = Math.min(f.layout.height, Math.round(div.clientWidth / ASPECTO_MAPA) + 8);
+    }
     div.style.minHeight = (f.layout && f.layout.height ? f.layout.height : 300) + "px";
     return Plotly.newPlot(div, { data: f.data, layout: f.layout, frames: f.frames || [], config: CONFIG });
   }
@@ -55,7 +60,7 @@
 
   document.querySelectorAll("[data-fig]").forEach((div) => {
     const datos = document.getElementById(div.dataset.fig);
-    if (datos) pintar(div, datos.textContent);
+    if (datos) div.pintado = pintar(div, datos.textContent);
   });
 
   // ------------------------------------------------------------ panel de escenario
@@ -90,6 +95,15 @@
       actualizarReparto();
     });
     reparto.addEventListener("change", actualizarReparto);
+
+    // deslizadores de las palancas: cifra al lado, con signo en la movilización
+    form.querySelectorAll("input[type=range][data-salida]").forEach((r) => {
+      const salida = document.getElementById(r.dataset.salida);
+      r.addEventListener("input", () => {
+        const v = Number(r.value);
+        salida.textContent = `${"signo" in r.dataset && v > 0 ? "+" : ""}${v} %`;
+      });
+    });
 
     // URL limpia: sólo lo que difiere del escenario por defecto
     form.addEventListener("submit", (e) => {
@@ -180,21 +194,95 @@
     });
   }
 
-  // ------------------------------------------------------------ provincias: modos del mapa
+  // ------------------------------------------------------------ provincias y Senado: modos del mapa
 
   const mapa = document.querySelector("[data-mapa]");
   if (mapa) {
     const div = mapa.querySelector("#f-mapa");
+    const api = mapa.dataset.api || "/api/mapa";
     const modos = [...mapa.querySelectorAll("[data-modo]")];
     const filaPartidos = mapa.querySelector("[data-partidos-mapa]");
-    const partidos = [...filaPartidos.querySelectorAll("[data-partido]")];
+    const partidos = filaPartidos ? [...filaPartidos.querySelectorAll("[data-partido]")] : [];
     const leyenda = mapa.querySelector("[data-leyenda-mapa]");
     const nota = mapa.querySelector("[data-nota-mapa]");
     let modo = "ganador";
     let partido = partidos.length ? partidos[0].dataset.partido : "";
 
+    // ---- detalle de una provincia (sólo en /provincias): clic en el mapa o en la tabla
+    const hueco = mapa.querySelector("[data-detalle-provincia]");
+    const apiDetalle = mapa.dataset.detalleApi;
+    let elegida = null;
+
+    /** Remarca la provincia elegida con un trazo oscuro (una capa más, encima del resto). */
+    function resaltar() {
+      const i = div.data.findIndex((t) => t.meta === "realce");
+      if (i >= 0) Plotly.deleteTraces(div, i);
+      if (!elegida) return;
+      const origen = div.data.find((t) => t.type === "choropleth" && t.locations.includes(elegida));
+      if (!origen) return;
+      const texto = origen.customdata[origen.locations.indexOf(elegida)];
+      Plotly.addTraces(div, {
+        type: "choropleth", meta: "realce", geojson: origen.geojson, featureidkey: "id", locations: [elegida],
+        z: [0], colorscale: [[0, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,0)"]], showscale: false,
+        marker: { line: { color: "#15202B", width: 2.5 } },
+        customdata: [texto], hovertemplate: "%{customdata}<extra></extra>",
+      });
+    }
+
+    async function abrir(prov, desdeTabla) {
+      elegida = prov;
+      history.replaceState(null, "", "#" + encodeURIComponent(prov));   // enlace directo a la provincia
+      resaltar();
+      hueco.hidden = false;
+      hueco.classList.add("cargando");
+      try {
+        const r = await fetch(apiDetalle + "?" + conEscenario({ nombre: prov }));
+        if (!r.ok) throw new Error(r.statusText);
+        const j = await r.json();
+        if (elegida !== prov) return;          // ya se ha pulsado otra
+        hueco.innerHTML = j.html;
+      } catch {
+        hueco.textContent = "No se ha podido cargar el detalle de la provincia.";
+      } finally {
+        hueco.classList.remove("cargando");
+      }
+      hueco.scrollIntoView({ block: desdeTabla ? "start" : "nearest" });
+    }
+
+    function cerrar() {
+      elegida = null;
+      history.replaceState(null, "", location.pathname + location.search);
+      hueco.hidden = true;
+      hueco.replaceChildren();
+      resaltar();
+    }
+
+    /** newPlot quita los manejadores de eventos: hay que engancharlos tras cada pintado. */
+    function enganchar() {
+      if (!apiDetalle) return;
+      div.on("plotly_click", (ev) => {
+        const pt = ev.points && ev.points[0];
+        const prov = pt && (pt.location || pt.text);
+        if (prov && prov !== "Canarias") abrir(prov, false);
+      });
+      resaltar();
+    }
+
+    if (apiDetalle) {
+      Promise.resolve(div.pintado).then(() => {
+        enganchar();
+        const ancla = decodeURIComponent(location.hash.slice(1));
+        if (ancla && document.querySelector(`[data-provincia="${CSS.escape(ancla)}"]`)) abrir(ancla, true);
+      });
+      hueco.addEventListener("click", (e) => { if (e.target.closest("[data-cerrar-provincia]")) cerrar(); });
+      document.querySelectorAll("[data-provincia]").forEach((b) => b.addEventListener("click", () => {
+        abrir(b.dataset.provincia, true);
+      }));
+    }
+
     async function actualizar() {
-      const j = await cargar(div, "/api/mapa?" + conEscenario({ modo, partido }));
+      const j = await cargar(div, api + "?" + conEscenario({ modo, partido }));
+      enganchar();
       leyenda.replaceChildren(...j.leyenda.map((l) => {
         const d = document.createElement("div");
         const i = document.createElement("i");
@@ -209,7 +297,7 @@
     modos.forEach((b) => b.addEventListener("click", () => {
       modo = b.dataset.modo;
       pulsado(modos, b);
-      filaPartidos.hidden = modo !== "partido";
+      if (filaPartidos) filaPartidos.hidden = modo !== "partido";
       actualizar();
     }));
     partidos.forEach((b) => b.addEventListener("click", () => {

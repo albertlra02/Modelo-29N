@@ -5,3 +5,10 @@ env/
 .pytest_cache/
 resultados/**/*.gz
 resultados/cache/
+
+# Escrutinio de la noche electoral (datos de una noche, o el simulacro de prueba)
+datos/escrutinio/
+
+# PDF generados por docs/pdf/construir.py (se reconstruyen)
+docs/pdf/*.pdf
+docs/pdf/*.html

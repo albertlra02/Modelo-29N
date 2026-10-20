@@ -26,15 +26,42 @@
   </div>
 </section>
 
+<section class="seccion" data-investidura>
+  <div class="seccion__cabecera"><h2>Investidura</h2></div>
+  <p class="seccion__intro">En la primera votación hacen falta 176 síes; en la segunda basta con más síes que noes, así
+    que las abstenciones ayudan. Elige qué vota cada partido.</p>
+  <div class="investidura__resultados" data-inv-resultados></div>
+  <div class="tarjeta tarjeta--tabla">
+    <div class="investidura__barra">
+      <label class="interruptor"><input type="checkbox" data-inv-veto checked> <span>Quien rechaza a Vox vota no a
+        un candidato que cuente con el sí de Vox</span></label>
+      <button type="button" class="boton boton--secundario" data-inv-restablecer>Posturas por defecto</button>
+    </div>
+    <div class="tabla-scroll">
+      <table class="tabla tabla--densa investidura__tabla">
+        <thead>
+          <tr>
+            <th scope="col">Partido</th>
+            <th scope="col" class="num">Escaños (mediana)</th>
+            <th scope="col">Si el candidato es Feijóo (PP)</th>
+            <th scope="col">Si es Sánchez (PSOE)</th>
+          </tr>
+        </thead>
+        <tbody data-inv-filas></tbody>
+      </table>
+    </div>
+  </div>
+  <p class="nota">Por defecto, lo que votó cada partido en 2023, salvo Junts, que ya no apoya a Sánchez. Las posturas son
+    supuestos; lo simulado son los escaños.</p>
+</section>
+
 <section class="seccion">
   <div class="seccion__cabecera"><h2>Escenarios</h2></div>
   <div class="tarjeta">
     {{ grafico("f-escenarios", fig_escenarios, "Probabilidad de cada escenario") }}
   </div>
-  <p class="nota">Las frecuencias son condicionales a los supuestos del modelo; no son una probabilidad electoral calibrada
-    con una serie histórica larga. El bloque de 2023 suma PSOE, Sumar, Podemos (o Frente Amplio), ERC, Junts, EH Bildu, PNV,
-    BNG, Coalición Canaria y Adelante. Que llegue a 176 no garantiza la investidura: harían falta todos los votos, Junts
-    incluido.</p>
+  <p class="nota">Frecuencias dentro de los supuestos del modelo, no probabilidades calibradas. El bloque de 2023 es el
+    que invistió a Sánchez, con el Frente Amplio y Podemos.</p>
 </section>
 <script type="application/json" id="datos-calculadora">{{ datos|safe }}</script>
 {% endblock %}

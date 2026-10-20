@@ -9,6 +9,7 @@ milisegundos; `python -m scripts.precalcular` calcula de antemano la rejilla hab
 from __future__ import annotations
 
 import gzip
+from dataclasses import replace
 import hashlib
 import pickle
 import shutil
@@ -22,7 +23,8 @@ import pandas as pd
 from datos.cargar import escanos_2026
 from datos.familias import PROV_CCAA
 from interfaz.estilo import nombre
-from motor.pipeline import DERECHA, PART_BASE, Escenario, ejecutar, piezas_centrales
+from motor import senado
+from motor.pipeline import CANDIDATURAS, DERECHA, PART_BASE, Escenario, ejecutar, piezas_centrales
 from motor.proyeccion import FECHA
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -60,7 +62,7 @@ def fechas_semanales() -> list[str]:
 def normalizar(esc: Escenario) -> Escenario:
     """Con la participación base el reparto de votantes extra no influye: misma clave para todos."""
     if abs(esc.participacion - PART_BASE) < 1e-9 and esc.reparto != "historico":
-        return Escenario(esc.fecha, esc.candidaturas, esc.participacion, "historico", esc.n_sim, esc.semilla)
+        return replace(esc, reparto="historico")
     return esc
 
 
@@ -77,12 +79,55 @@ def _provincias(r) -> pd.DataFrame:
         bloque = df[derecha].sum(axis=1)
         b_moda = bloque.mode().iloc[0]
         fila = {"Provincia": prov, "CCAA": PROV_CCAA[prov], "Escaños": int(esc[prov])}
-        moda = moda[moda > 0].sort_values(ascending=False, kind="stable")
-        fila["Reparto"] = ", ".join(f"{nombre(p)} {int(v)}" for p, v in moda.items())
+        fila["Reparto"] = _reparto_texto(moda)
         fila["Reparto más probable"] = round(100 * cnt.max() / len(arr))
         fila["Cambia el bloque"] = round(100 * float((bloque != b_moda).mean()))
         filas.append(fila)
     return pd.DataFrame(filas).sort_values("Escaños", ascending=False)
+
+
+def _detalle_provincias(r, n_repartos: int = 4) -> dict:
+    """Para el panel de cada provincia: los repartos más frecuentes (texto, % de simulaciones) y la
+    distribución de escaños de cada candidatura que saca alguno en al menos el 0,5 % ({escaños: %})."""
+    out = {}
+    for prov, df in r.provincias.items():
+        vec, cnt = np.unique(df.to_numpy(), axis=0, return_counts=True)
+        top = np.argsort(-cnt, kind="stable")[:n_repartos]
+        repartos = [(_reparto_texto(pd.Series(vec[i], index=df.columns)), round(100 * cnt[i] / len(df), 1))
+                    for i in top]
+        dist = {}
+        for p in df.columns:
+            frec = df[p].value_counts(normalize=True).sort_index()
+            if frec[frec.index > 0].sum() >= 0.005:
+                dist[p] = {int(k): round(100 * float(v), 1) for k, v in frec.items()}
+        out[prov] = {"repartos": repartos, "dist": dist}
+    return out
+
+
+def _reparto_texto(moda: pd.Series) -> str:
+    moda = moda[moda > 0].sort_values(ascending=False, kind="stable")
+    return ", ".join(f"{nombre(p)} {int(v)}" for p, v in moda.items())
+
+
+def _senado(s: dict) -> dict:
+    """Resumen del Senado: senadores por simulación (con y sin la coalición) y cada circunscripción."""
+    circ = senado.circunscripciones()
+    filas = []
+    for c, df in s["circunscripciones"].items():
+        arr = df.to_numpy()
+        vec, cnt = np.unique(arr, axis=0, return_counts=True)
+        moda = pd.Series(vec[cnt.argmax()], index=df.columns)
+        primera = df.idxmax(axis=1).value_counts(normalize=True)
+        filas.append({"Circunscripción": c, "Provincia": circ.at[c, "provincia"],
+                      "CCAA": PROV_CCAA[circ.at[c, "provincia"]], "Senadores": int(circ.at[c, "escanos"]),
+                      "Isla": bool(circ.at[c, "isla"]), "Coalición": bool(circ.at[c, "pacto"]),
+                      "Reparto": _reparto_texto(moda), "Reparto más probable": round(100 * cnt.max() / len(arr)),
+                      "Ganadora": moda.idxmax(), "P(ganadora)": round(100 * float(primera.get(moda.idxmax(), 0))),
+                      "moda": moda[moda > 0].astype(int).to_dict()})
+    return {"sim": s["sim"].astype("int16"), "sin_coalicion": s["sin_coalicion"].astype("int16"),
+            "probs": s["probs"], "circunscripciones": pd.DataFrame(filas), "voto": s["voto"].round(1),
+            # sólo en las hipótesis de retirada de Vox: dónde no va y dónde va dentro de la lista del PP
+            **{k: s[k] for k in ("sin_vox", "vox_en_pp", "vox_en_pp_sim") if k in s}}
 
 
 def voto_simulado(r) -> pd.DataFrame:
@@ -101,9 +146,13 @@ def resumir(r) -> dict:
         "voto": voto_simulado(r),
         "ppvox": r.suma(["PP", "VOX"]),
         "provincias": _provincias(r),
+        "detalle_prov": _detalle_provincias(r),
         "voto_prov": (100 * r.central["s0"]).round(1),
+        "s0": r.central["s0"].astype("float32"),        # sin redondear, para el simulador
         "diag": r.central["diag"],
         "dias": r.escenario.dias,
+        "senado": _senado(r.senado),
+        "senado_vox": {h: _senado(v) for h, v in r.senado["hipotesis_vox"].items()},
     }
 
 
@@ -112,6 +161,8 @@ def resumir(r) -> dict:
 def _ruta(esc: Escenario, version: str) -> Path:
     clave = (f"{esc.fecha}_{esc.candidaturas}_{round(1000 * esc.participacion)}_{esc.reparto}"
              f"_{esc.n_sim}_{esc.semilla}")
+    if esc.palancas.activas:
+        clave += "_" + hashlib.sha1(repr(esc.palancas).encode()).hexdigest()[:10]
     return CACHE / version / f"{clave}.pkl.gz"
 
 
@@ -157,11 +208,11 @@ def rejilla() -> list[Escenario]:
     piezas centrales (que dependen de fecha, participación y reparto, no de las candidaturas)."""
     out = []
     for f in fechas_semanales():
-        for cand in ("separados", "frente_amplio"):
+        for cand in CANDIDATURAS:
             out.append(Escenario(f, cand, PART_BASE, "historico", N_SIM, SEMILLA))
     for reparto in ("historico", "simetrico", "muy_asimetrico"):
         for part in sorted({p / 100 for p in PARTICIPACIONES} | set(BARRIDO)):
-            for cand in ("separados", "frente_amplio"):
+            for cand in CANDIDATURAS:
                 if round(100 * part) in PARTICIPACIONES:
                     out.append(Escenario(FECHA, cand, part, reparto, N_SIM, SEMILLA))
                 if part in BARRIDO:

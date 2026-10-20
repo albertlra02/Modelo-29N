@@ -10,6 +10,9 @@ Semillas de reparto provincial para candidaturas sin base comparable en 2023:
     peso relativo de Sumar y Podemos en las europeas de 2024
   - SALF: patrón provincial de las europeas de 2024
   - ADELANTE: patrón provincial del ElectoPanel 12/10/2026 (en 2023 solo fue en Cádiz)
+
+Nueva Canarias va como candidatura local (congelada en su base de 2023): en 2026 se integra en
+la lista conjunta de Canarias con el Frente Amplio y Podemos (ver motor/pipeline.py).
 """
 from __future__ import annotations
 
@@ -23,7 +26,7 @@ from datos.familias import a_familias
 from motor.agregador import agregar, preparar
 from motor.swing import proyectar
 
-FECHA = "2026-10-12"   # corte de encuestas por defecto; la app lo usa también como última fecha elegible
+FECHA = "2026-10-20"   # corte de encuestas por defecto; la app lo usa también como última fecha elegible
 PARTIDOS = ["PP", "PSOE", "VOX", "SUMAR", "PODEMOS", "SALF", "ERC", "JUNTS",
             "BILDU", "PNV", "BNG", "CC", "UPN", "ADELANTE"]
 BLANCO_PCT = 0.8   # voto en blanco 2023 ≈ 0,8 %
@@ -62,10 +65,9 @@ def base_2026() -> tuple[pd.DataFrame, pd.Series]:
     base = pd.DataFrame(index=s.index)
     for col in ["PP", "PSOE", "VOX", "ERC", "JUNTS", "PNV", "BNG", "BLANCO"]:
         base[col] = s[col]
-    # CC: las encuestas de 2026 dan a CC sola; NC (que en la familia CC va dentro) pasa a OTROS
+    # CC: las encuestas de 2026 dan a CC sola; NC (que en la familia CC va dentro) va aparte, como local
     validos = f.sum(axis=1)
     base["CC"] = b.votos["CC"] / validos
-    nc = b.votos["NC"] / validos
     base["BILDU"] = s["BILDU"]
     base["UPN"] = s["NAV_DCHA"]
     frac_podemos = eu.Podemos / (eu.Podemos + eu.Sumar)
@@ -76,11 +78,13 @@ def base_2026() -> tuple[pd.DataFrame, pd.Series]:
     ade = (ep.votos.get("AA", 0) + ep.votos.get("Adelante And.", 0)) / ep.validos
     base["ADELANTE"] = ade.reindex(s.index).fillna(0)
     # Candidaturas locales que pueden pelear un escaño: se mantienen con su base de 2023
-    locales = {"TERUEL": "Teruel Existe", "UPL": "UPL", "SORIA_YA": "Soria ¡Ya!"}
+    locales = {"TERUEL": "Teruel Existe", "UPL": "UPL", "SORIA_YA": "Soria ¡Ya!", "NC": "NC"}
     for k, col in locales.items():
         base[k] = b.votos[col] / validos
     # OTROS de la familia ya incluye UPL y Soria ¡Ya!; Teruel Existe tiene familia propia (s["TERUEL"])
-    base["OTROS"] = s[["OTROS", "CS", "CUP", "PRC", "TERUEL"]].sum(axis=1) + nc - base[list(locales)].sum(axis=1)
+    # y NC va dentro de la familia CC, así que se resta de OTROS sólo lo que viene de OTROS
+    de_otros = base[["UPL", "SORIA_YA"]].sum(axis=1)
+    base["OTROS"] = s[["OTROS", "CS", "CUP", "PRC"]].sum(axis=1) - de_otros
     base = base.div(base.sum(axis=1), axis=0)
 
     presencia = base > 0
@@ -88,7 +92,7 @@ def base_2026() -> tuple[pd.DataFrame, pd.Series]:
     return base, presencia
 
 
-LOCALES = ["TERUEL", "UPL", "SORIA_YA"]
+LOCALES = ["TERUEL", "UPL", "SORIA_YA", "NC"]
 
 
 def objetivo_nacional(est: pd.DataFrame, base: pd.DataFrame, pesos: pd.Series) -> pd.Series:

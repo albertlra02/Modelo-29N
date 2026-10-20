@@ -30,6 +30,10 @@ MESES = {m: i for i, m in enumerate(
 PARTIDOS = {
     "PP": "PP", "PSOE": "PSOE", "PSC": "PSOE", "PSE–EE (PSOE)": "PSOE", "PSdeG–PSOE": "PSOE",
     "Vox": "VOX", "Sumar": "SUMAR", "Podemos": "PODEMOS", "Podem": "PODEMOS",
+    # Desde octubre de 2026 Wikipedia separa Frente Amplio (FA) y Compromís-Front Valencià (FV); antes Compromís iba
+    # dentro de Sumar. Ambos son el espacio que el modelo llama SUMAR (y que pasa a FRENTE_AMPLIO con las candidaturas
+    # registradas, con la lista valenciana incluida).
+    "FA": "SUMAR", "FV": "SUMAR",
     "Unidas Podemos": "PODEMOS", "Unidos Podemos": "PODEMOS",
     "IU–UPeC": "IU", "IU-UPeC": "IU", "IU–LV": "IU", "IU-LV": "IU",
     "Más País": "MAS_PAIS", "Compromís": "COMPROMIS",
@@ -45,6 +49,7 @@ FICHEROS_NAC = [
     ("wiki_2015.json", "2015"),
     ("wiki_2016.json", "2016"),
     ("wiki_2019a.json", "2019A"),
+    ("wiki_2026_ciclo_2026_listas.json", "2026"),     # desde el registro de candidaturas (FA y FV aparte)
     ("wiki_2026_ciclo_2026.json", "2026"),
     ("wiki_2026_ciclo_2025.json", "2026"),
     ("wiki_2023_final.json", "2023"),
@@ -127,6 +132,8 @@ def _filas(texto: str, ciclo: str, ambito: str, cabecera: list[str], lineas: lis
 def nacionales() -> pd.DataFrame:
     filas = []
     for fichero, ciclo in FICHEROS_NAC:
+        if not (RAW / fichero).exists():          # la tabla posterior al registro sólo existe desde octubre de 2026
+            continue
         texto = json.load(open(RAW / fichero, encoding="utf-8"))
         lineas = texto.split("\n")
         cab = lineas[0].split("\t")[1:]

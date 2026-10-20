@@ -142,12 +142,14 @@ def simular(
     semilla: int = 2026,
     detalle: bool = False,
     por_provincia: bool = False,
+    cuotas: bool = False,
 ):
     """
     Devuelve un DataFrame (n_sim x partido) con los escaños nacionales de cada simulación.
     detalle=True devuelve además (sim, info): voto nacional simulado por partido, peso
     logit/uniforme de Vox y factor de bloque. por_provincia=True añade los escaños
-    por provincia (dict provincia -> array n_sim x listas).
+    por provincia (dict provincia -> array n_sim x listas). cuotas=True añade al final el
+    tensor de voto simulado (n_sim x provincia x partido, en el orden de s0): lo usa el Senado.
     """
     rng = np.random.default_rng(semilla)
     provs = list(s0.index)
@@ -249,6 +251,8 @@ def simular(
     info = pd.DataFrame(voto_nac, columns=partidos)
     info["peso_logit_vox"] = lam[:, 0]
     info["factor_bloque"] = z_blq[:, 0]
+    if cuotas:
+        return sim, info, prov_esc, S
     return sim, info, prov_esc
 
 

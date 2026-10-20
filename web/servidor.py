@@ -12,6 +12,7 @@ Los escenarios que no están en la caché se calculan de uno en uno desde la pro
 from __future__ import annotations
 
 import contextlib
+import dataclasses
 import json
 import os
 import re
@@ -23,11 +24,14 @@ os.chdir(RAIZ)                      # los módulos del modelo usan rutas relativ
 if str(RAIZ) not in sys.path:
     sys.path.insert(0, str(RAIZ))
 
+import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 import plotly  # noqa: E402
 from jinja2 import Environment, FileSystemLoader, select_autoescape  # noqa: E402
 from starlette.applications import Starlette  # noqa: E402
 from starlette.exceptions import HTTPException  # noqa: E402
+from starlette.middleware import Middleware  # noqa: E402
+from starlette.middleware.gzip import GZipMiddleware  # noqa: E402
 from starlette.responses import FileResponse, HTMLResponse, JSONResponse, Response  # noqa: E402
 from starlette.routing import Mount, Route  # noqa: E402
 from starlette.staticfiles import StaticFiles  # noqa: E402
@@ -35,15 +39,32 @@ from starlette.staticfiles import StaticFiles  # noqa: E402
 from interfaz import graficos as G  # noqa: E402
 from interfaz.estilo import (BRONCE, FONDO, FUENTE, FUENTE_CIFRAS, GRIS_DATO, PANEL, RAMPA_CLARO, REGLA, TINTA, TINTA_2,  # noqa: E402
                              TINTA_3, color, nombre, num, orden, pct)
+from datos import escrutinio as E  # noqa: E402
+from datos.cargar import escanos_2026  # noqa: E402
+from motor import senado  # noqa: E402
+from motor import noche as N  # noqa: E402
+from motor import simulador as M  # noqa: E402
 from web import datos as D  # noqa: E402
+from web import acceso  # noqa: E402
+from web.acceso import Acceso  # noqa: E402
+from web.rapido import PaginasEnMemoria, precalentar  # noqa: E402
 
 AQUI = Path(__file__).resolve().parent
 ESTATICO = AQUI / "estatico"
 PLOTLY_JS = Path(plotly.__file__).parent / "package_data" / "plotly.min.js"
 
-NAV = [("/", "Resumen"), ("/escanos", "Escaños"), ("/mayorias", "Mayorías"), ("/provincias", "Provincias"),
-       ("/encuestas", "Encuestas"), ("/evolucion", "Evolución"), ("/participacion", "Participación"),
-       ("/metodologia", "Metodología")]
+# Menú: seis secciones; las que tienen varias páginas muestran sus pestañas bajo la cabecera
+SECCIONES = [
+    ("Resumen", [("/", "Resumen")]),
+    ("Congreso", [("/escanos", "Escaños y voto"), ("/mayorias", "Mayorías"), ("/provincias", "Provincias")]),
+    ("Senado", [("/senado", "Senado")]),
+    ("Escenarios", [("/participacion", "Participación"), ("/simulador", "¿Y si…?"), ("/comparar", "Comparar")]),
+    ("Encuestas", [("/encuestas", "Encuestas"), ("/evolucion", "Evolución")]),
+    ("Cómo funciona", [("/metodologia", "Cómo funciona")]),
+]
+NAV = [pag for _, pags in SECCIONES for pag in pags]          # todas las páginas del menú, en orden
+# Fuera del menú: /noche, que entra sólo cuando hay un escrutinio cargado
+OTRAS = ["/noche"]
 DESDE = {"2025-01-01": "Enero de 2025", "2025-07-01": "Julio de 2025", "2026-01-01": "Enero de 2026",
          "2026-06-01": "Junio de 2026"}
 TOKENS = {"tinta": TINTA, "tinta2": TINTA_2, "tinta3": TINTA_3, "regla": REGLA, "panel": PANEL,
@@ -54,10 +75,14 @@ entorno = Environment(loader=FileSystemLoader(AQUI / "plantillas"), autoescape=s
                       trim_blocks=True, lstrip_blocks=True)
 entorno.filters.update(pct=pct, num=num, miles=D.miles, nombre=nombre, color=color,
                        fecha_larga=D.fecha_larga, fecha_corta=D.fecha_corta)
-entorno.globals.update(NAV=NAV, FECHAS=D.FECHAS, NOMBRES_CAND=D.NOMBRES_CAND, NOMBRES_REPARTO=D.NOMBRES_REPARTO,
+entorno.globals.update(NAV=NAV, FECHAS=D.FECHAS, NOMBRES_CAND=D.NOMBRES_CAND, DETALLE_CAND=D.DETALLE_CAND,
+                       NOMBRES_REPARTO=D.NOMBRES_REPARTO,
                        DETALLE_REPARTO=D.DETALLE_REPARTO, SIMULACIONES=D.SIMULACIONES,
                        PART_MIN=D.PARTICIPACION_MIN, PART_MAX=D.PARTICIPACION_MAX, PART_BASE=D.Params().participacion,
-                       ULTIMA_ENCUESTA=D.ULTIMA_ENCUESTA, VERSION=D.VERSION, TOKENS=TOKENS, DEFECTOS=DEFECTOS)
+                       ULTIMA_ENCUESTA=D.ULTIMA_ENCUESTA, VERSION=D.VERSION, TOKENS=TOKENS, DEFECTOS=DEFECTOS,
+                       NOMBRES_MOV=D.NOMBRES_MOV, DETALLE_MOV=D.DETALLE_MOV, NOMBRES_UTIL=D.NOMBRES_UTIL,
+                       NOMBRES_DONDE=D.NOMBRES_DONDE, AMBITOS=D.AMBITOS, LIMITE_MOV=D.LIMITE_MOV,
+                       LIMITE_UTIL=D.LIMITE_UTIL)
 
 
 # ------------------------------------------------------------------ utilidades
@@ -82,8 +107,12 @@ def params(request) -> D.Params:
 
 def pagina(request, plantilla: str, p: D.Params | None = None, estado: int = 200, **ctx) -> HTMLResponse:
     p = p or params(request)
+    secciones = SECCIONES + ([("Noche electoral", [("/noche", "Noche electoral")])] if E.RUTA.exists() else [])
+    ruta = request.url.path
+    actual = next((pags for _, pags in secciones if any(r == ruta for r, _ in pags)), [])
     html = entorno.get_template(plantilla).render(
-        ruta=request.url.path, p=p, q=p.query(), dias=D.dias_hasta(p.fecha),
+        ruta=ruta, p=p, q=p.query(), dias=D.dias_hasta(p.fecha), SECCIONES=secciones,
+        PESTANAS=actual if len(actual) > 1 else [],
         dias_hoy=D.dias_hasta(pd.Timestamp.today().normalize()), DIAS_CALIBRADOS=D.DIAS_CALIBRADOS,
         v=_version_estaticos(), **ctx)
     return HTMLResponse(html, status_code=estado)
@@ -139,8 +168,16 @@ def inicio(request):
     return pagina(
         request, "inicio.html", p, titular=titular, entradilla=entradilla, p_may=p_may, filas=filas,
         hemiciclo=figura(G.hemiciclo(sim)), leyenda=G.leyenda_html(sim, tabla["voto_%"]), tarjetas=tarjetas,
-        en_juego=int((d["provincias"]["Cambia el bloque"] >= 30).sum()), enc=D.resumen_encuestas(p.fecha),
-        p_bloque=probs["P(bloque de investidura 2023 ≥ 176)"], hace_un_mes=hace_un_mes)
+        primero_prov=_primero_en_provincias(d), enc=D.resumen_encuestas(p.fecha),
+        p_bloque=probs["P(bloque de investidura 2023 ≥ 176)"], hace_un_mes=hace_un_mes,
+        senado_pp=d["senado"]["sim"]["PP"].median())
+
+
+def _primero_en_provincias(d: dict) -> dict:
+    """Partido que es el más votado en más provincias, y en cuántas (para la portada)."""
+    vp = d["voto_prov"].drop(columns=["BLANCO", "OTROS"], errors="ignore")
+    cuenta = vp.idxmax(axis=1).value_counts()
+    return {"partido": cuenta.index[0], "n": int(cuenta.iloc[0])}
 
 
 def escanos(request):
@@ -178,37 +215,310 @@ def mayorias(request):
                   fig_escenarios=figura(G.barras_prob(serie)))
 
 
+# ------------------------------------------------------------------ simulador "¿y si…?"
+
+MAYORIA = 176
+
+
+def _partidos_simulador(d: dict) -> list[dict]:
+    """Partidos con deslizador: los que tienen al menos un 0,8 % nacional en la proyección central."""
+    nac = M.nacional_de(d["s0"].astype(float), D.pesos_2023())
+    out = []
+    for x in nac.sort_values(ascending=False).index:
+        if x in M.NO_LISTAS or nac[x] < 0.008:
+            continue
+        v = 100 * float(nac[x])
+        out.append({"clave": x, "base": round(v, 1), "max": float(min(60, max(10, round(2 * v + 10))))})
+    return out
+
+
+def _fijados(request, partidos: list[dict]) -> dict[str, float]:
+    """Voto pedido en la URL (v_PP=34.5, en %), sólo para partidos con deslizador y si difiere del base."""
+    out = {}
+    for x in partidos:
+        crudo = request.query_params.get("v_" + x["clave"])
+        try:
+            v = round(float(str(crudo).replace(",", ".")), 1)
+        except ValueError:
+            continue
+        if 0 <= v <= x["max"] and abs(v - x["base"]) >= 0.05:
+            out[x["clave"]] = v / 100
+    return out
+
+
+def _resultado_simulador(d: dict, fijados: dict[str, float]) -> dict:
+    s0, pesos, esc = d["s0"].astype(float), D.pesos_2023(), escanos_2026()
+    _, base = M.simular(s0, pesos, esc, {})
+    s, prov = M.simular(s0, pesos, esc, fijados)
+    total, total0 = prov.sum(), base.sum()
+    nac = 100 * M.nacional_de(s, pesos)
+    filas = [{"clave": x, "voto": float(nac[x]), "escanos": int(total[x]), "cambio": int(total[x] - total0[x]),
+              "fijado": x in fijados}
+             for x in sorted(total.index, key=lambda x: (-total[x], -nac[x])) if total[x] or total0[x]]
+    sumas = [{"texto": k, "partidos": [x for x in v if x in total], "escanos": int(total.reindex(v).fillna(0).sum())}
+             for k, v in D.ATAJOS.items()]
+    sim = pd.DataFrame([total[total > 0]]).astype(int)
+    vp = s.drop(columns=list(M.NO_LISTAS), errors="ignore")
+    hover = pd.Series({x: f"<b>{x}</b> · {int(esc[x])} escaños<br>"
+                          + " · ".join(f"{nombre(k)} {num(100 * v)} %" for k, v in vp.loc[x].nlargest(3).items())
+                          + "<br>" + ", ".join(f"{nombre(k)} {int(v)}" for k, v in prov.loc[x][prov.loc[x] > 0]
+                                              .sort_values(ascending=False).items())
+                       for x in vp.index})
+    dos = np.sort(vp.to_numpy(), axis=1)[:, -2:]
+    mapa = G.mapa_ganador(vp.idxmax(axis=1), hover, pd.Series(100 * (dos[:, 1] - dos[:, 0]), index=vp.index))
+    mapa.update_layout(height=460)
+    return {"filas": filas, "sumas": sumas, "mayoria": MAYORIA, "hay_cambios": bool(fijados),
+            "votos": {x: round(float(nac[x]), 1) for x in nac.index},
+            "hemiciclo": figura(G.hemiciclo(sim)), "leyenda": G.leyenda_html(sim), "mapa": figura(mapa)}
+
+
+def simulador_pagina(request):
+    p = params(request)
+    if r := esperar(request, p, "¿Y si…?"):
+        return r
+    d = D.correr(p.escenario())
+    partidos = _partidos_simulador(d)
+    fijados = _fijados(request, partidos)
+    res = _resultado_simulador(d, fijados)
+    for x in partidos:     # los no fijados ya llevan el reajuste proporcional
+        x["valor"] = round(100 * fijados[x["clave"]], 1) if x["clave"] in fijados else res["votos"][x["clave"]]
+    return pagina(request, "simulador.html", p, partidos=partidos, res=res)
+
+
+def api_simulador(request):
+    p = params(request)
+    d = _exigir_calculado(p)
+    res = _resultado_simulador(d, _fijados(request, _partidos_simulador(d)))
+    html = entorno.get_template("_simulador.html").render(res=res)
+    return JSONResponse({"html": html, "hemiciclo": res["hemiciclo"]["json"], "leyenda": res["leyenda"],
+                         "mapa": res["mapa"]["json"], "votos": res["votos"]})
+
+
+# ------------------------------------------------------------------ noche electoral
+
+def noche(request):
+    p = params(request)
+    if r := esperar(request, p, "Noche electoral"):
+        return r
+    d = D.correr(p.escenario())
+    esc2026 = escanos_2026()
+    provs = list(esc2026.index)
+    try:
+        esc = E.leer(provincias=provs)
+    except ValueError as e:
+        return pagina(request, "noche.html", p, error=str(e), esc=None)
+    if esc is None or not (esc.escrutado > 0).any():
+        return pagina(request, "noche.html", p, esc=None, error=None, fichero=str(E.RUTA.relative_to(RAIZ)))
+    s0 = d["s0"].astype(float)
+    cuotas = E.cuotas(esc)
+    s, proy = N.proyectar(s0, cuotas, esc.escrutado, esc2026)
+    ahora = N.escanos_escrutados(list(s0.columns), cuotas, esc2026)
+    pesos = D.pesos_2023().reindex(provs)
+    avance = float((esc.escrutado * pesos).sum() / pesos.sum())
+    votos = esc.drop(columns=["escrutado"]).rename(columns={"blancos": "BLANCO"}).sum()
+    nac_esc = 100 * votos / votos.sum()
+    nac_proy = 100 * M.nacional_de(s, D.pesos_2023())
+    tot_proy, tot_ahora, med = proy.sum(), ahora.sum(), d["sim"].median()
+    partidos = sorted({x for x in tot_proy.index if tot_proy[x] or tot_ahora[x]} | {x for x in med.index if med[x] >= 1},
+                      key=lambda x: (-tot_proy.get(x, 0), -med.get(x, 0)))
+    filas = [{"clave": x, "modelo": float(med.get(x, 0)), "ahora": int(tot_ahora.get(x, 0)),
+              "proy": int(tot_proy.get(x, 0)), "dif": int(tot_proy.get(x, 0)) - round(float(med.get(x, 0))),
+              "v_modelo": float(d["tabla"]["voto_%"].get(x, np.nan)), "v_esc": float(nac_esc.get(x, 0)),
+              "v_proy": float(nac_proy.get(x, 0))} for x in partidos]
+    sumas = [{"texto": k, "escanos": int(tot_proy.reindex(v).fillna(0).sum())} for k, v in D.ATAJOS.items()]
+    # provincias: escrutado, quién va primero y dónde más se aparta lo contado de lo previsto
+    c = N.alinear(cuotas, list(s0.columns))
+    dev = 100 * (c - s0).drop(columns=list(M.NO_LISTAS), errors="ignore")
+    prov_filas = []
+    for x in provs:
+        if esc.at[x, "escrutado"] <= 0:
+            continue
+        mayores = dev.loc[x].reindex(dev.loc[x].abs().sort_values(ascending=False).index[:3])
+        prov_filas.append({"provincia": x, "escrutado": float(esc.at[x, "escrutado"]),
+                           "primero": c.loc[x].drop(list(M.NO_LISTAS), errors="ignore").idxmax(),
+                           "desvio": [(k, float(v)) for k, v in mayores.items() if abs(v) >= 0.5],
+                           "max": float(dev.loc[x].abs().max()),
+                           "reparto": ", ".join(f"{nombre(k)} {int(v)}" for k, v in
+                                                proy.loc[x][proy.loc[x] > 0].sort_values(ascending=False).items())})
+    prov_filas.sort(key=lambda f: -f["max"])
+    vp = c.drop(columns=list(M.NO_LISTAS), errors="ignore")
+    dos = np.sort(vp.to_numpy(), axis=1)[:, -2:]
+    colores = pd.Series([G.tono_ventaja(vp.loc[x].idxmax(), 100 * (dos[i, 1] - dos[i, 0]))
+                         if esc.at[x, "escrutado"] > 0 else SIN_CAMBIO for i, x in enumerate(provs)], index=provs)
+    hover = pd.Series({x: f"<b>{x}</b> · {num(esc.at[x, 'escrutado'])} % escrutado<br>"
+                          + " · ".join(f"{nombre(k)} {num(100 * v)} %" for k, v in vp.loc[x].nlargest(3).items())
+                       for x in provs})
+    sim = pd.DataFrame([tot_proy[tot_proy > 0]]).astype(int)
+    return pagina(request, "noche.html", p, esc=esc, error=None, avance=avance, filas=filas, sumas=sumas,
+                  provincias=prov_filas, mayoria=MAYORIA, simulacro=E.MARCA_SIMULACRO.exists(),
+                  hemiciclo=figura(G.hemiciclo(sim)), leyenda=G.leyenda_html(sim),
+                  mapa=figura(G.mapa_colores(colores, hover)), n_prov=len(prov_filas),
+                  hora=pd.Timestamp.fromtimestamp(E.RUTA.stat().st_mtime).strftime("%H:%M"))
+
+
+# ------------------------------------------------------------------ comparar dos escenarios
+
+def _params_prefijo(request, prefijo: str, defecto: D.Params) -> D.Params:
+    """Escenario leído de los parámetros con prefijo (a_fecha, b_part…); lo que falta, del escenario `defecto`."""
+    q = {k[len(prefijo):]: v for k, v in request.query_params.items() if k.startswith(prefijo)}
+    base = {url: getattr(defecto, k) for k, url in D.CLAVES_URL.items()}
+    return D.Params.de_query(base | q)
+
+
+def comparar(request):
+    p = params(request)
+    # sin nada elegido: el escenario actual frente al mismo sin palancas (si las hay) o con la otra opción de
+    # candidaturas
+    otra = "lista_unica" if p.candidaturas == "registradas" else "registradas"
+    elegido = any(k.startswith(("a_", "b_")) for k in request.query_params)
+    if p.escenario().palancas.activas:
+        sin = {k: getattr(D.Params(), k) for k in list(D.NOMBRES_MOV) + list(D.NOMBRES_UTIL)}
+        a, b_defecto = dataclasses.replace(p, **sin), p
+    else:
+        a, b_defecto = p, dataclasses.replace(p, candidaturas=otra)
+    a = _params_prefijo(request, "a_", a if not elegido else p)
+    b = _params_prefijo(request, "b_", b_defecto if not elegido else p)
+    da, db = D.correr(a.escenario()), D.correr(b.escenario())       # lo ya calculado sale de la caché
+    partidos = [x for x in dict.fromkeys(D.visibles(da) + D.visibles(db))]
+    filas = []
+    for x in partidos:
+        ma = float(da["sim"][x].median()) if x in da["sim"] else None
+        mb = float(db["sim"][x].median()) if x in db["sim"] else None
+        va = float(da["tabla"].at[x, "voto_%"]) if x in da["tabla"].index else None
+        vb = float(db["tabla"].at[x, "voto_%"]) if x in db["tabla"].index else None
+        filas.append({"clave": x, "ma": ma, "mb": mb, "va": va, "vb": vb,
+                      "dif": (mb or 0) - (ma or 0) if (ma is not None or mb is not None) else 0})
+    filas.sort(key=lambda f: -max(f["ma"] or 0, f["mb"] or 0))
+    probs = [{"texto": t, "a": float(da["probs"][k]), "b": float(db["probs"][k])}
+             for k, t in D.ESCENARIOS.items() if k in da["probs"] and k in db["probs"]]
+    sen = [{"texto": t, "a": float(da["senado"]["probs"][k]), "b": float(db["senado"]["probs"][k])}
+           for k, t in list(D.ESCENARIOS_SENADO.items())[:5]]
+    return pagina(request, "comparar.html", p, a=a, b=b, filas=filas, probs=probs, sen=sen,
+                  senado_pp=(float(da["senado"]["sim"]["PP"].median()), float(db["senado"]["sim"]["PP"].median())))
+
+
 def _mapa(d: dict, modo: str, partido: str | None) -> dict:
     prov = d["provincias"].set_index("Provincia")
     vp = d["voto_prov"].drop(columns=["BLANCO", "OTROS"], errors="ignore")
     hover = pd.Series({
         x: (f"<b>{x}</b> · {prov.at[x, 'Escaños']} escaños<br>"
             + " · ".join(f"{nombre(k)} {num(v)} %" for k, v in vp.loc[x].nlargest(3).items())
-            + f"<br>Reparto más probable: {prov.at[x, 'Reparto']} ({prov.at[x, 'Reparto más probable']} %)"
-            + f"<br>Escaño en juego: {prov.at[x, 'Cambia el bloque']} %")
+            + f"<br>Reparto más probable: {prov.at[x, 'Reparto']}")
         for x in prov.index})
-    if modo == "juego":
-        fig = G.mapa_valor(prov["Cambia el bloque"].astype(float), hover, "BRONCE", "En juego", desde_cero=True)
-        return {"fig": figura(fig), "leyenda": [],
-                "nota": "Porcentaje de simulaciones en que PP + Vox + UPN + SALF sacan en la provincia un número de "
-                        "escaños distinto del más habitual: cuanto más oscuro, más baila el último escaño entre bloques."}
     if modo == "partido":
         partido = partido if partido in partidos_mapa(d) else partidos_mapa(d)[0]
         fig = G.mapa_valor(vp[partido], hover, partido, f"Voto de {nombre(partido)}")
         return {"fig": figura(fig), "leyenda": [],
-                "nota": f"Voto estimado de {nombre(partido)} en cada provincia (proyección central). La escala cubre "
-                        "sólo el rango de este partido para que se vean las diferencias."}
+                "nota": f"Voto estimado de {nombre(partido)}. La escala cubre sólo su rango para que se vean las "
+                        "diferencias."}
+    if modo == "cambios":
+        return _mapa_cambios(d, vp)
     ganador = vp.idxmax(axis=1)
+    dos = np.sort(vp.to_numpy(dtype=float), axis=1)[:, -2:]
+    ventaja = pd.Series(dos[:, 1] - dos[:, 0], index=vp.index)
     cuenta = ganador.value_counts()
-    return {"fig": figura(G.mapa_ganador(ganador, hover)),
+    return {"fig": figura(G.mapa_ganador(ganador, hover, ventaja)),
             "leyenda": [{"nombre": nombre(x), "color": color(x), "n": int(n)} for x, n in cuenta.items()],
-            "nota": "Partido con más voto estimado en cada provincia, según la proyección central (sin simular). "
-                    "Ceuta y Melilla aparecen como puntos."}
+            "nota": "Partido con más voto estimado en cada provincia. Cuanto más claro, más ajustada su ventaja sobre el "
+                    "segundo (menos de 5 puntos, de 5 a 15, más de 15)."}
+
+
+SIN_CAMBIO = "#DCE2E8"      # provincias que no cambian de partido más votado (gris claro, sin significado de partido)
+# En 2023 Frente Amplio y Podemos iban juntos en Sumar: para comparar escaños se suman
+IZQ_2026, IZQ_2023 = ("FRENTE_AMPLIO", "PODEMOS", "SUMAR"), "SUMAR"
+
+
+def _escanos_frente_2023(d: dict, prov: str) -> dict[str, int]:
+    """Cambio de escaños (mediana simulada - 2023) por partido en una provincia; sólo los que cambian."""
+    _, esc23 = D.resultados_2023()
+    dist = d["detalle_prov"][prov]["dist"]
+    ahora = {x: _cuantil(v, 0.5) for x, v in dist.items()}
+    cambios = {}
+    for x, c23 in D.EQUIVALENTES_2023.items():
+        antes = int(esc23.at[prov, c23]) if c23 in esc23 else 0
+        if x in ahora or antes:
+            cambios[x] = ahora.get(x, 0) - antes
+    izq = sum(ahora.get(x, 0) for x in IZQ_2026) - int(esc23.at[prov, IZQ_2023])
+    if izq or any(x in ahora for x in IZQ_2026):
+        cambios["IZQ"] = izq
+    return {k: v for k, v in cambios.items() if v}
+
+
+def _mapa_cambios(d: dict, vp: pd.DataFrame) -> dict:
+    """Provincias donde cambia el partido más votado respecto a julio de 2023 (las demás, en gris)."""
+    pct23, _ = D.resultados_2023()
+    inverso = {v: k for k, v in D.EQUIVALENTES_2023.items()} | {IZQ_2023: IZQ_2023}
+    g26, g23 = vp.idxmax(axis=1), pct23.idxmax(axis=1).map(inverso).reindex(vp.index)
+    cambia = g26 != g23
+    colores = pd.Series([color(a) if c else SIN_CAMBIO for a, c in zip(g26, cambia)], index=vp.index)
+    hover = {}
+    for x in vp.index:
+        cam = _escanos_frente_2023(d, x)
+        txt = " · ".join(f"{'Frente Amplio y Podemos' if k == 'IZQ' else nombre(k)} {v:+d}" for k, v in
+                         sorted(cam.items(), key=lambda kv: -abs(kv[1]))).replace("-", "−")
+        cabeza = (f"Pasa de {nombre(g23[x])} a {nombre(g26[x])}" if cambia[x] else f"Sigue ganando {nombre(g26[x])}")
+        hover[x] = f"<b>{x}</b><br>{cabeza}<br>Escaños frente a 2023: {txt or 'los mismos'}"
+    hover = pd.Series(hover)
+    nuevos = g26[cambia].value_counts()
+    leyenda = [{"nombre": f"Pasan a {nombre(x)}", "color": color(x), "n": int(n)} for x, n in nuevos.items()]
+    leyenda.append({"nombre": "Sin cambio", "color": SIN_CAMBIO, "n": int((~cambia).sum())})
+    return {"fig": figura(G.mapa_colores(colores, hover)), "leyenda": leyenda,
+            "nota": "En color, las provincias que cambian de partido más votado respecto a 2023; en gris, las que siguen "
+                    "igual. Pasa el ratón para ver los escaños que gana o pierde cada partido."}
 
 
 def partidos_mapa(d: dict) -> list[str]:
     vp = d["voto_prov"]
     return [x for x in orden_voto(d) if x in vp.columns and x in RAMPA_CLARO]
+
+
+def _cuantil(dist: dict[int, float], q: float) -> int:
+    """Cuantil de una distribución discreta {escaños: % de simulaciones}."""
+    acum = 0.0
+    for k in sorted(dist):
+        acum += dist[k]
+        if acum >= 100 * q - 1e-9:
+            return k
+    return max(dist)
+
+
+def _detalle_provincia(d: dict, prov: str) -> dict:
+    """Todo lo que enseña el panel de una provincia: voto, escaños simulados, 2023 y repartos."""
+    fila = d["provincias"].set_index("Provincia").loc[prov]
+    det = d["detalle_prov"][prov]
+    vp = d["voto_prov"].drop(columns=["BLANCO", "OTROS"], errors="ignore").loc[prov]
+    pct23, esc23 = D.resultados_2023()
+    claves = set(det["dist"]) | set(vp[vp >= 1].index)
+    partidos = []
+    for x in claves:
+        dist = det["dist"].get(x, {0: 100.0})
+        visibles = {k: v for k, v in dist.items() if v >= 0.5}
+        tope = max(visibles.values())
+        c23 = D.EQUIVALENTES_2023.get(x)
+        partidos.append({
+            "clave": x, "voto": float(vp.get(x, 0.0)), "mediana": _cuantil(dist, 0.5),
+            "p10": _cuantil(dist, 0.1), "p90": _cuantil(dist, 0.9),
+            "barras": [{"k": k, "pct": v, "alto": round(100 * v / tope)} for k, v in sorted(visibles.items())],
+            "voto23": float(pct23.at[prov, c23]) if c23 in pct23 else None,
+            "esc23": int(esc23.at[prov, c23]) if c23 in esc23 else None,
+        })
+    partidos.sort(key=lambda r: (-r["mediana"], -r["voto"]))
+    sumar = None
+    if {"FRENTE_AMPLIO", "PODEMOS", "SUMAR"} & claves and pct23.at[prov, "SUMAR"] > 0:
+        sumar = {"voto": float(pct23.at[prov, "SUMAR"]), "esc": int(esc23.at[prov, "SUMAR"])}
+    return {"nombre": prov, "ccaa": fila["CCAA"], "escanos": int(fila["Escaños"]),
+            "repartos": det["repartos"], "partidos": partidos, "sumar23": sumar,
+            "escanos23": int(esc23.loc[prov].sum())}
+
+
+def api_provincia(request):
+    p = params(request)
+    d = _exigir_calculado(p)
+    prov = request.query_params.get("nombre", "")
+    if prov not in d["detalle_prov"]:
+        raise HTTPException(404, "Provincia desconocida")
+    html = entorno.get_template("_provincia.html").render(prov=_detalle_provincia(d, prov))
+    return JSONResponse({"html": html, "nombre": prov})
 
 
 def provincias(request):
@@ -218,17 +528,178 @@ def provincias(request):
     d = D.correr(p.escenario())
     prov = d["provincias"].set_index("Provincia")
     vp = d["voto_prov"].drop(columns=["BLANCO", "OTROS"], errors="ignore")
-    top = prov["Cambia el bloque"].nlargest(12) / 100
-    top.index = [f"{x} ({prov.at[x, 'Escaños']})" for x in top.index]
     filas = [{"provincia": x, "ccaa": r_["CCAA"], "escanos": int(r_["Escaños"]), "reparto": r_["Reparto"],
-              "frecuencia": int(r_["Reparto más probable"]), "juego": int(r_["Cambia el bloque"]),
+              "frecuencia": int(r_["Reparto más probable"]),
               "primero": vp.loc[x].idxmax()}
              for x, r_ in prov.iterrows()]
     vpt = vp.loc[:, vp.max() >= 1]
     vpt = vpt[sorted(vpt.columns, key=lambda c: -vpt[c].sum())]
     return pagina(request, "provincias.html", p, mapa=_mapa(d, "ganador", None), partidos=partidos_mapa(d),
-                  fig_top=figura(G.barras_prob(top, alto_fila=30)), filas=filas, ccaa=sorted(prov.CCAA.unique()),
+                  filas=filas, ccaa=sorted(prov.CCAA.unique()),
                   voto_cols=list(vpt.columns), voto_filas=list(vpt.sort_index().iterrows()))
+
+
+# ------------------------------------------------------------------ Senado
+
+SENADORES = 208
+MITAD_SENADO = SENADORES // 2 + 1
+
+
+def _por_provincia_senado(s: dict) -> pd.DataFrame:
+    """Una fila por provincia: senadores del reparto más probable sumando sus circunscripciones,
+    lista con más senadores y texto emergente."""
+    circ, voto = s["circunscripciones"], s["voto"]
+    filas = {}
+    for prov, g in circ.groupby("Provincia", sort=False):
+        suma = pd.Series(dtype=float)
+        for m in g.moda:
+            suma = suma.add(pd.Series(m, dtype=float), fill_value=0)
+        votos = voto.loc[g["Circunscripción"]].sum()
+        # empate de senadores (2 + 2): gana la lista con más voto estimado
+        orden_ = sorted(suma.index, key=lambda x: (-suma[x], -votos.get(x, 0)))
+        lineas = []
+        for _, f in g.iterrows():
+            pre = f"{f['Circunscripción']}: " if f["Isla"] else ""
+            lineas.append(f"{pre}{f['Reparto']} ({f['Reparto más probable']} %)")
+        total = int(g["Senadores"].sum())
+        if g["Coalición"].all():
+            pacto = "con coalición"
+        elif not g["Coalición"].any():
+            pacto = "sin coalición"
+        else:
+            pacto = "coalición sólo en La Gomera"
+        filas[prov] = {"ganador": orden_[0], "senadores": total,
+                       "hover": f"<b>{prov}</b> · {total} senadores · {pacto}<br>Reparto más probable: "
+                                + "<br>".join(lineas)}
+    return pd.DataFrame.from_dict(filas, orient="index")
+
+
+# Hipótesis de retirada de Vox del Senado (motor/senado.py): clave de la URL -> texto del selector
+HIPOTESIS_VOX = {
+    "": "Vox se presenta en todas",
+    "anunciadas": "No se presenta en las 15 que se han publicado",
+    "amplia": "Sólo donde no hace falta retirarse",
+}
+
+
+def _hipotesis_vox(request) -> str:
+    h = request.query_params.get("vox", "")
+    return h if h in HIPOTESIS_VOX else ""
+
+
+def _senado_de(d: dict, vox: str) -> dict:
+    """Resumen del Senado con la hipótesis de Vox elegida ('' = se presenta en todas)."""
+    return d["senado_vox"][vox] if vox else d["senado"]
+
+
+def _comparar_vox(d: dict, q: str) -> list[dict]:
+    """Una fila por hipótesis de Vox: lo principal del Senado en cada una, para compararlas."""
+    filas = []
+    for h, texto in HIPOTESIS_VOX.items():
+        s = _senado_de(d, h)
+        sim, probs = s["sim"], s["probs"]
+        enlace = q + ("&" if q else "?") + f"vox={h}" if h else (q or "?")
+        filas.append({"clave": h, "texto": texto, "url": "/senado" + enlace,
+                      "pp": sim["PP"].median(), "vox": sim["VOX"].median() if "VOX" in sim else 0,
+                      "vox_en_pp": s["vox_en_pp_sim"].median() if "vox_en_pp_sim" in s else None,
+                      "p105": probs["P(PP + Vox ≥ 105)"], "p_pp": probs["P(PP mayoría absoluta)"],
+                      "p_quintos": probs["P(PP + Vox tres quintos)"],
+                      "sin_vox": s.get("sin_vox", []), "nombres": s.get("vox_en_pp", [])})
+    return filas
+
+
+def _mapa_senado(s: dict) -> dict:
+    pp = _por_provincia_senado(s)
+    cuenta = pp.ganador.value_counts()
+    return {"fig": figura(G.mapa_ganador(pp.ganador, pp.hover)),
+            "leyenda": [{"nombre": nombre(x), "color": color(x), "n": int(n)} for x, n in cuenta.items()],
+            "nota": "Lista con más senadores en el reparto más probable de cada provincia (en Baleares y Canarias, "
+                    "sumando sus islas). Pasa el ratón para ver el reparto."}
+
+
+def _rango(sim: pd.DataFrame, x: str) -> dict | None:
+    if x not in sim:
+        return None
+    return {"mediana": sim[x].median(), "p10": sim[x].quantile(0.1), "p90": sim[x].quantile(0.9)}
+
+
+def senado_pagina(request):
+    p = params(request)
+    if r := esperar(request, p, "Senado"):
+        return r
+    d = D.correr(p.escenario())
+    vox = _hipotesis_vox(request)
+    s = _senado_de(d, vox)
+    sim, sin, probs = s["sim"], s["sin_coalicion"], s["probs"]
+    p_pp = probs["P(PP ≥ 105)"]
+    pp_con, pp_sin = sim["PP"].median(), sin["PP"].median()
+    izq = [x for x in ("PROGRESO", "PSOE", "FRENTE_AMPLIO") if x in sim]
+    izq_sin = [x for x in ("PSOE", "FRENTE_AMPLIO") if x in sin]
+    gana = sim[izq].sum(axis=1).median() - sin[izq_sin].sum(axis=1).median()
+    if p_pp >= 0.5:
+        titular = f"El PP tiene la mitad de los senadores electos en el {pct(p_pp)} de las simulaciones"
+    else:
+        titular = f"El PP se queda sin la mitad de los senadores electos en el {pct(1 - p_pp)} de las simulaciones"
+    entradilla = (f"La coalición Senado de Progreso (PSOE y Frente Amplio en todas las provincias salvo Cataluña y "
+                  f"Canarias, más La Gomera) deja al PP en una mediana de {pp_con:.0f} senadores; sin ella tendría "
+                  f"{pp_sin:.0f}. PSOE y Frente Amplio ganan {gana:.0f} senadores yendo juntos.")
+    if vox:
+        entradilla = (f"Hipótesis: Vox no presenta lista al Senado en {len(s['sin_vox'])} provincias, pide el voto "
+                      f"para el PP y en {len(s['vox_en_pp'])} de ellas lleva un candidato en la lista del PP. "
+                      + entradilla)
+    filas_prob = [
+        ("PP y Vox llegan a 105", pct(probs["P(PP + Vox ≥ 105)"])),
+        ("La izquierda llega a 105", pct(probs["P(izquierda ≥ 105)"])),
+        ("El PP llegaría a 105 sin la coalición", pct(probs["P(PP ≥ 105 sin coalición)"])),
+        ("Senadores del PP sin la coalición, mediana", f"{pp_sin:.0f}"),
+    ]
+    listas = [x for x in dict.fromkeys(list(sim.columns) + list(sin.columns))
+              if (x in sim and sim[x].mean() >= 0.05) or (x in sin and sin[x].mean() >= 0.05)]
+    listas.sort(key=lambda x: -(sim[x].mean() if x in sim else sin[x].mean()))
+    tabla = [{"clave": x, "con": _rango(sim, x), "sin": _rango(sin, x)} for x in listas]
+    circ = s["circunscripciones"].sort_values(["Senadores", "Circunscripción"], ascending=[False, True])
+    filas = [{"circ": f["Circunscripción"], "ccaa": f["CCAA"], "isla": f["Isla"], "provincia": f["Provincia"],
+              "senadores": int(f["Senadores"]), "reparto": f["Reparto"], "ganadora": f["Ganadora"],
+              "p_ganadora": int(f["P(ganadora)"])}
+             for _, f in circ.iterrows()]
+    return pagina(request, "senado.html", p, titular=titular, entradilla=entradilla, p_pp=p_pp, filas_prob=filas_prob,
+                  hemiciclo=figura(G.hemiciclo(sim, SENADORES, "senadores", f"mitad de los electos: {MITAD_SENADO}")),
+                  leyenda=G.leyenda_html(sim, total=SENADORES), tabla=tabla, mapa=_mapa_senado(s),
+                  vox=vox, comparar_vox=_comparar_vox(d, p.query()), vox_con_lista=senado.VOX_CON_LISTA,
+                  trasvase_vox=senado.TRASVASE_VOX, p_pp_seguro=senado.P_PP_SEGURO,
+                  filas=filas, ccaa=sorted(circ["CCAA"].unique()),
+                  **_pleno_senado(sim, sin, probs))
+
+
+def _pleno_senado(sim: pd.DataFrame, sin: pd.DataFrame, probs: pd.Series) -> dict:
+    """El Senado completo: electos simulados + designados autonómicos actuales (fijos)."""
+    des = senado.designados()
+    por_lista = senado.designados_por_lista()
+    pl = senado.pleno(sim)
+    total = SENADORES + len(des)
+    mayoria = total // 2 + 1
+    listas = sorted([x for x in pl.columns if pl[x].mean() >= 0.05], key=lambda x: -pl[x].mean())
+    tabla = [{"clave": x, "electos": sim[x].median() if x in sim else 0, "designados": int(por_lista.get(x, 0)),
+              "total": pl[x].median(), "p10": pl[x].quantile(0.1), "p90": pl[x].quantile(0.9)} for x in listas]
+    pp_pl, pp_sin = pl["PP"].median(), senado.pleno(sin)["PP"].median()
+    por_ccaa = []
+    for ccaa, g in des.groupby("comunidad"):
+        cuenta = g.partido.value_counts()
+        por_ccaa.append({"ccaa": ccaa, "n": len(g), "reparto": ", ".join(f"{k} {v}" for k, v in cuenta.items()),
+                         "nombres": "; ".join(f"{r.nombre} ({r.partido})" for r in g.itertuples())})
+    por_ccaa.sort(key=lambda f: (-f["n"], f["ccaa"]))
+    return {
+        "pleno_total": total, "pleno_mayoria": mayoria, "pleno_pp": pp_pl, "pleno_pp_sin": pp_sin,
+        "pleno_designados": len(des), "pleno_tabla": tabla, "pleno_ccaa": por_ccaa,
+        "pleno_filas": [
+            ("El PP solo tiene mayoría absoluta", pct(probs["P(PP mayoría absoluta)"])),
+            ("PP, Vox y UPN tienen mayoría absoluta", pct(probs["P(PP + Vox + UPN mayoría absoluta)"])),
+            ("La izquierda tiene mayoría absoluta", pct(probs["P(izquierda mayoría absoluta)"])),
+            ("El PP solo, si no hubiera coalición", pct(probs["P(PP mayoría absoluta sin coalición)"])),
+        ],
+        "pleno_hemiciclo": figura(G.hemiciclo(pl, total, "senadores", f"mayoría absoluta: {mayoria}")),
+        "pleno_leyenda": G.leyenda_html(pl, total=total),
+    }
 
 
 def _fig_encuestas(fecha: str, partidos: list[str], desde: str) -> dict:
@@ -328,6 +799,12 @@ def api_mapa(request):
     return JSONResponse({"fig": m["fig"]["json"], "leyenda": m["leyenda"], "nota": m["nota"]})
 
 
+def api_mapa_senado(request):
+    p = params(request)
+    m = _mapa_senado(_senado_de(_exigir_calculado(p), _hipotesis_vox(request)))
+    return JSONResponse({"fig": m["fig"]["json"], "leyenda": m["leyenda"], "nota": m["nota"]})
+
+
 def api_encuestas(request):
     p = params(request)
     q = request.query_params
@@ -366,7 +843,7 @@ def descargar(request):
 
 
 def plotly_js(request):
-    return FileResponse(PLOTLY_JS, media_type="text/javascript", headers={"Cache-Control": "max-age=86400"})
+    return FileResponse(PLOTLY_JS, media_type="text/javascript", headers={"Cache-Control": "public, max-age=604800"})
 
 
 # ------------------------------------------------------------------ errores
@@ -387,23 +864,37 @@ async def fallo(request, exc):
                   mensaje=str(exc))
 
 
+def salud(request):
+    """Comprobación de vida para el alojamiento (sin contraseña ni veda)."""
+    return Response("ok", media_type="text/plain")
+
+
 @contextlib.asynccontextmanager
-async def arranque(app):
+async def arranque(app_):
     D.iniciar()
+    clave = os.environ.get("CLAVE")
+    precalentar(app, f"{acceso.COOKIE}={acceso.ficha(clave)}" if clave else None)
     yield
 
 
 app = Starlette(
     routes=[
         Route("/", inicio), Route("/escanos", escanos), Route("/mayorias", mayorias),
-        Route("/provincias", provincias), Route("/encuestas", encuestas), Route("/evolucion", evolucion),
-        Route("/participacion", participacion), Route("/metodologia", metodologia),
-        Route("/api/mapa", api_mapa), Route("/api/encuestas", api_encuestas), Route("/api/casas", api_casas),
+        Route("/simulador", simulador_pagina), Route("/provincias", provincias), Route("/senado", senado_pagina),
+        Route("/encuestas", encuestas), Route("/evolucion", evolucion), Route("/participacion", participacion),
+        Route("/comparar", comparar), Route("/noche", noche), Route("/metodologia", metodologia),
+        Route("/api/mapa", api_mapa), Route("/api/mapa_senado", api_mapa_senado), Route("/api/provincia", api_provincia),
+        Route("/api/simulador", api_simulador),
+        Route("/api/encuestas", api_encuestas), Route("/api/casas", api_casas),
         Route("/api/calcular", api_calcular, methods=["POST"]),
         Route("/descargar/simulaciones.csv", descargar),
         Route("/estatico/plotly.min.js", plotly_js),
+        Route("/salud", salud),
         Mount("/estatico", StaticFiles(directory=ESTATICO), name="estatico"),
     ],
+    # de fuera a dentro: contraseña y veda (web/acceso.py), páginas en memoria (web/rapido.py), compresión
+    middleware=[Middleware(Acceso), Middleware(PaginasEnMemoria), Middleware(GZipMiddleware, minimum_size=1000,
+                                                                             compresslevel=5)],
     exception_handlers={HTTPException: no_encontrado, Exception: fallo},
     lifespan=arranque,
 )

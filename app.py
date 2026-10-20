@@ -49,7 +49,7 @@ DETALLE_REPARTO = {
     "simetrico": "49 a la izquierda, 45 a la derecha y 6 al resto",
     "muy_asimetrico": "80 a la izquierda, 5 a la derecha y 15 al resto",
 }
-NOMBRES_CAND = {"separados": "Sumar y Podemos por separado", "frente_amplio": "Frente Amplio"}
+NOMBRES_CAND = {"registradas": "Candidaturas registradas", "lista_unica": "Hipótesis de lista única"}
 ATAJOS = {
     "PP + Vox": ["PP", "VOX"],
     "Toda la derecha": DERECHA,
@@ -119,7 +119,7 @@ def agregador(fecha: str, version: str) -> tuple[pd.DataFrame, dict]:
 def barrido_participacion(fecha: str, reparto: str, semilla: int, version: str) -> pd.DataFrame:
     filas = []
     for part in BARRIDO:
-        for cand in ["separados", "frente_amplio"]:
+        for cand in ["registradas", "lista_unica"]:
             d = correr(fecha, cand, part, reparto, N_SIM_BARRIDO, semilla, version)
             filas.append({"participacion": part, "candidaturas": NOMBRES_CAND[cand],
                           "P(mayoría PP + Vox)": d["probs"]["P(PP + Vox ≥ 176)"],

@@ -3,14 +3,14 @@
 {% block titulo %}Provincias{% endblock %}
 {% block contenido %}
 {{ cabecera("Provincias", "Las 52 circunscripciones",
-  "El Congreso se reparte provincia a provincia con D'Hondt: dónde gana cada partido y dónde baila el último escaño.") }}
+  "El Congreso se reparte provincia a provincia: quién gana en cada una y cuántos escaños se lleva cada partido.") }}
 
-<section class="tarjeta mapa" data-mapa>
+<section class="tarjeta mapa" data-mapa data-detalle-api="/api/provincia">
   <div class="mapa__controles">
     <div class="segmentado" role="group" aria-label="Qué mostrar">
       <button type="button" data-modo="ganador" aria-pressed="true">Partido más votado</button>
-      <button type="button" data-modo="juego" aria-pressed="false">Escaño en juego</button>
       <button type="button" data-modo="partido" aria-pressed="false">Voto de un partido</button>
+      <button type="button" data-modo="cambios" aria-pressed="false">Cambios desde 2023</button>
     </div>
     <div class="fichas" role="group" aria-label="Partido" data-partidos-mapa hidden>
       {% for x in partidos %}
@@ -23,15 +23,8 @@
     {% for l in mapa.leyenda %}<div><i style="background: {{ l.color }}"></i>{{ l.nombre }} <b>{{ l.n }}</b> {{ 'provincia' if l.n == 1 else 'provincias' }}</div>{% endfor %}
   </div>
   <p class="nota" data-nota-mapa>{{ mapa.nota }}</p>
-</section>
-
-<section class="seccion">
-  <div class="seccion__cabecera"><h2>Dónde se decide el último escaño</h2></div>
-  <div class="tarjeta">
-    {{ grafico("f-top", fig_top, "Provincias donde más cambia el reparto entre bloques") }}
-  </div>
-  <p class="nota">Las doce provincias donde más cambia el reparto entre bloques. Entre paréntesis, los escaños que reparte:
-    las que reparten muchos cambian más a menudo, porque cualquier movimiento pequeño mueve alguno de sus escaños.</p>
+  <p class="pista" data-pista-provincia>Pulsa una provincia para ver su detalle.</p>
+  <div class="ficha-prov-hueco" data-detalle-provincia hidden aria-live="polite"></div>
 </section>
 
 <section class="seccion">
@@ -53,28 +46,24 @@
             <th scope="col" class="num" data-orden="num" aria-sort="descending">Escaños</th>
             <th scope="col" data-orden="texto">Más votado</th>
             <th scope="col" data-orden="texto">Reparto más probable</th>
-            <th scope="col" data-orden="num">Frecuencia de ese reparto</th>
-            <th scope="col" data-orden="num">Escaño en juego</th>
+            <th scope="col" data-orden="num">Probabilidad</th>
           </tr>
         </thead>
         <tbody>
           {% for f in filas %}
           <tr data-ccaa="{{ f.ccaa }}">
-            <th scope="row" data-valor="{{ f.provincia }}">{{ f.provincia }}<span class="sub">{{ f.ccaa }}</span></th>
+            <th scope="row" data-valor="{{ f.provincia }}"><button type="button" class="enlace-prov" data-provincia="{{ f.provincia }}">{{ f.provincia }}</button><span class="sub">{{ f.ccaa }}</span></th>
             <td class="num fuerte" data-valor="{{ f.escanos }}">{{ f.escanos }}</td>
             <td data-valor="{{ f.primero|nombre }}"><span class="punto" style="--c: {{ f.primero|color }}"></span>{{ f.primero|nombre }}</td>
             <td class="reparto">{{ f.reparto }}</td>
             <td data-valor="{{ f.frecuencia }}"><span class="barrita" style="--x: {{ f.frecuencia }}%"><i></i>{{ f.frecuencia }} %</span></td>
-            <td data-valor="{{ f.juego }}"><span class="barrita barrita--bronce" style="--x: {{ f.juego }}%"><i></i>{{ f.juego }} %</span></td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
-  <p class="nota">Reparto más probable: la combinación de escaños que más se repite en las simulaciones, y con qué frecuencia.
-    Escaño en juego: porcentaje de simulaciones en que la derecha (PP, Vox, UPN y SALF) saca un número de escaños distinto
-    del habitual. Pulsa la cabecera de una columna para ordenar.</p>
+  <p class="nota">Reparto más probable: el que más se repite en las simulaciones, y en cuántas sale.</p>
 </section>
 
 <details class="desplegable">

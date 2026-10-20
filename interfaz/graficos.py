@@ -10,7 +10,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from interfaz.estilo import (BRONCE, FONDO, FUENTE, FUENTE_CIFRAS, GRIS_DATO, PANEL, REGLA, TINTA,
-                             TINTA_2, TINTA_3, color, nombre, orden, pct, rampa)
+                             TINTA_2, TINTA_3, color, mezcla, nombre, orden, pct, rampa)
 
 CONFIG = {"displayModeBar": False, "responsive": True}
 
@@ -31,7 +31,7 @@ def _base(fig: go.Figure, alto: int, margen=None) -> go.Figure:
 # ---------------------------------------------------------------- hemiciclo
 
 def reparto_representativo(sim: pd.DataFrame, total: int = 350) -> pd.Series:
-    """Escaños medios redondeados por resto mayor para que sumen exactamente 350."""
+    """Escaños medios redondeados por resto mayor para que sumen exactamente `total`."""
     media = sim.mean()
     base = np.floor(media).astype(int)
     faltan = total - int(base.sum())
@@ -52,8 +52,9 @@ def _posiciones(total: int = 350, filas: int = 11) -> np.ndarray:
     return pts[np.lexsort((-np.hypot(pts[:, 0], pts[:, 1]), -pts[:, 2]))]
 
 
-def hemiciclo(sim: pd.DataFrame) -> go.Figure:
-    rep = reparto_representativo(sim)
+def hemiciclo(sim: pd.DataFrame, total: int = 350, unidad: str = "escaños", rotulo: str | None = None) -> go.Figure:
+    """Reparto medio en semicírculo. La línea central deja total/2 a cada lado (mayoría: total/2 + 1)."""
+    rep = reparto_representativo(sim, total)
     rep = rep.sort_index(key=lambda idx: idx.map(orden))
     pos = _posiciones(int(rep.sum()))
     q = sim.quantile([0.1, 0.5, 0.9])
@@ -62,28 +63,31 @@ def hemiciclo(sim: pd.DataFrame) -> go.Figure:
     for p, n in rep.items():
         xy = pos[i:i + n]
         i += n
+        if len(sim) == 1:          # un solo reparto (simulador): sin mediana ni rangos
+            texto = f"<b>{nombre(p)}</b><br>{n} {unidad}<extra></extra>"
+        else:
+            texto = (f"<b>{nombre(p)}</b><br>Mediana {q.at[0.5, p]:.0f} {unidad}"
+                     f"<br>80 % de las simulaciones: {q.at[0.1, p]:.0f}–{q.at[0.9, p]:.0f}<extra></extra>")
         fig.add_trace(go.Scatter(
             x=xy[:, 0], y=xy[:, 1], mode="markers", name=nombre(p),
-            marker=dict(size=11, color=color(p), line=dict(width=1.5, color=FONDO)),
-            hovertemplate=(f"<b>{nombre(p)}</b><br>Mediana {q.at[0.5, p]:.0f} escaños"
-                           f"<br>80 % de las simulaciones: {q.at[0.1, p]:.0f}–{q.at[0.9, p]:.0f}<extra></extra>"),
+            marker=dict(size=11, color=color(p), line=dict(width=1.5, color=FONDO)), hovertemplate=texto,
         ))
-    # 175 escaños a cada lado del eje: quien lo cruza desde la derecha o la izquierda llega a 176
+    # total/2 escaños a cada lado del eje: quien lo cruza desde la derecha o la izquierda tiene mayoría
     fig.add_shape(type="line", x0=0, x1=0, y0=0.37, y1=1.05, line=dict(color=TINTA, width=1.5, dash="dot"), layer="below")
-    fig.add_annotation(x=0, y=1.05, text="mayoría: 176", showarrow=False, yanchor="bottom",
+    fig.add_annotation(x=0, y=1.05, text=rotulo or f"mayoría: {total // 2 + 1}", showarrow=False, yanchor="bottom",
                        font=dict(size=12, color=TINTA_2))
-    fig.add_annotation(x=0, y=0.06, text="350", showarrow=False,
+    fig.add_annotation(x=0, y=0.06, text=str(total), showarrow=False,
                        font=dict(family=FUENTE_CIFRAS, size=34, color=TINTA))
-    fig.add_annotation(x=0, y=-0.07, text="escaños", showarrow=False, font=dict(size=13, color=TINTA_3))
+    fig.add_annotation(x=0, y=-0.07, text=unidad, showarrow=False, font=dict(size=13, color=TINTA_3))
     fig = _base(fig, 380, dict(l=0, r=0, t=0, b=0))
     fig.update_xaxes(visible=False, range=[-1.06, 1.06])
     fig.update_yaxes(visible=False, range=[-0.14, 1.13], scaleanchor="x", scaleratio=1)
     return fig
 
 
-def leyenda_html(sim: pd.DataFrame, voto: pd.Series | None = None) -> str:
+def leyenda_html(sim: pd.DataFrame, voto: pd.Series | None = None, total: int = 350) -> str:
     """Leyenda del hemiciclo: escaños del reparto representativo y, si se da, % de voto nacional."""
-    rep = reparto_representativo(sim).sort_index(key=lambda idx: idx.map(orden))
+    rep = reparto_representativo(sim, total).sort_index(key=lambda idx: idx.map(orden))
     def extra(p):
         if voto is None or pd.isna(voto.get(p)):
             return ""
@@ -194,8 +198,8 @@ def efectos_casa(casas: pd.DataFrame, partido: str) -> go.Figure:
 def barrido(df: pd.DataFrame, columna: str, titulo_y: str) -> go.Figure:
     fig = go.Figure()
     # trazo y marcador distintos además del color: las dos líneas se distinguen sin depender de él
-    estilos = {"Sumar y Podemos por separado": (dict(color=TINTA, dash="solid"), "circle"),
-               "Frente Amplio": (dict(color=color("FRENTE_AMPLIO"), dash="dash"), "diamond")}
+    estilos = {"Candidaturas registradas": (dict(color=TINTA, dash="solid"), "circle"),
+               "Hipótesis de lista única": (dict(color=color("FRENTE_AMPLIO"), dash="dash"), "diamond")}
     for cand, g in df.groupby("candidaturas", sort=False):
         g = g.sort_values("participacion")
         linea, simbolo = estilos.get(cand, ({}, "circle"))
@@ -231,15 +235,33 @@ def barras_prob(serie: pd.Series, alto_fila: int = 34) -> go.Figure:
 # ---------------------------------------------------------------- mapa de provincias
 
 RUTA_GEO = Path(__file__).resolve().parent.parent / "datos" / "geo" / "provincias.geojson"
-SIN_SUPERFICIE = ["Ceuta", "Melilla"]          # demasiado pequeñas: se marcan con un punto
-# Canarias viene desplazada +6,5º en el GeoJSON para acercarla a la península (sin recuadro:
-# con la proyección cónica un rectángulo lon/lat sale torcido)
+SIN_SUPERFICIE = ["Ceuta", "Melilla"]          # demasiado pequeñas: se marcan con un punto rotulado
+CANARIAS = ["Las Palmas", "Santa Cruz de Tenerife"]
+# Canarias viene desplazada +6,5º lon/lat en el GeoJSON; aquí se mueve un poco más, al Atlántico al
+# suroeste de Portugal, en un recuadro encajado en la esquina del marco (con Mercator, los lados salen rectos)
+AJUSTE_CANARIAS = (-3.1, 0.5)
+ENCUADRE = dict(lon=[-15.3, 4.6], lat=[34.15, 44.0])
+RECUADRO_CANARIAS = dict(lon=[-15.3, -9.75], lat=[34.15, 36.8])     # comparte la esquina inferior izquierda
+TIERRA_VECINA = "#E9EDF1"       # Portugal, Francia y el norte de África, sólo como contexto
+TRAZO = 0.8                     # límites provinciales (color del fondo: separan sin pesar)
+# Tramos de ventaja del primero sobre el segundo (puntos): de más clara a color pleno
+TRAMOS_VENTAJA = [(5, 0.55), (15, 0.25)]            # por encima de 15 (o sin dato), color pleno
+
+
+def _mover(coords, dlon: float, dlat: float):
+    if isinstance(coords[0], (int, float)):
+        return [round(coords[0] + dlon, 4), round(coords[1] + dlat, 4)]
+    return [_mover(c, dlon, dlat) for c in coords]
 
 
 @lru_cache(maxsize=1)
 def geo_provincias() -> dict:
     with open(RUTA_GEO, encoding="utf-8") as f:
-        return json.load(f)
+        geo = json.load(f)
+    for f in geo["features"]:
+        if f["id"] in CANARIAS:
+            f["geometry"]["coordinates"] = _mover(f["geometry"]["coordinates"], *AJUSTE_CANARIAS)
+    return geo
 
 
 @lru_cache(maxsize=1)
@@ -253,57 +275,86 @@ def _centros() -> pd.DataFrame:
     return pd.DataFrame.from_dict(filas, orient="index")
 
 
-def _mapa_base(fig: go.Figure, alto: int = 540) -> go.Figure:
-    fig = _base(fig, alto, dict(l=0, r=0, t=0, b=0))
-    # Encuadre fijo: fitbounds="locations" no encuadra bien con la proyección cónica
-    fig.update_geos(visible=False, bgcolor=FONDO, lonaxis_range=[-12.2, 4.6], lataxis_range=[33.8, 44.0],
-                    projection=dict(type="conic conformal", parallels=[36, 43], rotation=dict(lon=-4)))
+def _mapa_base(fig: go.Figure, alto: int = 600) -> go.Figure:
+    fig = _base(fig, alto, dict(l=2, r=2, t=2, b=2))     # unos píxeles para que el marco no quede recortado
+    # Encuadre fijo (fitbounds se ajustaría a las provincias y cortaría la tierra vecina a ras de costa)
+    fig.update_geos(visible=True, bgcolor=FONDO, projection_type="mercator",
+                    showframe=True, framecolor=REGLA, framewidth=1,
+                    lonaxis_range=ENCUADRE["lon"], lataxis_range=ENCUADRE["lat"], resolution=50,
+                    showocean=False, showlakes=False, showrivers=False, showcoastlines=False,
+                    showland=True, landcolor=TIERRA_VECINA, showcountries=True, countrycolor=FONDO, countrywidth=1)
+    # lados superior y derecho del recuadro (los otros dos son el marco); con muchos puntos, para que
+    # Plotly no los trace como arcos de círculo máximo
+    lon, lat = RECUADRO_CANARIAS["lon"], RECUADRO_CANARIAS["lat"]
+    arriba = np.linspace(lon[0], lon[1], 60)
+    fig.add_trace(go.Scattergeo(lon=[*arriba, lon[1]], lat=[lat[1]] * len(arriba) + [lat[0]],
+                                mode="lines", line=dict(color=REGLA, width=1), hoverinfo="skip", showlegend=False))
+    fig.add_trace(go.Scattergeo(lon=[lon[0] + 0.2], lat=[lat[1] - 0.15], mode="text", text=["Canarias"],
+                                textposition="bottom right", textfont=dict(size=11, color=TINTA_3),
+                                hoverinfo="skip", showlegend=False))
     return fig
 
 
-def _puntos_pequenas(fig, provs, colores, hover):
-    """Ceuta y Melilla: un punto del mismo color que tendrían en el mapa."""
+def _coropletas(fig: go.Figure, locs: list[str], **kw) -> None:
+    fig.add_trace(go.Choropleth(geojson=geo_provincias(), featureidkey="id", locations=locs,
+                                marker=dict(line=dict(color=FONDO, width=TRAZO)),
+                                hovertemplate="%{customdata}<extra></extra>", **kw))
+
+
+def _puntos_pequenas(fig, provs, hover, **marker):
+    """Ceuta y Melilla: un punto con el color que tendrían en el mapa y su nombre al lado."""
     c = _centros().reindex(provs)
-    fig.add_trace(go.Scattergeo(lon=c.lon, lat=c.lat, mode="markers", showlegend=False,
-                                marker=dict(size=10, color=colores, line=dict(width=2, color=FONDO)),
+    fig.add_trace(go.Scattergeo(lon=c.lon, lat=c.lat, mode="markers+text", showlegend=False, text=provs,
+                                textposition=["middle left" if x == "Ceuta" else "middle right" for x in provs],
+                                textfont=dict(size=11, color=TINTA_3),
+                                marker=dict(size=11, line=dict(width=1.5, color=FONDO), **marker),
                                 customdata=hover, hovertemplate="%{customdata}<extra></extra>"))
 
 
-def mapa_ganador(ganador: pd.Series, hover: pd.Series) -> go.Figure:
-    """Partido más votado en cada provincia. ganador/hover: índice = provincia."""
-    geo = geo_provincias()
+def tono_ventaja(p: str, ventaja: float) -> str:
+    """Color del ganador aclarado según su ventaja (puntos) sobre el segundo."""
+    t = next((t for tope, t in TRAMOS_VENTAJA if ventaja < tope), 0.0)
+    return mezcla(color(p), PANEL, t)
+
+
+def mapa_ganador(ganador: pd.Series, hover: pd.Series, ventaja: pd.Series | None = None) -> go.Figure:
+    """Partido más votado en cada provincia. ganador/hover/ventaja: índice = provincia.
+    Con `ventaja` (puntos sobre el segundo), el color se aclara donde la victoria es más ajustada."""
+    ventaja = ventaja.reindex(ganador.index) if ventaja is not None else pd.Series(np.nan, index=ganador.index)
+    colores = pd.Series([tono_ventaja(p, v) for p, v in zip(ganador, ventaja)], index=ganador.index)
+    return mapa_colores(colores, hover)
+
+
+def mapa_colores(colores: pd.Series, hover: pd.Series) -> go.Figure:
+    """Mapa con un color ya decidido para cada provincia (índice = provincia)."""
     fig = go.Figure()
-    for p in ganador.value_counts().index:
-        provs = ganador.index[ganador == p]
-        fig.add_trace(go.Choropleth(
-            geojson=geo, featureidkey="id", locations=list(provs), z=np.ones(len(provs)),
-            colorscale=[[0, color(p)], [1, color(p)]], showscale=False, name=nombre(p),
-            marker=dict(line=dict(color=FONDO, width=1.2)),
-            customdata=hover.reindex(provs), hovertemplate="%{customdata}<extra></extra>"))
-    pequenas = [x for x in SIN_SUPERFICIE if x in ganador.index]
-    _puntos_pequenas(fig, pequenas, [color(ganador[x]) for x in pequenas], hover.reindex(pequenas))
+    for c in colores.unique():
+        provs = [x for x in colores.index if colores[x] == c]
+        if provs:
+            _coropletas(fig, provs, z=np.ones(len(provs)), colorscale=[[0, c], [1, c]], showscale=False,
+                        customdata=hover.reindex(provs).to_numpy())
+    pequenas = [x for x in SIN_SUPERFICIE if x in colores.index]
+    _puntos_pequenas(fig, pequenas, hover.reindex(pequenas), color=list(colores.reindex(pequenas)))
     return _mapa_base(fig)
 
 
 def mapa_valor(valor: pd.Series, hover: pd.Series, escala: str, titulo: str, desde_cero: bool = False) -> go.Figure:
-    """Mapa de un valor en % (voto de un partido, escaño en juego) con una rampa de un solo tono.
+    """Mapa de un valor en % (p. ej. el voto de un partido) con una rampa de un solo tono.
     La escala cubre el rango observado (redondeado a 5) para que se distingan las provincias."""
-    geo = geo_provincias()
     zmax = float(np.ceil(valor.max() / 5) * 5) or 5.0
     zmin = 0.0 if desde_cero else float(np.floor(valor.min() / 5) * 5)
     cs = rampa(escala)
-    fig = go.Figure(go.Choropleth(
-        geojson=geo, featureidkey="id", locations=list(valor.index), z=valor.to_numpy(), zmin=zmin, zmax=zmax,
-        colorscale=cs, marker=dict(line=dict(color=FONDO, width=1.2)),
-        colorbar=dict(title=dict(text=titulo, font=dict(color=TINTA_2, size=12)), ticksuffix=" %", thickness=10,
-                      len=0.55, outlinewidth=0, x=0.98, tickfont=dict(color=TINTA_3)),
-        customdata=hover.reindex(valor.index), hovertemplate="%{customdata}<extra></extra>"))
+    provs = list(valor.index)
+    fig = go.Figure()
+    _coropletas(fig, provs, z=valor.reindex(provs).to_numpy(), zmin=zmin, zmax=zmax, colorscale=cs,
+                # horizontal, sobre el Atlántico (arriba a la izquierda), que siempre queda vacío
+                colorbar=dict(title=dict(text=titulo, side="top", font=dict(color=TINTA_2, size=12)),
+                              orientation="h", ticksuffix=" %", thickness=10, len=0.24, outlinewidth=0,
+                              x=0.1, xanchor="left", y=0.93, yanchor="top", tickfont=dict(color=TINTA_3)),
+                customdata=hover.reindex(provs).to_numpy())
     pequenas = [x for x in SIN_SUPERFICIE if x in valor.index]
-    c = _centros().reindex(pequenas)
-    fig.add_trace(go.Scattergeo(lon=c.lon, lat=c.lat, mode="markers", showlegend=False,
-                                marker=dict(size=10, color=valor.reindex(pequenas), colorscale=cs, cmin=zmin, cmax=zmax,
-                                            line=dict(width=2, color=FONDO)),
-                                customdata=hover.reindex(pequenas), hovertemplate="%{customdata}<extra></extra>"))
+    _puntos_pequenas(fig, pequenas, hover.reindex(pequenas), color=valor.reindex(pequenas),
+                     colorscale=cs, cmin=zmin, cmax=zmax)
     return _mapa_base(fig)
 
 
@@ -399,5 +450,5 @@ def lineas_evolucion(df: pd.DataFrame, colores: dict[str, str], titulo_y: str, s
 
 
 __all__ = ["CONFIG", "hemiciclo", "leyenda_html", "rangos", "histograma_mayoria", "serie_encuestas",
-           "efectos_casa", "barrido", "reparto_representativo", "pct", "barras_prob", "mapa_ganador",
+           "efectos_casa", "barrido", "reparto_representativo", "pct", "barras_prob", "mapa_ganador", "mapa_colores",
            "mapa_valor", "geo_provincias", "hemiciclo_animado", "lineas_evolucion"]

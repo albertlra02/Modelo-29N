@@ -136,3 +136,124 @@
 
   actualizar();
 })();
+
+/* Investidura: con las posturas elegidas (sí, abstención, no) se cuentan en cada simulación los síes y los noes.
+   Primera votación: 176 síes. Segunda: más síes que noes. */
+(() => {
+  const raiz = document.querySelector("[data-investidura]");
+  if (!raiz) return;
+  const { partidos, sim } = JSON.parse(document.getElementById("datos-calculadora").textContent);
+  const claves = partidos.map((p) => p.clave);
+  const n = sim[claves[0]].length;
+  const MAYORIA = 176;
+  const CANDIDATOS = { PP: "Feijóo", PSOE: "Sánchez" };
+  // Posturas por defecto (ver la nota de la página). Lo que no aparece, abstención.
+  const DEFECTO = {
+    PP: { PP: "si", VOX: "si", UPN: "si", CC: "si", SALF: "no", PSOE: "no", SUMAR: "no", FRENTE_AMPLIO: "no",
+      PODEMOS: "no", ERC: "no", JUNTS: "no", BILDU: "no", PNV: "no", BNG: "no", ADELANTE: "no" },
+    PSOE: { PSOE: "si", SUMAR: "si", FRENTE_AMPLIO: "si", PODEMOS: "si", ERC: "si", BILDU: "si", PNV: "si",
+      BNG: "si", CC: "si", ADELANTE: "si", JUNTS: "no", PP: "no", VOX: "no", UPN: "no", SALF: "no" },
+  };
+  const RECHAZAN_A_VOX = ["PSOE", "SUMAR", "FRENTE_AMPLIO", "PODEMOS", "ERC", "JUNTS", "BILDU", "PNV", "BNG", "ADELANTE"];
+  const TEXTOS = { si: "Sí", abs: "Abstención", no: "No" };
+  let posturas;
+  const veto = raiz.querySelector("[data-inv-veto]");
+
+  function porDefecto() {
+    posturas = {};
+    for (const c of Object.keys(CANDIDATOS)) {
+      posturas[c] = Object.fromEntries(claves.map((x) => [x, DEFECTO[c][x] || "abs"]));
+    }
+  }
+
+  /** Posturas efectivas: con el veto, quien rechaza a Vox vota no si Vox vota sí (salvo el propio candidato). */
+  function efectivas(c) {
+    const p = { ...posturas[c] };
+    if (veto.checked && p.VOX === "si") {
+      for (const x of RECHAZAN_A_VOX) if (x in p && x !== c) p[x] = "no";
+    }
+    return p;
+  }
+
+  const pct = (x) => (x > 0 && x < 0.005 ? "< 1 %" : x > 0.995 && x < 1 ? "> 99 %" : `${Math.round(100 * x)} %`);
+
+  function calcular(c) {
+    const p = efectivas(c);
+    const si = new Int32Array(n), no = new Int32Array(n);
+    for (const x of claves) {
+      const s = sim[x];
+      if (p[x] === "si") for (let i = 0; i < n; i++) si[i] += s[i];
+      else if (p[x] === "no") for (let i = 0; i < n; i++) no[i] += s[i];
+    }
+    let primera = 0, segunda = 0;
+    for (let i = 0; i < n; i++) {
+      if (si[i] >= MAYORIA) primera++;
+      else if (si[i] > no[i]) segunda++;
+    }
+    const med = (a) => Array.from(a).sort((x, y) => x - y)[Math.floor(n / 2)];
+    return { primera: primera / n, segunda: segunda / n, total: (primera + segunda) / n, si: med(si), no: med(no), p };
+  }
+
+  function pintarResultados() {
+    const caja = raiz.querySelector("[data-inv-resultados]");
+    caja.replaceChildren(...Object.entries(CANDIDATOS).map(([c, quien]) => {
+      const r = calcular(c);
+      const art = document.createElement("article");
+      art.className = "tarjeta investidura__candidato";
+      art.style.setProperty("--c", partidos.find((x) => x.clave === c)?.color || "#888");
+      art.innerHTML = `<h3>${quien} <span>(${partidos.find((x) => x.clave === c)?.nombre || c})</span></h3>
+        <p class="cifra">${pct(r.total)}</p>
+        <p class="cifra__texto">de las simulaciones sale investido</p>
+        <dl class="filas">
+          <div><dt>En la primera votación (176 síes)</dt><dd>${pct(r.primera)}</dd></div>
+          <div><dt>En la segunda (más síes que noes)</dt><dd>${pct(r.segunda)}</dd></div>
+          <div><dt>Síes y noes, mediana</dt><dd>${r.si} – ${r.no}</dd></div>
+        </dl>`;
+      return art;
+    }));
+    // en la tabla, marca las posturas que el veto ha cambiado
+    raiz.querySelectorAll("select[data-cand]").forEach((s) => {
+      const ef = efectivas(s.dataset.cand)[s.dataset.partido];
+      s.classList.toggle("vetado", ef !== s.value);
+      s.title = ef !== s.value ? "Vota no por el veto a Vox" : "";
+    });
+  }
+
+  function pintarTabla() {
+    const cuerpo = raiz.querySelector("[data-inv-filas]");
+    cuerpo.replaceChildren(...partidos.map((p) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<th scope="row"><span class="punto" style="--c: ${p.color}"></span>${p.nombre}</th>
+        <td class="num">${p.mediana}</td>`;
+      for (const c of Object.keys(CANDIDATOS)) {
+        const td = document.createElement("td");
+        const sel = document.createElement("select");
+        sel.className = "postura";
+        sel.dataset.cand = c;
+        sel.dataset.partido = p.clave;
+        sel.setAttribute("aria-label", `${p.nombre}, si el candidato es ${CANDIDATOS[c]}`);
+        for (const [v, t] of Object.entries(TEXTOS)) sel.add(new Option(t, v, false, posturas[c][p.clave] === v));
+        sel.dataset.valor = sel.value;
+        sel.addEventListener("change", () => {
+          posturas[c][p.clave] = sel.value;
+          sel.dataset.valor = sel.value;
+          pintarResultados();
+        });
+        td.append(sel);
+        tr.append(td);
+      }
+      return tr;
+    }));
+  }
+
+  porDefecto();
+  pintarTabla();
+  pintarResultados();
+  veto.addEventListener("change", pintarResultados);
+  raiz.querySelector("[data-inv-restablecer]").addEventListener("click", () => {
+    porDefecto();
+    veto.checked = true;
+    pintarTabla();
+    pintarResultados();
+  });
+})();
