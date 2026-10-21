@@ -139,6 +139,33 @@ def retiradas():
     return svg(720, 296, "".join(c), "Tres quintos del Senado según las retiradas de Vox")
 
 
+def retiradas_65():
+    """Variante para el artículo: sólo la participación del 65 %, con las lecturas sobre la propia línea."""
+    p65 = [17.2, 20.3, 23.4, 25.6, 27.4, 29.6, 31.8, 34.0, 36.6, 39.1, 41.1, 42.9, 44.8, 46.4, 48.0, 49.4, 50.6, 52.0,
+           53.5, 54.9, 56.3, 58.0, 59.9, 61.7, 63.7, 65.7, 67.5, 69.5, 71.2, 72.8, 74.7, 76.9, 78.6, 80.2, 81.5, 82.9,
+           84.0, 85.1, 85.9, 86.7, 87.0, 87.5, 87.8]
+
+    def X(k):
+        return 60 + k / 42 * 520
+
+    def Y(p):
+        return 250 - p * 2.3
+
+    c = []
+    for v in (0, 25, 50, 75, 100):
+        c += [ln(60, Y(v), 580, Y(v), "ref" if v == 50 else "grid"), t(50, Y(v) + 4, f"{v} %", "q", "end")]
+    for k in (0, 10, 20, 30, 40):
+        c.append(t(X(k), 270, k, "q", "middle"))
+    c.append(t(580, 290, "número de provincias en las que Vox no presenta lista →", "q", "end"))
+    c.append(poli([(X(k), Y(p)) for k, p in enumerate(p65)], "s1"))
+    for k, p, txt, dx, dy, anc in ((0, 17.2, "Vox en todas: 17 %", 12, 4, "start"),
+                                   (16, 50.6, "16 provincias: 51 %", -10, -14, "end"),
+                                   (42, 87.8, "42 provincias: 88 % (el techo)", 0, -14, "end")):
+        c.append(f'<circle cx="{X(k):.1f}" cy="{Y(p):.1f}" r="5.5" class="f1" stroke="#fff" stroke-width="1.5"/>')
+        c.append(t(X(k) + dx, Y(p) + dy, txt, "kb", anc))
+    return svg(640, 300, "".join(c), "Tres quintos del Senado según en cuántas provincias no se presenta Vox")
+
+
 def constitucional():
     grupos = [("Congreso (3/5)", "mandato hasta nov. 2028", 20, 20, False,
                [("Inmaculada Montalbán", "progresista · vicepres.", True), ("Ramón Sáez", "progresista", True),
