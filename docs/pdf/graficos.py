@@ -107,7 +107,7 @@ def dispersion():
         if lado == "s":
             c.append(t(X(p) + 12, Y(e) - 8, f"{nom}: {sg}", "kb"))
         else:
-            c.append(t(X(p) - 12, Y(e) - 8, f"{nom}: {sg}", "kb", "end"))
+            c.append(t(X(p) + 12, Y(e) + 22, f"{nom}: {sg}", "kb"))
     return svg(680, Y(-3) + 50, "".join(c), "Error de las encuestas con la derecha según la participación")
 
 
