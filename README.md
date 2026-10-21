@@ -1,12 +1,14 @@
 # Modelo electoral – Congreso y Senado 29-N 2026
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23530778.svg)](https://doi.org/10.5281/zenodo.23530778)
+
 Modelo propio de las elecciones generales del 29 de noviembre de 2026. Convierte las encuestas publicadas en miles de
 parlamentos posibles, para el Congreso y el Senado, y deja probar escenarios desde una web propia. Datos públicos, sin
 trabajo de campo.
 
 **Aplicación:** [modelo-29n.onrender.com](https://modelo-29n.onrender.com) ·
 **Documentos:** el técnico y el de análisis, en PDF, se generan con [docs/pdf/construir.py](docs/pdf/construir.py) ·
-**Pruebas:** 101, con integración continua · **Autor:** Alberto ([albertlra02](https://github.com/albertlra02))
+**Pruebas:** 101, con integración continua · **Autor:** Alberto Lobo Ramos ([albertlra02](https://github.com/albertlra02)) · **Cita:** [10.5281/zenodo.23530778](https://doi.org/10.5281/zenodo.23530778)
 
 ![Resumen de la aplicación](docs/pdf/capturas/resumen.jpg)
 

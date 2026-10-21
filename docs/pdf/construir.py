@@ -202,7 +202,7 @@ def tecnico(paginas=None):
     <div><span class="d-num">8 <small>vs 22</small></span><span class="d-lbl">escaños de error por partido, frente a repetir la elección anterior</span></div>
     <div><span class="d-num">199/208</span><span class="d-lbl">senadores bien asignados con el voto real de 2023</span></div>
   </div>
-  <p class="p-web">Pruébala: <b>{WEB}</b> · Código: <b>{GITHUB}</b></p>
+  <p class="p-web">Pruébala: <b>{WEB}</b> · Código: <b>{GITHUB}</b><br>DOI: <b>10.5281/zenodo.23530778</b></p>
   <p class="p-firma"><b>{AUTOR}</b> · {FECHA}<br>Acompaña al documento de análisis «Una mayoría que depende de quién vote»</p>
 </div></section>"""
     cuerpo = portada + indice(lista, paginas or {}) + f'<main>{html}</main>'

@@ -166,7 +166,7 @@ El Constitucional se renueva por tercios cada tres años. Ahora toca el tercio d
 
 Las cifras salen de un modelo que he construido yo, con ayuda de un asistente de IA para programarlo y documentarlo; los números no los pone la IA, salen de ejecutar el modelo sobre datos públicos. Promedia las encuestas publicadas corrigiendo el sesgo de cada empresa, lleva el voto a las 52 provincias y a las 59 circunscripciones del Senado, y repite la elección miles de veces con los errores que han tenido las encuestas de verdad entre 2015 y 2023. Lo he probado con elecciones que el modelo no conocía: se equivoca en unos 8 escaños por partido, frente a 22 si simplemente repites el resultado anterior, y con el voto de 2023 acierta 199 de los 208 senadores.
 
-Lo que muevo en este documento (participación, voto útil, retirada de Vox) son supuestos, no predicciones ni recomendaciones: el modelo dice qué pasaría si se cumplen. Los detalles están en el documento técnico que acompaña a este, y todo se puede probar en la aplicación.
+Lo que muevo en este documento (participación, voto útil, retirada de Vox) son supuestos, no predicciones ni recomendaciones: el modelo dice qué pasaría si se cumplen. Los detalles están en el documento técnico que acompaña a este, y todo se puede probar en la aplicación. El modelo está registrado antes de las elecciones con el DOI [10.5281/zenodo.23530778](https://doi.org/10.5281/zenodo.23530778).
 
 ## Fuentes
 
