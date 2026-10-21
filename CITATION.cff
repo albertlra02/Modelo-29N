@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "Si usas este modelo o sus resultados, cítalo así."
+title: "Modelo 29-N: simulación del Congreso y el Senado para las elecciones generales del 29 de noviembre de 2026"
+authors:
+  - family-names: "Lobo Ramos"
+    given-names: "Alberto"
+version: "1.1.0"
+date-released: "2026-10-21"
+license: MIT
+repository-code: "https://github.com/albertlra02/Modelo-29N"
+url: "https://modelo-29n.onrender.com"
+keywords:
+  - elecciones
+  - encuestas
+  - Monte Carlo
+  - Senado
+  - España

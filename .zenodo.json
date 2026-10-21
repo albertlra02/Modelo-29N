@@ -1,0 +1,9 @@
+{
+  "title": "Modelo 29-N: simulación del Congreso y el Senado para las elecciones generales del 29 de noviembre de 2026",
+  "description": "Modelo que agrega las encuestas publicadas corrigiendo el sesgo de cada empresa, las lleva a las 52 circunscripciones del Congreso y a las 59 del Senado y simula la elección miles de veces con los errores medidos en las generales de 2015 a 2023. Incluye la validación (reproduce los 350 escaños de 2015-2023; 199 de 208 senadores con el voto de 2023), los escenarios de participación, voto útil y retirada de candidaturas, y una aplicación web. Versión registrada antes de las elecciones para poder evaluar la predicción con el resultado.",
+  "upload_type": "software",
+  "creators": [{"name": "Lobo Ramos, Alberto"}],
+  "license": "MIT",
+  "language": "spa",
+  "keywords": ["elecciones generales", "encuestas", "Monte Carlo", "Senado", "España", "predicción electoral"]
+}
