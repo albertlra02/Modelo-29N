@@ -52,14 +52,14 @@
         del PP es un independiente propuesto por Vox. El PP no se presenta en {{ pacto_pp_fuera|join(", ") }}. En
         {{ pacto_vox_uno|join(", ") }}, Vox lleva un solo candidato, el PP sus tres, y Vox pide a sus votantes marcar
         también a dos del PP.</li>
-      <li>El reparto se calcula nombre a nombre, porque cada elector marca nombres, no listas. Donde Vox lleva un solo
-        candidato, los dos primeros del PP suman votos de Vox pero el tercero sólo los del PP, y puede perder el escaño
-        frente al segundo de otra lista. Donde Vox no va, sus votantes marcan al independiente de Vox y sólo una parte
-        también a los del PP.</li>
+      <li>Donde Vox no va, su votante ve una papeleta del PP y no sabe cuál de los tres nombres es el de Vox: marca la
+        lista entera, así que el independiente sólo sale si el PP gana sus tres senadores. Donde Vox lleva un solo
+        candidato, el reparto se calcula nombre a nombre: los dos primeros del PP suman votos de Vox, pero el tercero
+        sólo los del PP y puede perder el escaño frente al segundo de otra lista.</li>
       <li>Supuestos: donde Vox no va, el {{ (100 * trasvase_vox)|round|int }} % de sus votantes sigue votando a la
         derecha; donde no va el PP, el {{ (100 * trasvase_pp)|round|int }} % de los suyos vota a Vox; y el
-        {{ (100 * marca_pp_vox)|round|int }} % de los votantes de Vox marca también a dos nombres del PP (no todos están
-        dispuestos). No hay precedente de un acuerdo así con el que calibrarlos.</li>
+        {{ (100 * marca_pp_vox)|round|int }} % de los votantes de Vox marca también a dos nombres del PP donde Vox lleva un
+        solo candidato (hay que conocer la consigna y estar dispuesto a seguirla). No hay precedente de un acuerdo así con el que calibrarlos.</li>
       <li>«Vox se retira casi en todas»: Vox mantiene lista sólo en {{ vox_con_lista|join(", ") }} y donde el PP gana
         igualmente (en el {{ (100 * p_pp_seguro)|round|int }} % de las simulaciones o más). Como en el acuerdo, en las
         provincias de cuatro senadores el tercer nombre del PP sería un independiente propuesto por Vox. Es una

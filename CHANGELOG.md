@@ -20,17 +20,20 @@ Plantilla de entrada:
 - **Acuerdo PP-Vox para el Senado (26/10/2026)** en `motor/senado.py`, en lugar de la hipótesis de las 15
   provincias publicadas: Vox no se presenta en 6 provincias (uno de los tres nombres del PP es un independiente
   propuesto por Vox en las de 4 senadores), el PP no se presenta en Gipuzkoa, Girona y Tarragona, y en 14
-  provincias Vox lleva un solo candidato y pide marcar dos del PP. Donde la lista no es la de siempre, reparto
-  nombre a nombre (`elegir`, que con listas de 3 nombres da lo mismo que `repartir`): los votantes de Vox marcan a
-  su candidato y a los dos primeros del PP, y el tercero del PP sólo tiene voto del PP. Supuestos sin calibrar:
-  TRASVASE_VOX 80 %, TRASVASE_PP 60 %, MARCA_PP_VOX 75 %, PP_MARCA_VOX 0 %.
-- La hipótesis «Vox se retira casi en todas» lleva, como el acuerdo, un independiente de Vox como tercer nombre
-  del PP en todas las provincias de 4 senadores.
+  provincias Vox lleva un solo candidato y pide marcar dos del PP. Ahí el reparto es nombre a nombre (`elegir`,
+  que con listas de 3 nombres da lo mismo que `repartir`): los votantes de Vox que conocen la consigna marcan a su
+  candidato y a los dos primeros del PP, y el tercero del PP sólo tiene voto del PP. Donde Vox se retira, su votante
+  no sabe cuál de los tres nombres del PP es el independiente de Vox y marca la lista entera: reparto por listas y
+  el independiente sólo sale si el PP gana sus 3. Supuestos sin calibrar: TRASVASE_VOX 80 %, TRASVASE_PP 60 %,
+  MARCA_PP_VOX 50 %, PP_MARCA_VOX 0 %.
+- La hipótesis «Vox se retira casi en todas» lleva, como el acuerdo, un independiente de Vox en la lista del PP en
+  todas las provincias de 4 senadores.
 - `scripts/analisis_pacto_senado.py`: sin pacto, el acuerdo y el mejor pacto posible por provincia.
 ### Efecto
-- Con un 65 % de participación, PP + Vox con tres quintos del Senado: 17 % sin pacto → 39 % con el acuerdo
-  (mediana de electos de PP + Vox: 111 → 127). El mejor pacto posible llegaría al 81 % (54 % con supuestos
-  pesimistas). Con un 72 %: 4 % → 10 % (47 % con el mejor pacto).
+- Con un 65 % de participación, PP + Vox con tres quintos del Senado: 17 % sin pacto → 38 % con el acuerdo
+  (mediana de electos de PP + Vox: 111 → 127). El mejor pacto posible (Vox fuera casi en todas, con su independiente
+  en la lista del PP) llegaría al 88 % (76 % con supuestos pesimistas). Con un 72 %: 4 % → 9 % (60 % con el mejor
+  pacto).
 - **Palancas de escenario** (`motor/palancas.py`), aplicadas a la proyección central antes de simular, así que
   mueven Congreso, Senado y mayorías:
   - Movilización por bloque (izquierda, derecha, nacionalistas y regionalistas), de −20 % a +20 % de su voto,
