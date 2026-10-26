@@ -356,3 +356,82 @@ def portada_flujo():
                      f'<path d="M{x + 13:.1f} 15L{x + 18:.1f} 19L{x + 13:.1f} 23" fill="none" stroke="#E8590C" stroke-width="1.6"/>')
             x += 22
     return svg(int(x) + 2, 38, "".join(c), "Proceso del modelo")
+
+
+# ---------------------------------------------------------------- artículo del acuerdo PP-Vox (Senado)
+def pacto_barras(filas: list[tuple[str, float, float]]) -> str:
+    """filas: (escenario, P tres quintos, P mayoría absoluta) en %. Barras agrupadas."""
+    x0, w = 230, 400
+
+    def X(v):
+        return x0 + v / 100 * w
+
+    c = [f'<rect x="{x0}" y="4" width="12" height="12" rx="2" class="f1"/>', t(x0 + 18, 14, "tres quintos (160)", "q"),
+         f'<rect x="{x0 + 170}" y="4" width="12" height="12" rx="2" class="f2"/>',
+         t(x0 + 188, 14, "mayoría absoluta (134)", "q")]
+    y0, alto, hueco = 36, 26, 22
+    yfin = y0 + len(filas) * (2 * alto + hueco) - hueco
+    for v in (0, 25, 50, 75, 100):
+        c += [ln(X(v), y0 - 4, X(v), yfin, "ref" if v == 50 else "grid"), t(X(v), yfin + 18, f"{v} %", "q", "middle")]
+    for i, (nom, a, b) in enumerate(filas):
+        y = y0 + i * (2 * alto + hueco)
+        c.append(t(x0 - 14, y + alto + 4, nom, "kb" if i == 1 else "k", "end"))
+        for j, (v, cls) in enumerate(((a, "f1"), (b, "f2"))):
+            yy = y + j * alto
+            c.append(f'<rect x="{X(0)}" y="{yy + 3}" width="{max(X(v) - X(0), 2):.1f}" height="{alto - 6}" rx="2" '
+                     f'class="{cls}"/>')
+            c.append(t(X(v) + 8, yy + alto / 2 + 4, f"{round(v)} %", "kb"))
+    return svg(680, yfin + 26, "".join(c), "Tres quintos y mayoría absoluta del bloque de derechas según el pacto")
+
+
+def pacto_participacion(part: list[int], quintos: list[float], mayoria: list[float]) -> str:
+    """Probabilidad (en %) de los tres quintos y de la mayoría absoluta con el acuerdo, según la participación."""
+    def X(v):
+        return 70 + (v - part[0]) / (part[-1] - part[0]) * 450
+
+    def Y(v):
+        return 250 - v * 2.2
+    c = []
+    for v in (0, 25, 50, 75, 100):
+        c += [ln(70, Y(v), 520, Y(v), "ref" if v == 50 else "grid"), t(60, Y(v) + 4, f"{v} %", "q", "end")]
+    for p in part:
+        c.append(t(X(p), 270, f"{p} %", "q", "middle"))
+    c.append(t(520, 288, "participación sobre el censo", "q", "end"))
+    c += [ln(X(65), 22, X(65), 250, "ref"), t(X(65) + 6, 18, "lo que suponen las encuestas", "q")]
+    if part[0] <= 71.8 <= part[-1]:
+        c += [ln(X(71.8), 30, X(71.8), 250, "ref"), t(X(71.8) + 6, 40, "abril de 2019: 71,8 %", "q")]
+    c.append(poli([(X(p), Y(v)) for p, v in zip(part, mayoria)], "s2"))
+    c.append(poli([(X(p), Y(v)) for p, v in zip(part, quintos)], "s1"))
+    for p, v in zip(part, mayoria):
+        c.append(f'<rect x="{X(p) - 3.5:.1f}" y="{Y(v) - 3.5:.1f}" width="7" height="7" class="f2"/>')
+    for p, v in zip(part, quintos):
+        c.append(f'<circle cx="{X(p):.1f}" cy="{Y(v):.1f}" r="4" class="f1"/>')
+    c.append(t(X(part[-1]) + 10, Y(mayoria[-1]) + 4, f"Mayoría absoluta: {round(mayoria[-1])} %", "kb"))
+    c.append(t(X(part[-1]) + 10, Y(quintos[-1]) + 4, f"Tres quintos: {round(quintos[-1])} %", "kb a1"))
+    c.append(t(X(part[0]) + 8, Y(mayoria[0]) - 10, f"{round(mayoria[0])} %", "kb"))
+    c.append(t(X(part[0]) + 8, Y(quintos[0]) - 10, f"{round(quintos[0])} %", "kb a1"))
+    return svg(720, 296, "".join(c), "Mayorías del bloque de derechas con el acuerdo según la participación")
+
+
+def pacto_huecos(filas: list[tuple[str, float, bool]]) -> str:
+    """Senadores (media) que el acuerdo deja por el camino en cada provincia frente al mejor pacto posible.
+    filas: (provincia, senadores, True si el acuerdo pone ahí a Vox con un solo candidato)."""
+    x0, w, mx = 150, 420, 1.0
+
+    def X(v):
+        return x0 + v / mx * w
+    y0, paso = 30, 26
+    yfin = y0 + paso * (len(filas) - 1)
+    c = [f'<rect x="{x0}" y="2" width="12" height="12" rx="2" class="f1"/>',
+         t(x0 + 18, 12, "Vox con un solo candidato", "q"),
+         f'<rect x="{x0 + 200}" y="2" width="12" height="12" rx="2" class="f2"/>',
+         t(x0 + 218, 12, "provincia sin acuerdo", "q")]
+    for v in (0, 0.25, 0.5, 0.75, 1.0):
+        c += [ln(X(v), y0 - 12, X(v), yfin + 12), t(X(v), yfin + 30, n(v, 2), "q", "middle")]
+    for i, (prov, v, uno) in enumerate(filas):
+        y = y0 + i * paso
+        c.append(t(x0 - 12, y + 4, prov, "k", "end"))
+        c.append(f'<rect x="{x0}" y="{y - 8}" width="{X(v) - x0:.1f}" height="16" rx="2" class="{"f1" if uno else "f2"}"/>')
+        c.append(t(X(v) + 8, y + 4, n(v, 1), "kb"))
+    c.append(t(x0 + w, yfin + 48, "senadores de más para el bloque de derechas con el mejor pacto (media)", "q", "end"))
+    return svg(680, yfin + 58, "".join(c), "Provincias donde el acuerdo deja más senadores")
