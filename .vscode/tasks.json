@@ -1,0 +1,10 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "Instalar dependencias", "type": "shell", "command": "python -m pip install -r requirements.txt", "problemMatcher": [] },
+    { "label": "Tests", "type": "shell", "command": "python -m pytest -q", "group": "test", "problemMatcher": [] },
+    { "label": "Lint (ruff)", "type": "shell", "command": "python -m ruff check .", "problemMatcher": [] },
+    { "label": "Validar el motor (escaños 2015-2023)", "type": "shell", "command": "python -m validacion.validar_motor", "problemMatcher": [] },
+    { "label": "Precalcular escenarios de la app", "type": "shell", "command": "python -m scripts.precalcular", "problemMatcher": [] }
+  ]
+}

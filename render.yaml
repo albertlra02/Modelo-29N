@@ -1,0 +1,24 @@
+# Web publicada en Render (plan gratuito). Se crea una vez con «New > Blueprint» eligiendo este repositorio;
+# después cada `python -m scripts.desplegar` sube una versión nueva a la rama `despliegue` y Render la publica sola.
+services:
+  - type: web
+    name: modelo-29n
+    runtime: python
+    plan: free
+    region: frankfurt
+    branch: despliegue
+    buildCommand: pip install -r requirements-web.txt
+    startCommand: uvicorn web.servidor:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /salud
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+      - key: MAX_SIM          # 10.000 simulaciones no caben en los 512 MB del plan gratuito
+        value: "5000"
+      - key: MALLOC_ARENA_MAX # menos memoria fragmentada entre hilos (el servidor usa varios)
+        value: "2"
+      - key: PUBLICADO       # activa el cierre automático durante la veda electoral (web/acceso.py)
+        value: "1"
+      - key: CLAVE            # contraseña de acceso: Render la pide al crear el servicio y no se guarda aquí
+        sync: false

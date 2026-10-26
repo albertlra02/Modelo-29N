@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% from "_macros.html" import grafico, cabecera %}
+{% block titulo %}Mayorías{% endblock %}
+{% block contenido %}
+{{ cabecera("Mayorías", "Calculadora de pactos",
+  "Elige qué partidos suman y mira en cuántas de las " ~ (p.n_sim|miles) ~ " simulaciones llegan a los 176 escaños de la mayoría absoluta.") }}
+
+<section class="tarjeta calculadora" data-calculadora>
+  <div class="calculadora__controles">
+    <div class="grupo">
+      <span class="grupo__etiqueta" id="etq-atajos">Atajos</span>
+      <div class="fichas" role="group" aria-labelledby="etq-atajos" data-atajos></div>
+    </div>
+    <div class="grupo">
+      <span class="grupo__etiqueta" id="etq-partidos">Partidos que suman <span class="grupo__extra">(entre paréntesis, su mediana de escaños)</span></span>
+      <div class="fichas" role="group" aria-labelledby="etq-partidos" data-partidos></div>
+    </div>
+  </div>
+  <div class="calculadora__resultado" aria-live="polite">
+    <div class="calculadora__cifras">
+      <p class="cifra" data-cifra>–</p>
+      <p class="cifra__texto" data-texto></p>
+      <dl class="filas" data-filas></dl>
+    </div>
+    <div class="grafico" id="f-histograma" style="min-height: 320px" role="img" aria-label="Distribución de escaños de la coalición"></div>
+  </div>
+</section>
+
+<section class="seccion" data-investidura>
+  <div class="seccion__cabecera"><h2>Investidura</h2></div>
+  <p class="seccion__intro">En la primera votación hacen falta 176 síes; en la segunda basta con más síes que noes, así
+    que las abstenciones ayudan. Elige qué vota cada partido.</p>
+  <div class="investidura__resultados" data-inv-resultados></div>
+  <div class="tarjeta tarjeta--tabla">
+    <div class="investidura__barra">
+      <label class="interruptor"><input type="checkbox" data-inv-veto checked> <span>Quien rechaza a Vox vota no a
+        un candidato que cuente con el sí de Vox</span></label>
+      <button type="button" class="boton boton--secundario" data-inv-restablecer>Posturas por defecto</button>
+    </div>
+    <div class="tabla-scroll">
+      <table class="tabla tabla--densa investidura__tabla">
+        <thead>
+          <tr>
+            <th scope="col">Partido</th>
+            <th scope="col" class="num">Escaños (mediana)</th>
+            <th scope="col">Si el candidato es Feijóo (PP)</th>
+            <th scope="col">Si es Sánchez (PSOE)</th>
+          </tr>
+        </thead>
+        <tbody data-inv-filas></tbody>
+      </table>
+    </div>
+  </div>
+  <p class="nota">Por defecto, lo que votó cada partido en 2023, salvo Junts, que ya no apoya a Sánchez. Las posturas son
+    supuestos; lo simulado son los escaños.</p>
+</section>
+
+<section class="seccion">
+  <div class="seccion__cabecera"><h2>Escenarios</h2></div>
+  <div class="tarjeta">
+    {{ grafico("f-escenarios", fig_escenarios, "Probabilidad de cada escenario") }}
+  </div>
+  <p class="nota">Frecuencias dentro de los supuestos del modelo, no probabilidades calibradas. El bloque de 2023 es el
+    que invistió a Sánchez, con el Frente Amplio y Podemos.</p>
+</section>
+<script type="application/json" id="datos-calculadora">{{ datos|safe }}</script>
+{% endblock %}
+{% block final %}<script src="/estatico/mayorias.js?v={{ v }}" defer></script>{% endblock %}

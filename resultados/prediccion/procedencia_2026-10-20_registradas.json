@@ -1,0 +1,47 @@
+{
+  "generado": "2026-10-20T15:02:19+02:00",
+  "git": {
+    "commit": "aabde95c6e3ab141987b70f638624a60dc83c53c",
+    "cambios_sin_confirmar": true
+  },
+  "huella_modelo": "7d952b46495f7c11",
+  "escenario": {
+    "fecha": "2026-10-20",
+    "candidaturas": "registradas",
+    "participacion": 0.65,
+    "reparto": "historico",
+    "n_sim": 10000,
+    "semilla": 2026,
+    "palancas": {
+      "mov_izda": 0,
+      "mov_dcha": 0,
+      "mov_nac": 0,
+      "mov_ambito": "España",
+      "util_pod_fa": 0,
+      "util_fa_psoe": 0,
+      "util_vox_pp": 0,
+      "util_salf_vox": 0,
+      "util_sin_escano": true
+    }
+  },
+  "encuestas": {
+    "n": 338,
+    "ultima": {
+      "fin": "2026-10-17",
+      "encuestadora": "EM-Analytics",
+      "medio": "Electomanía"
+    }
+  },
+  "entorno": {
+    "python": "3.12.10",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "plotly": "7.1.0"
+  },
+  "ficheros": {
+    "simulaciones_2026-10-20_registradas.csv.gz": "11c6fc1c3168b6b5bcce8b8ef572e09f935307304bec076ad9fd78d0a0493e57",
+    "prediccion_2026-10-20_registradas.csv": "bcd0f5cea755dbc269f0a701e14f339c6f548521040a84b35254b832bd92f8c5",
+    "probabilidades_2026-10-20_registradas.csv": "c71d6daf0a13b03d1306633fdf919ba6ca34dbfddb286f33cb2581957c1c58d5",
+    "senado_2026-10-20_registradas.csv": "f9bf041631e5d6c91b3f46feedcda42374fff1e40ec5ab50c9fc58fe6f95997e"
+  }
+}

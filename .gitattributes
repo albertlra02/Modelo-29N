@@ -1,0 +1,3 @@
+# Guardar todo byte a byte: sin conversión de finales de línea, para que los
+# hashes de datos/MANIFEST.sha256 y de la procedencia sigan valiendo tras un checkout.
+* -text

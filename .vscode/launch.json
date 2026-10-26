@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Abrir la aplicación",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/lanzar.py",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": true
+    },
+    {
+      "name": "Predicción por consola",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "scripts.prediccion_2026",
+      "args": ["2026-10-12", "separados"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}

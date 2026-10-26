@@ -1,0 +1,62 @@
+{# Panel de una provincia (lo pide app.js a /api/provincia al pulsarla en el mapa o en la tabla). #}
+<article class="ficha-prov" aria-label="Detalle de {{ prov.nombre }}">
+  <header class="ficha-prov__cab">
+    <div>
+      <p class="antetitulo">{{ prov.ccaa }}</p>
+      <h3>{{ prov.nombre }}</h3>
+    </div>
+    <dl class="ficha-prov__cifras">
+      <div><dt>Escaños</dt><dd>{{ prov.escanos }}</dd></div>
+    </dl>
+    <button type="button" class="ficha-prov__cerrar" data-cerrar-provincia aria-label="Cerrar el detalle">&times;</button>
+  </header>
+
+  <div class="ficha-prov__cuerpo{{ ' ficha-prov__cuerpo--solo' if prov.repartos[0][1] < 5 }}">
+    <div class="tabla-scroll">
+      <table class="tabla tabla--densa">
+        <thead>
+          <tr>
+            <th scope="col">Candidatura</th>
+            <th scope="col" class="num">Voto</th>
+            <th scope="col" class="num">Escaños</th>
+            <th scope="col">Escaños en las simulaciones</th>
+            <th scope="col" class="num">En 2023</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for x in prov.partidos %}
+          <tr>
+            <th scope="row"><span class="punto" style="--c: {{ x.clave|color }}"></span>{{ x.clave|nombre }}</th>
+            <td class="num">{{ x.voto|num }} %</td>
+            <td class="num fuerte">{{ x.mediana }}{% if x.p10 != x.p90 %}<span class="sub">{{ x.p10 }}–{{ x.p90 }}</span>{% endif %}</td>
+            <td>
+              <span class="dist" style="--c: {{ x.clave|color }}">
+                {% for b in x.barras %}<span class="dist__barra{{ ' dist__barra--mediana' if b.k == x.mediana else '' }}" style="--h: {{ b.alto }}%" title="{{ b.k }} {{ 'escaño' if b.k == 1 else 'escaños' }}: {{ b.pct|num }} % de las simulaciones"><i></i><small>{{ b.k }}</small></span>{% endfor %}
+              </span>
+            </td>
+            <td class="num">
+              {% if x.voto23 is not none %}{{ x.voto23|num }} %<span class="sub">{{ x.esc23 }} {{ 'escaño' if x.esc23 == 1 else 'escaños' }}</span>{% else %}<span class="sub">—</span>{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if prov.repartos[0][1] >= 5 %}
+    <aside class="ficha-prov__repartos">
+      <h4>Repartos más probables</h4>
+      <ol>
+        {% set tope = prov.repartos[0][1] %}
+        {% for texto, frec in prov.repartos[:3] %}
+        <li><span>{{ texto }}</span><span class="barrita" style="--x: {{ (100 * frec / tope)|round|int }}%"><i></i>{{ frec|num }} % de las simulaciones</span></li>
+        {% endfor %}
+      </ol>
+    </aside>
+    {% endif %}
+  </div>
+
+  <p class="nota">Escaños: mediana y rango del 80 % de las simulaciones; las barras, cuántas veces sale cada cifra.
+    «En 2023»: el resultado real.{% if prov.sumar23 %} Frente Amplio y Podemos iban entonces juntos en Sumar
+    ({{ prov.sumar23.voto|num }} % y {{ prov.sumar23.esc }} {{ 'escaño' if prov.sumar23.esc == 1 else 'escaños' }}).{% endif %}</p>
+</article>

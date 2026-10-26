@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+{% from "_macros.html" import grafico, cabecera %}
+{% block titulo %}Senado{% endblock %}
+{% block contenido %}
+<section class="portada">
+  <p class="antetitulo">Senado · 208 senadores de elección directa</p>
+  <h1 class="titular">{{ titular }}</h1>
+  <p class="entradilla">{{ entradilla }}</p>
+</section>
+
+<section class="tarjeta hipotesis-vox" aria-labelledby="t-vox">
+  <div class="hipotesis-vox__cab">
+    <h2 class="tarjeta__titulo" id="t-vox">El acuerdo PP-Vox frente a las alternativas</h2>
+    <nav class="segmentado" aria-label="Hipótesis sobre las listas de Vox al Senado">
+      {% for f in comparar_vox %}<a href="{{ f.url }}"{% if f.clave == vox %} aria-current="true"{% endif %}>{{ f.texto }}</a>{% endfor %}
+    </nav>
+  </div>
+  <div class="tabla-scroll">
+    <table class="tabla tabla--densa">
+      <thead>
+        <tr>
+          <th scope="col">Hipótesis</th>
+          <th scope="col" class="num">PP</th>
+          <th scope="col" class="num">Vox</th>
+          <th scope="col" class="num">PP + Vox + UPN en el pleno</th>
+          <th scope="col" class="num">Tres quintos (160)</th>
+          <th scope="col" class="num">Mayoría absoluta (134)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in comparar_vox %}
+        <tr{% if f.clave == vox %} class="marcada"{% endif %}>
+          <th scope="row"><a href="{{ f.url }}">{{ f.texto }}</a></th>
+          <td class="num fuerte">{{ f.pp|num(0) }}</td>
+          <td class="num fuerte">{{ f.vox|num(0) }}{% if f.vox_en_pp %}<span class="sub">{{ f.vox_en_pp|num(0) }} en listas del PP</span>{% endif %}</td>
+          <td class="num">{{ f.mediana|num(0) }}<span class="sub">{{ f.p10|num(0) }}–{{ f.p90|num(0) }}</span></td>
+          <td class="num fuerte">{{ f.p_quintos|pct }}</td>
+          <td class="num">{{ f.p_mayoria|pct }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="nota">PP y Vox: senadores electos (mediana). El bloque de derechas (PP, Vox y UPN) se cuenta en el Senado
+    completo, con los designados autonómicos: mediana, 80 % de las simulaciones y probabilidad de cada mayoría. La
+    hipótesis marcada es la que muestra el resto de la página.</p>
+  <details class="desplegable desplegable--compacto">
+    <summary>Cómo están hechas las hipótesis</summary>
+    <ul class="nota hipotesis-vox__lista">
+      <li>El acuerdo del 26 de octubre (comunicado de Vox) no es una coalición: cada partido mantiene su papeleta.
+        Vox no se presenta en {{ pacto_vox_fuera|join(", ") }}, y en las provincias de cuatro senadores el tercer nombre
+        del PP es un independiente propuesto por Vox. El PP no se presenta en {{ pacto_pp_fuera|join(", ") }}. En
+        {{ pacto_vox_uno|join(", ") }}, Vox lleva un solo candidato, el PP sus tres, y Vox pide a sus votantes marcar
+        también a dos del PP.</li>
+      <li>Donde Vox no va, su votante ve una papeleta del PP y no sabe cuál de los tres nombres es el de Vox: marca la
+        lista entera, así que el independiente sólo sale si el PP gana sus tres senadores. Donde Vox lleva un solo
+        candidato, el reparto se calcula nombre a nombre: los dos primeros del PP suman votos de Vox, pero el tercero
+        sólo los del PP y puede perder el escaño frente al segundo de otra lista.</li>
+      <li>Supuestos: donde Vox no va, el {{ (100 * trasvase_vox)|round|int }} % de sus votantes sigue votando a la
+        derecha; donde no va el PP, el {{ (100 * trasvase_pp)|round|int }} % de los suyos vota a Vox; y el
+        {{ (100 * marca_pp_vox)|round|int }} % de los votantes de Vox marca también a dos nombres del PP donde Vox lleva un
+        solo candidato (hay que conocer la consigna y estar dispuesto a seguirla). No hay precedente de un acuerdo así con el que calibrarlos.</li>
+      <li>«Vox se retira casi en todas»: Vox mantiene lista sólo en {{ vox_con_lista|join(", ") }} y donde el PP gana
+        igualmente (en el {{ (100 * p_pp_seguro)|round|int }} % de las simulaciones o más). Como en el acuerdo, en las
+        provincias de cuatro senadores el tercer nombre del PP sería un independiente propuesto por Vox. Es una
+        referencia de hasta dónde podría llegar una retirada, no algo anunciado.</li>
+    </ul>
+  </details>
+</section>
+
+<section class="rejilla rejilla--portada">
+  <article class="tarjeta">
+    <h2 class="tarjeta__titulo">El Senado completo: {{ der.total }} senadores</h2>
+    {{ grafico("f-hemiciclo", hemiciclo, "Hemiciclo del Senado completo con la línea de los tres quintos") }}
+    {{ leyenda|safe }}
+    <p class="nota">Reparto medio de las simulaciones: los 208 electos el 29-N más los 58 designados por los parlamentos
+      autonómicos. La línea marca los {{ der.quintos }} senadores de los tres quintos, contados desde la derecha. Senado de
+      Progreso es la lista de PSOE y Frente Amplio (salvo en Cataluña y Canarias).</p>
+  </article>
+
+  <aside class="tarjeta tarjeta--cifras" aria-label="Probabilidades principales del Senado">
+    <p class="cifra">{{ der.p_quintos|pct }}</p>
+    <p class="cifra__texto">de las simulaciones dan a PP, Vox y UPN los tres quintos del Senado ({{ der.quintos }} de
+      {{ der.total }})</p>
+    <dl class="filas">
+      {% for a, b in filas_prob %}<div><dt>{{ a }}</dt><dd>{{ b }}</dd></div>{% endfor %}
+    </dl>
+  </aside>
+</section>
+
+<section class="seccion">
+  <div class="seccion__cabecera"><h2>Con y sin la coalición</h2></div>
+  <div class="tarjeta tarjeta--tabla">
+    <div class="tabla-scroll">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th scope="col">Lista</th>
+            <th scope="col" class="num">Con coalición, mediana</th>
+            <th scope="col" class="num">80 % de las simulaciones</th>
+            <th scope="col" class="num">Sin coalición, mediana</th>
+            <th scope="col" class="num">80 % de las simulaciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in tabla %}
+          <tr>
+            <th scope="row"><span class="punto" style="--c: {{ f.clave|color }}"></span>{{ f.clave|nombre }}</th>
+            {% for r in (f.con, f.sin) %}
+            {% if r %}
+            <td class="num fuerte">{{ r.mediana|num(0) }}</td>
+            <td class="num">{{ r.p10|num(0) }}–{{ r.p90|num(0) }}</td>
+            {% else %}
+            <td class="num">—</td><td class="num">—</td>
+            {% endif %}
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="nota">Las mismas simulaciones, repartidas con la coalición y como si PSOE y Frente Amplio fueran por separado.</p>
+</section>
+
+<section class="tarjeta mapa" data-mapa data-api="/api/mapa_senado">
+  <div class="mapa__controles">
+    <div class="segmentado" role="group" aria-label="Qué mostrar">
+      <button type="button" data-modo="ganador" aria-pressed="true">Lista con más senadores</button>
+      <button type="button" data-modo="derecha" aria-pressed="false">Bloque de derechas</button>
+      <button type="button" data-modo="acuerdo" aria-pressed="false">El acuerdo PP-Vox</button>
+    </div>
+  </div>
+  {{ grafico("f-mapa", mapa.fig, "Mapa del Senado por provincias") }}
+  <div class="leyenda" data-leyenda-mapa>
+    {% for l in mapa.leyenda %}<div><i style="background: {{ l.color }}"></i>{{ l.nombre }} <b>{{ l.n }}</b> {{ 'provincia' if l.n == 1 else 'provincias' }}</div>{% endfor %}
+  </div>
+  <p class="nota" data-nota-mapa>{{ mapa.nota }}</p>
+</section>
+
+
+<section class="seccion">
+  <div class="seccion__cabecera">
+    <h2>Circunscripción a circunscripción</h2>
+    <label class="filtro">Comunidad
+      <select data-filtro-ccaa>
+        <option value="">Todas</option>
+        {% for c in ccaa %}<option>{{ c }}</option>{% endfor %}
+      </select>
+    </label>
+  </div>
+  <div class="tarjeta tarjeta--tabla">
+    <div class="tabla-scroll">
+      <table class="tabla" data-ordenable>
+        <thead>
+          <tr>
+            <th scope="col" data-orden="texto">Circunscripción</th>
+            <th scope="col" class="num" data-orden="num" aria-sort="descending">Senadores</th>
+            <th scope="col" data-orden="texto">Reparto más probable</th>
+            <th scope="col" data-orden="num">Primera lista</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in filas %}
+          <tr data-ccaa="{{ f.ccaa }}">
+            <th scope="row" data-valor="{{ f.circ }}">{{ f.circ }}<span class="sub">{% if f.isla %}{{ f.provincia }} · {% endif %}{{ f.ccaa }}</span></th>
+            <td class="num fuerte" data-valor="{{ f.senadores }}">{{ f.senadores }}</td>
+            <td class="reparto">{{ f.reparto }}</td>
+            <td data-valor="{{ f.p_ganadora }}"><span class="punto" style="--c: {{ f.ganadora|color }}"></span>{{ f.ganadora|nombre }} · {{ f.p_ganadora }} %</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="nota">Cada elector marca hasta 3 de los 4 nombres, así que lo normal es 3 senadores para la lista más votada
+    y 1 para la segunda (2 + 2 si quedan muy igualadas). «Primera lista»: la que más senadores saca y en qué porcentaje de
+    las simulaciones.</p>
+</section>
+
+<section class="seccion" id="pleno">
+  <div class="seccion__cabecera"><h2>El Senado completo: {{ pleno_total }} senadores</h2></div>
+  <p class="entradilla">A los 208 electos se suman los {{ pleno_designados }} senadores que designan los parlamentos
+    autonómicos, tal como están hoy. La mayoría absoluta está en {{ pleno_mayoria }}.</p>
+  <div class="rejilla rejilla--portada">
+    <article class="tarjeta">
+      <h3 class="tarjeta__titulo">Reparto medio de los {{ pleno_total }} senadores</h3>
+      {{ grafico("f-pleno", pleno_hemiciclo, "Hemiciclo del Senado completo, con electos y designados") }}
+      {{ pleno_leyenda|safe }}
+    </article>
+    <aside class="tarjeta tarjeta--cifras" aria-label="Mayoría absoluta del Senado completo">
+      <dl class="filas">
+        {% for a, b in pleno_filas %}<div><dt>{{ a }}</dt><dd>{{ b }}</dd></div>{% endfor %}
+      </dl>
+      <p class="nota">Porcentaje de simulaciones con al menos {{ pleno_mayoria }} de {{ pleno_total }}.</p>
+    </aside>
+  </div>
+
+  <div class="tarjeta tarjeta--tabla">
+    <div class="tabla-scroll">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th scope="col">Lista</th>
+            <th scope="col" class="num">Electos, mediana</th>
+            <th scope="col" class="num">Designados</th>
+            <th scope="col" class="num">Total, mediana</th>
+            <th scope="col" class="num">80 % de las simulaciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in pleno_tabla %}
+          <tr>
+            <th scope="row"><span class="punto" style="--c: {{ f.clave|color }}"></span>{{ f.clave|nombre }}</th>
+            <td class="num">{{ f.electos|num(0) }}</td>
+            <td class="num">{{ f.designados }}</td>
+            <td class="num fuerte">{{ f.total|num(0) }}</td>
+            <td class="num">{{ f.p10|num(0) }}–{{ f.p90|num(0) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="nota">Los designados de Compromís y Más Madrid cuentan con el Frente Amplio.</p>
+
+  <details class="desplegable">
+    <summary>Designados por comunidad autónoma</summary>
+    <div class="tarjeta tarjeta--tabla">
+      <div class="tabla-scroll">
+        <table class="tabla tabla--densa">
+          <thead>
+            <tr>
+              <th scope="col">Comunidad</th>
+              <th scope="col" class="num">Senadores</th>
+              <th scope="col">Reparto</th>
+              <th scope="col">Quiénes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for f in pleno_ccaa %}
+            <tr>
+              <th scope="row">{{ f.ccaa }}</th>
+              <td class="num fuerte">{{ f.n }}</td>
+              <td>{{ f.reparto }}</td>
+              <td class="reparto">{{ f.nombres }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="nota">Fuente: web del Senado, «Designados por Parlamentos Autonómicos», consultada el 17 de octubre de 2026
+      (grupo parlamentario traducido a partido). Cada parlamento designa un senador más uno por cada millón de habitantes.</p>
+  </details>
+</section>
+
+<details class="desplegable">
+  <summary>Cómo se calcula el Senado</summary>
+  <div class="tarjeta articulo__texto">
+    <ul>
+      <li>Cada lista saca en el Senado el voto que su partido saca en el Congreso en esa circunscripción, simulación a
+        simulación. Aplicado al voto real de julio de 2023, este método da 199 de los 208 senadores que salieron (PP 122
+        frente a 120 reales).</li>
+      <li>Las islas se calculan desde su provincia con el patrón del Congreso de 2023 isla a isla. ASG (La Gomera) y AHI
+        (El Hierro), que no van al Congreso, se mantienen en su voto al Senado de 2023, con el que ganaron su escaño.</li>
+      <li>El 2 + 2 se sortea con la caída de voto entre candidatos de una misma lista medida en las 47 provincias de 2023.</li>
+      <li>Coalición Senado de Progreso (acuerdo del 17 de octubre): PSOE, IU, Sumar, Compromís, Más Madrid, Chunta
+        Aragonesista, Batzarre y Més, en 46 provincias (todas salvo Cataluña y Canarias) y en La Gomera.</li>
+    </ul>
+  </div>
+</details>
+{% endblock %}
