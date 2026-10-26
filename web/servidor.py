@@ -170,7 +170,7 @@ def inicio(request):
         hemiciclo=figura(G.hemiciclo(sim)), leyenda=G.leyenda_html(sim, tabla["voto_%"]), tarjetas=tarjetas,
         primero_prov=_primero_en_provincias(d), enc=D.resumen_encuestas(p.fecha),
         p_bloque=probs["P(bloque de investidura 2023 ≥ 176)"], hace_un_mes=hace_un_mes,
-        senado_pp=d["senado"]["sim"]["PP"].median())
+        senado_quintos=_derecha_pleno(_senado_de(d, "")["sim"])["p_quintos"])
 
 
 def _primero_en_provincias(d: dict) -> dict:
@@ -392,9 +392,10 @@ def comparar(request):
     probs = [{"texto": t, "a": float(da["probs"][k]), "b": float(db["probs"][k])}
              for k, t in D.ESCENARIOS.items() if k in da["probs"] and k in db["probs"]]
     sen = [{"texto": t, "a": float(da["senado"]["probs"][k]), "b": float(db["senado"]["probs"][k])}
-           for k, t in list(D.ESCENARIOS_SENADO.items())[:5]]
+           for k, t in list(D.ESCENARIOS_SENADO.items())[:3]]
     return pagina(request, "comparar.html", p, a=a, b=b, filas=filas, probs=probs, sen=sen,
-                  senado_pp=(float(da["senado"]["sim"]["PP"].median()), float(db["senado"]["sim"]["PP"].median())))
+                  senado_pp=(_derecha_pleno(da["senado"]["sim"])["mediana"],
+                             _derecha_pleno(db["senado"]["sim"])["mediana"]))
 
 
 def _mapa(d: dict, modo: str, partido: str | None) -> dict:
@@ -576,9 +577,9 @@ def _por_provincia_senado(s: dict) -> pd.DataFrame:
 
 # Hipótesis de retirada de Vox del Senado (motor/senado.py): clave de la URL -> texto del selector
 HIPOTESIS_VOX = {
-    "": "Vox se presenta en todas",
-    "anunciadas": "No se presenta en las 15 que se han publicado",
-    "amplia": "Sólo donde no hace falta retirarse",
+    "": "Con el acuerdo PP-Vox del 26 de octubre",
+    "sin": "Sin pacto: cada uno en todas",
+    "amplia": "Vox se retira casi en todas",
 }
 
 
@@ -588,8 +589,25 @@ def _hipotesis_vox(request) -> str:
 
 
 def _senado_de(d: dict, vox: str) -> dict:
-    """Resumen del Senado con la hipótesis de Vox elegida ('' = se presenta en todas)."""
-    return d["senado_vox"][vox] if vox else d["senado"]
+    """Resumen del Senado con la hipótesis elegida ('' = el acuerdo PP-Vox, 'sin' = cada uno en todas)."""
+    if vox == "sin":
+        return d["senado"]
+    return d["senado_vox"][vox or "pacto"]
+
+
+DERECHA_SEN = ("PP", "VOX", "UPN")
+
+
+def _derecha_pleno(sim: pd.DataFrame) -> dict:
+    """Bloque de derechas (PP + Vox + UPN) en el Senado completo: senadores en cada simulación, umbrales y
+    probabilidades de los tres quintos y de la mayoría absoluta."""
+    pl = senado.pleno(sim)
+    t = pl[[x for x in DERECHA_SEN if x in pl]].sum(axis=1)
+    total = SENADORES + len(senado.designados())
+    quintos, mayoria = -(-3 * total // 5), total // 2 + 1
+    return {"t": t, "total": total, "quintos": quintos, "mayoria": mayoria,
+            "p_quintos": float((t >= quintos).mean()), "p_mayoria": float((t >= mayoria).mean()),
+            "mediana": float(t.median()), "p10": float(t.quantile(0.1)), "p90": float(t.quantile(0.9))}
 
 
 def _comparar_vox(d: dict, q: str) -> list[dict]:
@@ -597,13 +615,12 @@ def _comparar_vox(d: dict, q: str) -> list[dict]:
     filas = []
     for h, texto in HIPOTESIS_VOX.items():
         s = _senado_de(d, h)
-        sim, probs = s["sim"], s["probs"]
+        sim = s["sim"]
         enlace = q + ("&" if q else "?") + f"vox={h}" if h else (q or "?")
         filas.append({"clave": h, "texto": texto, "url": "/senado" + enlace,
                       "pp": sim["PP"].median(), "vox": sim["VOX"].median() if "VOX" in sim else 0,
                       "vox_en_pp": s["vox_en_pp_sim"].median() if "vox_en_pp_sim" in s else None,
-                      "p105": probs["P(PP + Vox ≥ 105)"], "p_pp": probs["P(PP mayoría absoluta)"],
-                      "p_quintos": probs["P(PP + Vox tres quintos)"],
+                      **{k: v for k, v in _derecha_pleno(sim).items() if k != "t"},
                       "sin_vox": s.get("sin_vox", []), "nombres": s.get("vox_en_pp", [])})
     return filas
 
@@ -631,27 +648,27 @@ def senado_pagina(request):
     vox = _hipotesis_vox(request)
     s = _senado_de(d, vox)
     sim, sin, probs = s["sim"], s["sin_coalicion"], s["probs"]
-    p_pp = probs["P(PP ≥ 105)"]
-    pp_con, pp_sin = sim["PP"].median(), sin["PP"].median()
-    izq = [x for x in ("PROGRESO", "PSOE", "FRENTE_AMPLIO") if x in sim]
-    izq_sin = [x for x in ("PSOE", "FRENTE_AMPLIO") if x in sin]
-    gana = sim[izq].sum(axis=1).median() - sin[izq_sin].sum(axis=1).median()
-    if p_pp >= 0.5:
-        titular = f"El PP tiene la mitad de los senadores electos en el {pct(p_pp)} de las simulaciones"
-    else:
-        titular = f"El PP se queda sin la mitad de los senadores electos en el {pct(1 - p_pp)} de las simulaciones"
-    entradilla = (f"La coalición Senado de Progreso (PSOE y Frente Amplio en todas las provincias salvo Cataluña y "
-                  f"Canarias, más La Gomera) deja al PP en una mediana de {pp_con:.0f} senadores; sin ella tendría "
-                  f"{pp_sin:.0f}. PSOE y Frente Amplio ganan {gana:.0f} senadores yendo juntos.")
-    if vox:
+    der, der_sin = _derecha_pleno(sim), _derecha_pleno(sin)
+    falta = der["quintos"] - der["mediana"]
+    titular = (f"El bloque de derechas llega a los tres quintos del Senado en el {pct(der['p_quintos'])} de las "
+               f"simulaciones")
+    entradilla = (f"PP, Vox y UPN necesitan {der['quintos']} de los {der['total']} senadores para los tres quintos, que "
+                  f"permiten renovar el Constitucional sin pactar. Su mediana es de {der['mediana']:.0f}"
+                  + (f", a {falta:.0f} de la cifra" if falta > 0 else "") + ". La mayoría absoluta "
+                  f"({der['mayoria']}) la tienen en el {pct(der['p_mayoria'])} de las simulaciones.")
+    if vox == "":
+        entradilla = (f"Con el acuerdo PP-Vox: Vox no se presenta en {len(s['sin_vox'])} provincias, el PP no se "
+                      f"presenta en {len(s.get('pp_fuera', []))} y en otras {len(s.get('vox_uno', []))} Vox lleva un "
+                      "solo candidato y pide marcar dos del PP. " + entradilla)
+    elif vox == "amplia":
         entradilla = (f"Hipótesis: Vox no presenta lista al Senado en {len(s['sin_vox'])} provincias, pide el voto "
                       f"para el PP y en {len(s['vox_en_pp'])} de ellas lleva un candidato en la lista del PP. "
                       + entradilla)
     filas_prob = [
-        ("PP y Vox llegan a 105", pct(probs["P(PP + Vox ≥ 105)"])),
-        ("La izquierda llega a 105", pct(probs["P(izquierda ≥ 105)"])),
-        ("El PP llegaría a 105 sin la coalición", pct(probs["P(PP ≥ 105 sin coalición)"])),
-        ("Senadores del PP sin la coalición, mediana", f"{pp_sin:.0f}"),
+        (f"Mayoría absoluta ({der['mayoria']})", pct(der["p_mayoria"])),
+        ("Senadores del bloque, mediana", f"{der['mediana']:.0f}"),
+        ("80 % de las simulaciones", f"{der['p10']:.0f}–{der['p90']:.0f}"),
+        ("Tres quintos si no hubiera coalición de PSOE y FA", pct(der_sin["p_quintos"])),
     ]
     listas = [x for x in dict.fromkeys(list(sim.columns) + list(sin.columns))
               if (x in sim and sim[x].mean() >= 0.05) or (x in sin and sin[x].mean() >= 0.05)]
@@ -662,11 +679,16 @@ def senado_pagina(request):
               "senadores": int(f["Senadores"]), "reparto": f["Reparto"], "ganadora": f["Ganadora"],
               "p_ganadora": int(f["P(ganadora)"])}
              for _, f in circ.iterrows()]
-    return pagina(request, "senado.html", p, titular=titular, entradilla=entradilla, p_pp=p_pp, filas_prob=filas_prob,
-                  hemiciclo=figura(G.hemiciclo(sim, SENADORES, "senadores", f"mitad de los electos: {MITAD_SENADO}")),
-                  leyenda=G.leyenda_html(sim, total=SENADORES), tabla=tabla, mapa=_mapa_senado(s),
+    pl = senado.pleno(sim)
+    return pagina(request, "senado.html", p, titular=titular, entradilla=entradilla, der=der, filas_prob=filas_prob,
+                  hemiciclo=figura(G.hemiciclo(pl, der["total"], "senadores", f"tres quintos: {der['quintos']}",
+                                               umbral=der["quintos"])),
+                  leyenda=G.leyenda_html(pl, total=der["total"]), tabla=tabla, mapa=_mapa_senado(s),
                   vox=vox, comparar_vox=_comparar_vox(d, p.query()), vox_con_lista=senado.VOX_CON_LISTA,
                   trasvase_vox=senado.TRASVASE_VOX, p_pp_seguro=senado.P_PP_SEGURO,
+                  trasvase_pp=senado.TRASVASE_PP, cumple_vox_uno=senado.CUMPLE_VOX_UNO,
+                  pacto_vox_fuera=senado.PACTO_VOX_FUERA, pacto_pp_fuera=senado.PACTO_PP_FUERA,
+                  pacto_vox_uno=senado.PACTO_VOX_UNO,
                   filas=filas, ccaa=sorted(circ["CCAA"].unique()),
                   **_pleno_senado(sim, sin, probs))
 
@@ -692,10 +714,9 @@ def _pleno_senado(sim: pd.DataFrame, sin: pd.DataFrame, probs: pd.Series) -> dic
         "pleno_total": total, "pleno_mayoria": mayoria, "pleno_pp": pp_pl, "pleno_pp_sin": pp_sin,
         "pleno_designados": len(des), "pleno_tabla": tabla, "pleno_ccaa": por_ccaa,
         "pleno_filas": [
-            ("El PP solo tiene mayoría absoluta", pct(probs["P(PP mayoría absoluta)"])),
-            ("PP, Vox y UPN tienen mayoría absoluta", pct(probs["P(PP + Vox + UPN mayoría absoluta)"])),
-            ("La izquierda tiene mayoría absoluta", pct(probs["P(izquierda mayoría absoluta)"])),
-            ("El PP solo, si no hubiera coalición", pct(probs["P(PP mayoría absoluta sin coalición)"])),
+            ("PP, Vox y UPN: tres quintos (160)", pct(_derecha_pleno(sim)["p_quintos"])),
+            ("PP, Vox y UPN: mayoría absoluta", pct(_derecha_pleno(sim)["p_mayoria"])),
+            ("La izquierda: mayoría absoluta", pct(probs["P(izquierda mayoría absoluta)"])),
         ],
         "pleno_hemiciclo": figura(G.hemiciclo(pl, total, "senadores", f"mayoría absoluta: {mayoria}")),
         "pleno_leyenda": G.leyenda_html(pl, total=total),

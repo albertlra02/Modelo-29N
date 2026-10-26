@@ -52,8 +52,11 @@ def _posiciones(total: int = 350, filas: int = 11) -> np.ndarray:
     return pts[np.lexsort((-np.hypot(pts[:, 0], pts[:, 1]), -pts[:, 2]))]
 
 
-def hemiciclo(sim: pd.DataFrame, total: int = 350, unidad: str = "escaños", rotulo: str | None = None) -> go.Figure:
-    """Reparto medio en semicírculo. La línea central deja total/2 a cada lado (mayoría: total/2 + 1)."""
+def hemiciclo(sim: pd.DataFrame, total: int = 350, unidad: str = "escaños", rotulo: str | None = None,
+              umbral: int | None = None) -> go.Figure:
+    """Reparto medio en semicírculo. La línea central deja total/2 a cada lado (mayoría: total/2 + 1).
+    Con `umbral`, la línea marca en cambio cuántos escaños hacen falta contando desde la derecha
+    (p. ej. los tres quintos del Senado)."""
     rep = reparto_representativo(sim, total)
     rep = rep.sort_index(key=lambda idx: idx.map(orden))
     pos = _posiciones(int(rep.sum()))
@@ -73,9 +76,15 @@ def hemiciclo(sim: pd.DataFrame, total: int = 350, unidad: str = "escaños", rot
             marker=dict(size=11, color=color(p), line=dict(width=1.5, color=FONDO)), hovertemplate=texto,
         ))
     # total/2 escaños a cada lado del eje: quien lo cruza desde la derecha o la izquierda tiene mayoría
-    fig.add_shape(type="line", x0=0, x1=0, y0=0.37, y1=1.05, line=dict(color=TINTA, width=1.5, dash="dot"), layer="below")
-    fig.add_annotation(x=0, y=1.05, text=rotulo or f"mayoría: {total // 2 + 1}", showarrow=False, yanchor="bottom",
-                       font=dict(size=12, color=TINTA_2))
+    ang = np.pi / 2
+    if umbral is not None and 0 < umbral < len(pos):
+        k = len(pos) - umbral                  # los `umbral` escaños de más a la derecha empiezan aquí
+        ang = (pos[k - 1, 2] + pos[k, 2]) / 2
+    cx, cy = np.cos(ang), np.sin(ang)
+    fig.add_shape(type="line", x0=0.37 * cx, x1=1.05 * cx, y0=0.37 * cy, y1=1.05 * cy,
+                  line=dict(color=TINTA, width=1.5, dash="dot"), layer="below")
+    fig.add_annotation(x=1.05 * cx, y=1.05 * cy, text=rotulo or f"mayoría: {total // 2 + 1}", showarrow=False,
+                       yanchor="bottom", font=dict(size=12, color=TINTA_2))
     fig.add_annotation(x=0, y=0.06, text=str(total), showarrow=False,
                        font=dict(family=FUENTE_CIFRAS, size=34, color=TINTA))
     fig.add_annotation(x=0, y=-0.07, text=unidad, showarrow=False, font=dict(size=13, color=TINTA_3))

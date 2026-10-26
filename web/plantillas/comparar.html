@@ -96,7 +96,7 @@
       <table class="tabla tabla--densa">
         <thead><tr><th scope="col">Senado</th><th scope="col" class="num">A</th><th scope="col" class="num">B</th><th scope="col" class="num">Puntos</th></tr></thead>
         <tbody>
-          <tr><th scope="row">Senadores electos del PP (mediana)</th><td class="num">{{ senado_pp[0]|num(0) }}</td><td class="num">{{ senado_pp[1]|num(0) }}</td><td class="num">{{ dif(senado_pp[1] - senado_pp[0]) }}</td></tr>
+          <tr><th scope="row">PP, Vox y UPN en el Senado completo (mediana)</th><td class="num">{{ senado_pp[0]|num(0) }}</td><td class="num">{{ senado_pp[1]|num(0) }}</td><td class="num">{{ dif(senado_pp[1] - senado_pp[0]) }}</td></tr>
           {% for f in sen %}
           <tr><th scope="row">{{ f.texto }}</th><td class="num">{{ f.a|pct }}</td><td class="num">{{ f.b|pct }}</td><td class="num">{{ dif(100 * (f.b - f.a)) }}</td></tr>
           {% endfor %}

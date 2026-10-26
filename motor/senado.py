@@ -23,17 +23,24 @@ Supuestos del modelo (validados contra 2023 con validacion/validar_senado.py):
     Batzarre y Més; acuerdo del 17/10/2026): suma íntegra de sus votos en todas las provincias salvo
     Cataluña y Canarias, más La Gomera. Podemos no está en el pacto: donde comparte lista con el
     Frente Amplio en el Congreso (C. Valenciana y Canarias) su parte va al Senado por su cuenta.
-  - Hipótesis de retirada de Vox (no es un supuesto del escenario base): Vox estudia no presentar lista al
-    Senado donde divide el voto de la derecha y meter a algunos candidatos suyos en la lista del PP (El
-    Español, 18/10/2026; lo decide su Comité Ejecutivo el 19/10 y las listas se presentan del 21 al 26).
-    "anunciadas": las 15 provincias que cita esa información; "amplia": todas salvo Murcia, Almería y
-    Ceuta (donde mantendría lista propia) y las provincias donde el PP queda primero de todos modos (en al
-    menos P_PP_SEGURO de las simulaciones con Vox presente): ahí retirarse no le haría falta. Donde Vox no se
-    presenta, el TRASVASE_VOX de su voto va a la lista del PP y el resto se pierde (blanco, abstención o sin
-    marcar); el 80 % es un supuesto sin calibrar, no hay precedente de una retirada así.
-    Además, donde Vox tiene al menos CUOTA_NOMBRE_VOX del voto de PP + Vox (estimación central: las listas se
-    cierran antes de votar) uno de los tres nombres de la lista del PP es suyo: si la lista gana sus 3
-    escaños, uno es de Vox; si gana 2 (2 + 2) o 1, se supone que salen los del PP.
+  - Acuerdo PP-Vox para el Senado (26/10/2026, comunicado de Vox recogido por Moncloa.com, Demócrata y
+    Vozpópuli; no es una coalición: cada partido mantiene su papeleta). Tres piezas:
+      * Vox no presenta lista en PACTO_VOX_FUERA (6 provincias). El TRASVASE_VOX de su voto va a la lista del
+        PP y el resto se pierde (blanco, abstención o sin marcar). En las de 4 senadores, uno de los tres
+        nombres del PP es un independiente propuesto por Vox: si la lista gana sus 3 escaños, uno es suyo.
+      * El PP no presenta lista en PACTO_PP_FUERA (Gipuzkoa, Girona, Tarragona): el TRASVASE_PP de su voto va
+        a Vox.
+      * Vox presenta un solo candidato en PACTO_VOX_UNO (14 provincias) y pide a sus votantes marcar a ese
+        candidato y a dos del PP. Ahí el reparto se hace candidato a candidato (repartir_candidatos): cada
+        nombre del PP suma CUMPLE_VOX_UNO x 2/3 del voto de Vox (dos marcas de tres nombres, repartidas), y
+        se eligen los cuatro nombres más votados de todas las listas.
+    TRASVASE_VOX (80 %), TRASVASE_PP (60 %) y CUMPLE_VOX_UNO (80 %) son supuestos sin calibrar: no hay
+    precedente de un acuerdo así. Lo más parecido medido en España es Unidos Podemos en 2016, que conservó el
+    83 % de los votos que Podemos e IU habían sacado por separado.
+  - Hipótesis "amplia" (contrafactual): Vox no se presenta en ninguna provincia salvo Murcia, Almería y Ceuta y
+    las provincias donde el PP queda primero de todos modos (en al menos P_PP_SEGURO de las simulaciones con
+    Vox presente). Donde Vox tiene al menos CUOTA_NOMBRE_VOX del voto de PP + Vox, uno de los tres nombres de
+    la lista del PP es suyo.
 
 Senadores designados por los parlamentos autonómicos (58): no dependen del 29-N sino de cada parlamento
 autonómico, así que se suman fijos tal como están hoy (datos/senado_designados.csv, transcrito de la web
@@ -71,12 +78,18 @@ LOCALES_ISLA = {"La Gomera": ("ASG", "ASG"), "El Hierro": ("AHI", "A.H.I.")}
 PATRON_2023 = {"PP": "PP", "PSOE": "PSOE", "VOX": "VOX", "SUMAR": "SUMAR", "PODEMOS": "SUMAR",
                "FRENTE_AMPLIO": "SUMAR", "CC": "CC", "NC": "NC"}
 COCIENTE_MIN, COCIENTE_MAX = 0.25, 4.0
-# Hipótesis de retirada de Vox: provincias donde no presentaría lista al Senado (ver cabecera)
+# Acuerdo PP-Vox del 26/10/2026 (ver cabecera)
+PACTO_VOX_FUERA = ("Las Palmas", "Santa Cruz de Tenerife", "Cádiz", "València/Valencia", "Castelló/Castellón",
+                   "Illes Balears")
+PACTO_PP_FUERA = ("Gipuzkoa", "Girona", "Tarragona")
+PACTO_VOX_UNO = ("Sevilla", "Huelva", "Asturias", "Badajoz", "Araba/Álava", "Navarra", "Cáceres", "Huesca",
+                 "Zaragoza", "Alacant/Alicante", "Granada", "Cuenca", "Pontevedra", "Jaén")
+# Hipótesis "amplia": provincias donde Vox mantendría lista de todos modos
 VOX_CON_LISTA = ("Murcia", "Almería", "Ceuta")
-VOX_ANUNCIADAS = ("València/Valencia", "Sevilla", "Cádiz", "Huelva", "Castelló/Castellón", "Badajoz", "Cáceres",
-                  "Asturias", "Jaén", "Córdoba", "Granada", "Zaragoza", "Huesca", "Guadalajara", "Cuenca")
-HIPOTESIS_VOX = ("anunciadas", "amplia")
+HIPOTESIS_VOX = ("pacto", "amplia")
 TRASVASE_VOX = 0.8          # parte del voto de Vox que va a la lista del PP donde Vox no se presenta
+TRASVASE_PP = 0.6           # parte del voto del PP que va a Vox donde el PP no se presenta
+CUMPLE_VOX_UNO = 0.8        # votantes de Vox que marcan dos nombres del PP donde Vox lleva un solo candidato
 P_PP_SEGURO = 0.95          # con esta probabilidad de quedar primero, el PP no necesita la retirada de Vox
 CUOTA_NOMBRE_VOX = 1 / 3    # voto de Vox / (PP + Vox) a partir del cual uno de los 3 nombres del PP es de Vox
 
@@ -86,8 +99,8 @@ def retirada_vox(hipotesis: str | None, seguras: frozenset[str] = frozenset()) -
     `seguras`: provincias donde el PP queda primero de todos modos (ver pp_seguro); en la amplia, Vox va."""
     if hipotesis is None:
         return frozenset()
-    if hipotesis == "anunciadas":
-        return frozenset(VOX_ANUNCIADAS)
+    if hipotesis == "pacto":
+        return frozenset(PACTO_VOX_FUERA)
     if hipotesis == "amplia":
         return frozenset(circunscripciones().provincia) - set(VOX_CON_LISTA) - seguras
     raise ValueError(f"hipótesis de Vox desconocida: {hipotesis!r} (válidas: {HIPOTESIS_VOX})")
@@ -110,6 +123,16 @@ def pp_seguro(por_circ: dict[str, pd.DataFrame]) -> frozenset[str]:
         if primero is not None and primero.mean() >= P_PP_SEGURO:
             out.add(prov)
     return frozenset(out)
+
+
+def hipotesis_vox(hipotesis: str, s0: pd.DataFrame, seguras: frozenset[str] = frozenset()) -> dict:
+    """Argumentos de simular() para cada hipótesis: sin_vox, vox_en_pp, pp_fuera y vox_uno."""
+    sv = retirada_vox(hipotesis, seguras)
+    if hipotesis == "pacto":
+        cuatro = set(circunscripciones().query("escanos == 4").index)
+        return {"sin_vox": sv, "vox_en_pp": frozenset(p for p in sv if p in cuatro),
+                "pp_fuera": frozenset(PACTO_PP_FUERA), "vox_uno": frozenset(PACTO_VOX_UNO)}
+    return {"sin_vox": sv, "vox_en_pp": nombres_vox(s0, sv), "pp_fuera": frozenset(), "vox_uno": frozenset()}
 
 
 def nombres_vox(s0: pd.DataFrame, sin_vox: frozenset[str]) -> frozenset[str]:
@@ -226,18 +249,41 @@ def repartir(votos: np.ndarray, escanos: int, umbral: np.ndarray | None = None) 
     return np.where(votos > 0, out, 0)
 
 
+def repartir_candidatos(votos: np.ndarray, nombres: np.ndarray, escanos: int,
+                        umbral: np.ndarray | None = None) -> np.ndarray:
+    """Voto limitado candidato a candidato. votos: (n, listas), lo que saca cada nombre de la lista;
+    nombres: (listas,), candidatos de cada lista. Salen los `escanos` nombres más votados.
+
+    Con `umbral` (n,), el tercer nombre de cada lista saca votos x (1 - umbral), como en repartir(): con dos
+    listas de 3 nombres da exactamente el mismo 3 + 1 o 2 + 2."""
+    votos = np.atleast_2d(np.asarray(votos, dtype=float))
+    n, L = votos.shape
+    u = np.zeros(n) if umbral is None else np.asarray(umbral, dtype=float)
+    cols, lista = [], []
+    for j in range(L):
+        for k in range(int(nombres[j])):
+            cols.append(votos[:, j] * (1 - u) if k == 2 else votos[:, j])
+            lista.append(j)
+    cand = np.stack(cols, axis=1)
+    elegidos = np.asarray(lista)[np.argsort(-cand, axis=1, kind="stable")[:, :escanos]]
+    out = np.stack([(elegidos == j).sum(axis=1) for j in range(L)], axis=1)
+    return np.where(votos > 0, out, 0)
+
+
 def listas(partidos: list[str]) -> list[str]:
     """Listas posibles al Senado: las del Congreso, la coalición y las insulares."""
     return [p for p in partidos if p not in NO_LISTAS] + [PROGRESO] + [k for k, _ in LOCALES_ISLA.values()]
 
 
 def voto_senado(S: np.ndarray, provincias: list[str], partidos: list[str], ajena: pd.Series,
-                coalicion: bool = True, sin_vox: frozenset[str] = frozenset()) -> tuple[np.ndarray, list[str]]:
+                coalicion: bool = True, sin_vox: frozenset[str] = frozenset(),
+                pp_fuera: frozenset[str] = frozenset()) -> tuple[np.ndarray, list[str]]:
     """Voto de cada lista al Senado en cada circunscripción.
 
-    S:       voto simulado al Congreso (n, provincia, partido), filas que suman 1
-    ajena:   por provincia, fracción de la lista FRENTE_AMPLIO que no entra en el pacto (Podemos, NC)
-    sin_vox: provincias donde Vox no presenta lista (su voto pasa en parte al PP: TRASVASE_VOX)
+    S:        voto simulado al Congreso (n, provincia, partido), filas que suman 1
+    ajena:    por provincia, fracción de la lista FRENTE_AMPLIO que no entra en el pacto (Podemos, NC)
+    sin_vox:  provincias donde Vox no presenta lista (su voto pasa en parte al PP: TRASVASE_VOX)
+    pp_fuera: provincias donde el PP no presenta lista (su voto pasa en parte a Vox: TRASVASE_PP)
     Devuelve (array (n, circunscripción, lista) en el orden de circunscripciones(), nombres de las listas).
     """
     circ = circunscripciones()
@@ -268,6 +314,9 @@ def voto_senado(S: np.ndarray, provincias: list[str], partidos: list[str], ajena
         if fila.provincia in sin_vox and "VOX" in il:
             v[:, il["PP"]] += TRASVASE_VOX * v[:, il["VOX"]]
             v[:, il["VOX"]] = 0.0
+        if fila.provincia in pp_fuera and "VOX" in il:
+            v[:, il["VOX"]] += TRASVASE_PP * v[:, il["PP"]]
+            v[:, il["PP"]] = 0.0
         if coalicion and fila.pacto and "PSOE" in il:
             aj = float(ajena.get(fila.provincia, 0.0))
             fa = v[:, il["FRENTE_AMPLIO"]].copy() if "FRENTE_AMPLIO" in il else 0.0
@@ -283,17 +332,28 @@ def voto_senado(S: np.ndarray, provincias: list[str], partidos: list[str], ajena
 
 def simular(S: np.ndarray, provincias: list[str], partidos: list[str], ajena: pd.Series,
             coalicion: bool = True, semilla: int = 2026, sin_vox: frozenset[str] = frozenset(),
-            vox_en_pp: frozenset[str] = frozenset()) -> tuple[pd.DataFrame, dict[str, pd.DataFrame]]:
+            vox_en_pp: frozenset[str] = frozenset(), pp_fuera: frozenset[str] = frozenset(),
+            vox_uno: frozenset[str] = frozenset()) -> tuple[pd.DataFrame, dict[str, pd.DataFrame]]:
     """Senadores por lista en cada simulación (n x lista) y por circunscripción.
-    `vox_en_pp`: provincias donde la lista del PP lleva un nombre de Vox (ver nombres_vox)."""
-    V, L = voto_senado(S, provincias, partidos, ajena, coalicion, sin_vox)
+    `vox_en_pp`: provincias donde la lista del PP lleva un nombre de Vox (ver nombres_vox).
+    `pp_fuera`:  provincias donde el PP no presenta lista.
+    `vox_uno`:   provincias de 4 senadores donde Vox lleva un solo nombre y sus votantes marcan dos del PP."""
+    V, L = voto_senado(S, provincias, partidos, ajena, coalicion, sin_vox, pp_fuera)
     circ = circunscripciones()
     rng = np.random.default_rng(semilla)
     u = rng.choice(umbrales_empate(), size=(V.shape[0], len(circ)))
     total = np.zeros((V.shape[0], len(L)), dtype=int)
     por_circ = {}
     for c, (nombre, fila) in enumerate(circ.iterrows()):
-        e = repartir(V[:, c, :], int(fila.escanos), u[:, c])
+        if nombre in vox_uno and fila.escanos == 4 and "VOX" in L:
+            pp, vx = L.index("PP"), L.index("VOX")
+            v = V[:, c, :].copy()
+            v[:, pp] += CUMPLE_VOX_UNO * 2 / 3 * v[:, vx]
+            nombres = np.full(len(L), VOTOS_ELECTOR[4])
+            nombres[vx] = 1
+            e = repartir_candidatos(v, nombres, 4, u[:, c])
+        else:
+            e = repartir(V[:, c, :], int(fila.escanos), u[:, c])
         if nombre in vox_en_pp and "VOX" in L:
             pp, vx = L.index("PP"), L.index("VOX")
             tres = e[:, pp] == 3                 # la lista gana sus 3: entra también el nombre de Vox
@@ -308,8 +368,9 @@ def simular(S: np.ndarray, provincias: list[str], partidos: list[str], ajena: pd
 
 
 def central(s0: pd.DataFrame, ajena: pd.Series, coalicion: bool = True,
-            sin_vox: frozenset[str] = frozenset()) -> pd.DataFrame:
+            sin_vox: frozenset[str] = frozenset(), pp_fuera: frozenset[str] = frozenset()) -> pd.DataFrame:
     """Voto central (sin simular) de cada lista al Senado por circunscripción, en %."""
-    V, L = voto_senado(s0.to_numpy()[None, :, :], list(s0.index), list(s0.columns), ajena, coalicion, sin_vox)
+    V, L = voto_senado(s0.to_numpy()[None, :, :], list(s0.index), list(s0.columns), ajena, coalicion, sin_vox,
+                       pp_fuera)
     df = pd.DataFrame(100 * V[0], index=circunscripciones().index, columns=L)
     return df.loc[:, df.max() > 0]

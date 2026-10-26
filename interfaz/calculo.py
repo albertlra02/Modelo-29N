@@ -127,7 +127,7 @@ def _senado(s: dict) -> dict:
     return {"sim": s["sim"].astype("int16"), "sin_coalicion": s["sin_coalicion"].astype("int16"),
             "probs": s["probs"], "circunscripciones": pd.DataFrame(filas), "voto": s["voto"].round(1),
             # sólo en las hipótesis de retirada de Vox: dónde no va y dónde va dentro de la lista del PP
-            **{k: s[k] for k in ("sin_vox", "vox_en_pp", "vox_en_pp_sim") if k in s}}
+            **{k: s[k] for k in ("sin_vox", "vox_en_pp", "vox_en_pp_sim", "pp_fuera", "vox_uno") if k in s}}
 
 
 def voto_simulado(r) -> pd.DataFrame:

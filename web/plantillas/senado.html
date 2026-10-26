@@ -10,7 +10,7 @@
 
 <section class="tarjeta hipotesis-vox" aria-labelledby="t-vox">
   <div class="hipotesis-vox__cab">
-    <h2 class="tarjeta__titulo" id="t-vox">¿Y si Vox no se presenta?</h2>
+    <h2 class="tarjeta__titulo" id="t-vox">El acuerdo PP-Vox frente a las alternativas</h2>
     <nav class="segmentado" aria-label="Hipótesis sobre las listas de Vox al Senado">
       {% for f in comparar_vox %}<a href="{{ f.url }}"{% if f.clave == vox %} aria-current="true"{% endif %}>{{ f.texto }}</a>{% endfor %}
     </nav>
@@ -22,9 +22,9 @@
           <th scope="col">Hipótesis</th>
           <th scope="col" class="num">PP</th>
           <th scope="col" class="num">Vox</th>
-          <th scope="col" class="num">PP + Vox: mitad de los electos</th>
-          <th scope="col" class="num">PP solo: mayoría absoluta</th>
-          <th scope="col" class="num">PP + Vox: tres quintos</th>
+          <th scope="col" class="num">PP + Vox + UPN en el pleno</th>
+          <th scope="col" class="num">Tres quintos (160)</th>
+          <th scope="col" class="num">Mayoría absoluta (134)</th>
         </tr>
       </thead>
       <tbody>
@@ -33,43 +33,50 @@
           <th scope="row"><a href="{{ f.url }}">{{ f.texto }}</a></th>
           <td class="num fuerte">{{ f.pp|num(0) }}</td>
           <td class="num fuerte">{{ f.vox|num(0) }}{% if f.vox_en_pp %}<span class="sub">{{ f.vox_en_pp|num(0) }} en listas del PP</span>{% endif %}</td>
-          <td class="num">{{ f.p105|pct }}</td>
-          <td class="num">{{ f.p_pp|pct }}</td>
-          <td class="num">{{ f.p_quintos|pct }}</td>
+          <td class="num">{{ f.mediana|num(0) }}<span class="sub">{{ f.p10|num(0) }}–{{ f.p90|num(0) }}</span></td>
+          <td class="num fuerte">{{ f.p_quintos|pct }}</td>
+          <td class="num">{{ f.p_mayoria|pct }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-  {% set anunc = comparar_vox[1] %}{% set amplia = comparar_vox[2] %}
-  <p class="nota">Senadores electos (mediana) y probabilidad de cada mayoría. La mayoría absoluta (134) y los tres quintos
-    (160) son del Senado completo, con los designados. La hipótesis marcada es la que muestra el resto de la página.</p>
+  <p class="nota">PP y Vox: senadores electos (mediana). El bloque de derechas (PP, Vox y UPN) se cuenta en el Senado
+    completo, con los designados autonómicos: mediana, 80 % de las simulaciones y probabilidad de cada mayoría. La
+    hipótesis marcada es la que muestra el resto de la página.</p>
   <details class="desplegable desplegable--compacto">
     <summary>Cómo están hechas las hipótesis</summary>
     <ul class="nota hipotesis-vox__lista">
-      <li>Vox decide el 19 de octubre si deja de presentarse donde divide el voto de la derecha. Las 15 provincias
-        publicadas (El Español, 18 de octubre): {{ anunc.sin_vox|join(", ") }}.</li>
-      <li>«Sólo donde no hace falta retirarse»: Vox mantiene lista en {{ vox_con_lista|join(", ") }} y donde el PP gana
-        igualmente (en el {{ (100 * p_pp_seguro)|round|int }} % de las simulaciones o más).</li>
-      <li>Donde Vox no va, el {{ (100 * trasvase_vox)|round|int }} % de sus votantes vota al PP, y si Vox tiene al menos
-        un tercio del voto de PP + Vox, uno de los tres candidatos del PP es suyo (sale si la lista gana sus tres
-        senadores). Son supuestos: con un trasvase entre el 50 y el 100 % el resultado apenas cambia.</li>
+      <li>El acuerdo del 26 de octubre (comunicado de Vox) no es una coalición: cada partido mantiene su papeleta.
+        Vox no se presenta en {{ pacto_vox_fuera|join(", ") }}, y en las provincias de cuatro senadores uno de los tres
+        nombres del PP es un independiente propuesto por Vox. El PP no se presenta en {{ pacto_pp_fuera|join(", ") }}.
+        En {{ pacto_vox_uno|join(", ") }}, Vox lleva un solo candidato y pide a sus votantes marcar también a dos del
+        PP; ahí el reparto se calcula candidato a candidato.</li>
+      <li>Supuestos: donde Vox no va, el {{ (100 * trasvase_vox)|round|int }} % de sus votantes vota al PP; donde no va el
+        PP, el {{ (100 * trasvase_pp)|round|int }} % de los suyos vota a Vox; y donde Vox lleva un solo nombre, el
+        {{ (100 * cumple_vox_uno)|round|int }} % de sus votantes marca también a dos del PP. No hay precedente de un
+        acuerdo así con el que calibrarlos.</li>
+      <li>«Vox se retira casi en todas»: Vox mantiene lista sólo en {{ vox_con_lista|join(", ") }} y donde el PP gana
+        igualmente (en el {{ (100 * p_pp_seguro)|round|int }} % de las simulaciones o más). Es una referencia de hasta
+        dónde podría llegar una retirada, no algo anunciado.</li>
     </ul>
   </details>
 </section>
 
 <section class="rejilla rejilla--portada">
   <article class="tarjeta">
-    <h2 class="tarjeta__titulo">Reparto medio de los 208 senadores electos</h2>
-    {{ grafico("f-hemiciclo", hemiciclo, "Hemiciclo con el reparto medio de senadores") }}
+    <h2 class="tarjeta__titulo">El Senado completo: {{ der.total }} senadores</h2>
+    {{ grafico("f-hemiciclo", hemiciclo, "Hemiciclo del Senado completo con la línea de los tres quintos") }}
     {{ leyenda|safe }}
-    <p class="nota">Reparto medio de las simulaciones. Senado de Progreso es la lista de PSOE y Frente Amplio (salvo en
-      Cataluña y Canarias). Sólo los electos el 29-N: <a href="#pleno">el Senado completo, más abajo</a>.</p>
+    <p class="nota">Reparto medio de las simulaciones: los 208 electos el 29-N más los 58 designados por los parlamentos
+      autonómicos. La línea marca los {{ der.quintos }} senadores de los tres quintos, contados desde la derecha. Senado de
+      Progreso es la lista de PSOE y Frente Amplio (salvo en Cataluña y Canarias).</p>
   </article>
 
   <aside class="tarjeta tarjeta--cifras" aria-label="Probabilidades principales del Senado">
-    <p class="cifra">{{ p_pp|pct }}</p>
-    <p class="cifra__texto">de las simulaciones dan al PP al menos 105 de los 208 senadores electos</p>
+    <p class="cifra">{{ der.p_quintos|pct }}</p>
+    <p class="cifra__texto">de las simulaciones dan a PP, Vox y UPN los tres quintos del Senado ({{ der.quintos }} de
+      {{ der.total }})</p>
     <dl class="filas">
       {% for a, b in filas_prob %}<div><dt>{{ a }}</dt><dd>{{ b }}</dd></div>{% endfor %}
     </dl>

@@ -198,16 +198,17 @@ def ejecutar(esc: Escenario, c: dict | None = None) -> Resultado:
     # Hipótesis de retirada de Vox del Senado, sobre las mismas simulaciones (y la misma semilla)
     hip_vox, seguras = {}, senado.pp_seguro(sen_circ)
     for h in senado.HIPOTESIS_VOX:
-        sv = senado.retirada_vox(h, seguras)
-        nv = senado.nombres_vox(c["s0"], sv)
-        kw = dict(semilla=esc.semilla, sin_vox=sv, vox_en_pp=nv)
-        con_h, circ_h = senado.simular(S, provs, partidos, c["ajena"], coalicion=True, **kw)
-        sin_h, _ = senado.simular(S, provs, partidos, c["ajena"], coalicion=False, **kw)
+        kw = senado.hipotesis_vox(h, c["s0"], seguras)
+        sv, nv = kw["sin_vox"], kw["vox_en_pp"]
+        con_h, circ_h = senado.simular(S, provs, partidos, c["ajena"], coalicion=True, semilla=esc.semilla, **kw)
+        sin_h, _ = senado.simular(S, provs, partidos, c["ajena"], coalicion=False, semilla=esc.semilla, **kw)
         # sin lista propia en esas provincias, cualquier senador de Vox ahí sale de la lista del PP
         en_pp = sum((circ_h[p]["VOX"] for p in nv if "VOX" in circ_h[p]), pd.Series(0, index=con_h.index))
         hip_vox[h] = {"sim": con_h, "sin_coalicion": sin_h, "circunscripciones": circ_h,
-                      "voto": senado.central(c["s0"], c["ajena"], sin_vox=sv), "probs": probs_senado(con_h, sin_h),
-                      "sin_vox": sorted(sv), "vox_en_pp": sorted(nv), "vox_en_pp_sim": en_pp.astype("int16")}
+                      "voto": senado.central(c["s0"], c["ajena"], sin_vox=sv, pp_fuera=kw["pp_fuera"]),
+                      "probs": probs_senado(con_h, sin_h),
+                      "sin_vox": sorted(sv), "vox_en_pp": sorted(nv), "vox_en_pp_sim": en_pp.astype("int16"),
+                      "pp_fuera": sorted(kw["pp_fuera"]), "vox_uno": sorted(kw["vox_uno"])}
     del S
 
     tabla, probs = resumen(sim, mayorias)

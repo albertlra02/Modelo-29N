@@ -60,15 +60,15 @@ ATAJOS = {
     "Bloque de 2023": SOCIOS_2023 + ["FRENTE_AMPLIO"],
     "PSOE y su izquierda": ["PSOE", "SUMAR", "PODEMOS", "FRENTE_AMPLIO"],
 }
-ESCENARIOS_SENADO = {   # clave de las probabilidades del Senado -> texto
-    "P(PP mayoría absoluta)": "El PP solo, mayoría absoluta del pleno",
-    "P(PP + Vox + UPN mayoría absoluta)": "PP, Vox y UPN, mayoría absoluta del pleno",
+ESCENARIOS_SENADO = {   # clave de las probabilidades del Senado -> texto (las primeras, las que se comparan)
     "P(PP + Vox tres quintos)": "PP y Vox, tres quintos del pleno (160)",
+    "P(PP + Vox + UPN mayoría absoluta)": "PP, Vox y UPN, mayoría absoluta del pleno (134)",
     "P(izquierda mayoría absoluta)": "La izquierda, mayoría absoluta del pleno",
-    "P(PP mayoría absoluta sin coalición)": "El PP solo, si no hubiera coalición",
-    "P(PP ≥ 105)": "El PP solo tiene la mitad de los electos",
     "P(PP + Vox ≥ 105)": "PP y Vox tienen la mitad de los electos",
     "P(izquierda ≥ 105)": "La izquierda tiene la mitad de los electos",
+    "P(PP mayoría absoluta)": "El PP solo, mayoría absoluta del pleno",
+    "P(PP mayoría absoluta sin coalición)": "El PP solo, si no hubiera coalición",
+    "P(PP ≥ 105)": "El PP solo tiene la mitad de los electos",
     "P(PP ≥ 105 sin coalición)": "El PP solo, si no hubiera coalición",
     "P(izquierda ≥ 105 sin coalición)": "La izquierda, si no hubiera coalición",
 }

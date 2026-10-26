@@ -65,7 +65,9 @@ def test_retirada_de_vox():
     circ = senado.circunscripciones()
     provincias = set(circ.provincia)
     assert senado.retirada_vox(None) == frozenset()
-    assert set(senado.VOX_ANUNCIADAS) <= provincias and len(senado.retirada_vox("anunciadas")) == 15
+    for grupo in (senado.PACTO_VOX_FUERA, senado.PACTO_PP_FUERA, senado.PACTO_VOX_UNO):
+        assert set(grupo) <= provincias
+    assert len(senado.retirada_vox("pacto")) == 6 and len(senado.PACTO_VOX_UNO) == 14
     assert senado.retirada_vox("amplia") == provincias - set(senado.VOX_CON_LISTA)
     # donde Vox no va, su voto desaparece y el PP recibe TRASVASE_VOX de él
     partidos = ["PP", "PSOE", "VOX"]
@@ -101,3 +103,39 @@ def test_vox_en_la_lista_del_pp_y_provincias_seguras():
     # el nombre de Vox sólo va donde tiene al menos un tercio del voto de PP + Vox
     s0 = pd.DataFrame({"PP": [0.40, 0.40], "VOX": [0.25, 0.15]}, index=["Sevilla", "Cádiz"])
     assert senado.nombres_vox(s0, sin) == frozenset(["Sevilla"])
+
+
+def test_repartir_candidatos_coincide_con_repartir():
+    """Con listas de tres nombres, el reparto candidato a candidato da lo mismo que repartir()."""
+    rng = np.random.default_rng(1)
+    votos = rng.dirichlet([5, 4, 1, 1], size=500)
+    u = rng.choice(senado.umbrales_empate(), size=500)
+    a = senado.repartir(votos, 4, u)
+    b = senado.repartir_candidatos(votos, np.full(4, 3), 4, u)
+    assert (a == b).all()
+
+
+def test_acuerdo_pp_vox():
+    circ = senado.circunscripciones()
+    provs = sorted(set(circ.provincia))
+    partidos = ["PP", "PSOE", "VOX"]
+    vacia = pd.Series(dtype=float)
+    # donde el PP no va, Vox recibe TRASVASE_PP de su voto
+    S = np.tile([0.30, 0.45, 0.25], (1, len(provs), 1))
+    base, L = senado.voto_senado(S, provs, partidos, vacia, coalicion=False)
+    fuera, _ = senado.voto_senado(S, provs, partidos, vacia, coalicion=False, pp_fuera=frozenset(["Girona"]))
+    g = list(circ.index).index("Girona")
+    assert fuera[0, g, L.index("PP")] == 0
+    assert np.isclose(fuera[0, g, L.index("VOX")], 0.25 + senado.TRASVASE_PP * 0.30)
+    # Vox con un solo nombre: si sus votantes marcan dos del PP, la derecha puede pasar de 2 + 2 a 3 + 1
+    S = np.tile([0.36, 0.40, 0.18], (1, len(provs), 1))
+    sep, pc_sep = senado.simular(S, provs, partidos, vacia, coalicion=False)
+    uno, pc_uno = senado.simular(S, provs, partidos, vacia, coalicion=False, vox_uno=frozenset(["Sevilla"]))
+    assert list(pc_sep["Sevilla"].loc[0, ["PP", "PSOE", "VOX"]]) == [1, 3, 0]
+    assert list(pc_uno["Sevilla"].loc[0, ["PP", "PSOE", "VOX"]]) == [3, 1, 0]    # 0,36 + 0,8·2/3·0,18 > 0,40
+    assert uno.sum(axis=1).eq(senado.TOTAL).all()
+    # la hipótesis del pacto lleva las cuatro piezas
+    s0 = pd.DataFrame({"PP": [0.4] * len(provs), "VOX": [0.1] * len(provs)}, index=provs)
+    kw = senado.hipotesis_vox("pacto", s0)
+    assert kw["vox_en_pp"] == frozenset(["Cádiz", "València/Valencia", "Castelló/Castellón"])
+    assert kw["pp_fuera"] == frozenset(senado.PACTO_PP_FUERA) and len(kw["vox_uno"]) == 14

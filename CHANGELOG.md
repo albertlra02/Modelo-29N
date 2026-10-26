@@ -17,6 +17,17 @@ Plantilla de entrada:
 ## [Sin publicar]
 
 ### Modelo
+- **Acuerdo PP-Vox para el Senado (26/10/2026)** en `motor/senado.py`, en lugar de la hipótesis de las 15
+  provincias publicadas: Vox no se presenta en 6 provincias (uno de los tres nombres del PP es un independiente
+  propuesto por Vox en las de 4 senadores), el PP no se presenta en Gipuzkoa, Girona y Tarragona, y en 14
+  provincias Vox lleva un solo candidato y pide marcar dos del PP. Para esto último, reparto candidato a candidato
+  (`repartir_candidatos`, que con listas de 3 nombres da lo mismo que `repartir`). Supuestos sin calibrar:
+  TRASVASE_VOX 80 %, TRASVASE_PP 60 %, CUMPLE_VOX_UNO 80 %.
+- `scripts/analisis_pacto_senado.py`: sin pacto, el acuerdo y el mejor pacto posible por provincia.
+### Efecto
+- Con un 65 % de participación, PP + Vox con tres quintos del Senado: 17 % sin pacto → 53 % con el acuerdo
+  (mediana de electos de PP + Vox: 111 → 133). El mejor pacto posible llegaría al 89 % (77 % con supuestos
+  pesimistas). Con un 72 %: 4 % → 15 % (61 % con el mejor pacto).
 - **Palancas de escenario** (`motor/palancas.py`), aplicadas a la proyección central antes de simular, así que
   mueven Congreso, Senado y mayorías:
   - Movilización por bloque (izquierda, derecha, nacionalistas y regionalistas), de −20 % a +20 % de su voto,
