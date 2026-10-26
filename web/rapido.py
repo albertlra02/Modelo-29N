@@ -19,7 +19,7 @@ import time
 from collections import OrderedDict
 
 TTL = 6 * 3600                 # las páginas incluyen «faltan N días»: se regeneran cada pocas horas
-MAX_BYTES = 80 * 2**20         # tope de memoria para las páginas guardadas (comprimidas)
+MAX_BYTES = 32 * 2**20         # tope de memoria para las páginas guardadas (comprimidas; el plan gratuito da 512 MB)
 NO_GUARDAR = ("/api/calcular", "/salud", "/entrar", "/descargar/")
 MARCA_CALCULANDO = b"data-calcular="
 PRECALENTAR = ["/estatico/plotly.min.js", "/", "/escanos", "/mayorias", "/provincias", "/senado", "/participacion",

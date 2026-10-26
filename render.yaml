@@ -16,7 +16,9 @@ services:
         value: 3.12.10
       - key: MAX_SIM          # 10.000 simulaciones no caben en los 512 MB del plan gratuito
         value: "5000"
-      - key: PUBLICADO        # activa el cierre automático durante la veda electoral (web/acceso.py)
+      - key: MALLOC_ARENA_MAX # menos memoria fragmentada entre hilos (el servidor usa varios)
+        value: "2"
+      - key: PUBLICADO       # activa el cierre automático durante la veda electoral (web/acceso.py)
         value: "1"
       - key: CLAVE            # contraseña de acceso: Render la pide al crear el servicio y no se guarda aquí
         sync: false

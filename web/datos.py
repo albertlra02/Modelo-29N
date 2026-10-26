@@ -6,7 +6,10 @@ La caché en disco es la de interfaz/calculo.py (la misma que llena `python -m s
 """
 from __future__ import annotations
 
+import ctypes
+import gc
 import os
+import sys
 import threading
 from collections import OrderedDict
 from dataclasses import dataclass, replace
@@ -196,7 +199,9 @@ class Params:
 
 _CANDADO = threading.Lock()                 # un cálculo a la vez: numpy ya usa todos los núcleos
 _MEMORIA: OrderedDict[Escenario, dict] = OrderedDict()
-_MAX_MEMORIA = 64
+# Cada escenario ocupa unos 2 MB y leerlo de disco cuesta milisegundos: en la web publicada (512 MB) se guardan pocos,
+# para dejar sitio a un cálculo en vivo, que sube el pico unos 270 MB
+_MAX_MEMORIA = 12 if os.environ.get("PUBLICADO") else 64
 _centrales = lru_cache(maxsize=24)(piezas_centrales)
 
 
@@ -216,11 +221,25 @@ def correr(esc: Escenario) -> dict:
         if esc in _MEMORIA:
             _MEMORIA.move_to_end(esc)
             return _MEMORIA[esc]
+        calcular = not en_disco(esc, VERSION)
         d = escenario(esc, VERSION, centrales=_centrales)
         _MEMORIA[esc] = d
         while len(_MEMORIA) > _MAX_MEMORIA:
             _MEMORIA.popitem(last=False)
+        if calcular:
+            _devolver_memoria()
         return d
+
+
+def _devolver_memoria() -> None:
+    """Tras un cálculo en vivo, devuelve al sistema la memoria que ya no se usa. En Linux, Python se queda
+    con ella aunque esté libre, y el siguiente cálculo podría pasar del límite del servidor."""
+    gc.collect()
+    if sys.platform.startswith("linux"):
+        try:
+            ctypes.CDLL("libc.so.6").malloc_trim(0)
+        except (OSError, AttributeError):
+            pass
 
 
 TAREAS = ("escenario", "evolucion", "barrido")
