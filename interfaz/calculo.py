@@ -13,6 +13,7 @@ from dataclasses import replace
 import hashlib
 import pickle
 import shutil
+import sys
 from datetime import date, timedelta
 from pathlib import Path
 from collections.abc import Callable
@@ -26,6 +27,10 @@ from interfaz.estilo import nombre
 from motor import senado
 from motor.pipeline import CANDIDATURAS, DERECHA, PART_BASE, Escenario, ejecutar, piezas_centrales
 from motor.proyeccion import FECHA
+
+# Texto en formato Python, no pyarrow: la caché se lee en la web publicada, que no instala pyarrow. Si los pickles
+# guardan texto de pyarrow, el servidor no puede leerlos, los da por corruptos y se pone a recalcular.
+pd.set_option("mode.string_storage", "python")
 
 RAIZ = Path(__file__).resolve().parent.parent
 CACHE = RAIZ / "resultados" / "cache"
@@ -188,7 +193,10 @@ def escenario(esc: Escenario, version: str,
         try:
             with gzip.open(ruta, "rb") as f:
                 return pickle.load(f)
-        except Exception:  # noqa: BLE001  (fichero a medio escribir o corrupto: se recalcula)
+        except MemoryError:
+            raise                                  # falta memoria, no es el fichero: no se borra la caché
+        except Exception as e:  # noqa: BLE001  (fichero a medio escribir o corrupto: se recalcula)
+            print(f"No se pudo leer {ruta.name}: {e!r}; se recalcula", file=sys.stderr, flush=True)
             ruta.unlink(missing_ok=True)
     c = (centrales or piezas_centrales)(esc.fecha, esc.participacion, esc.reparto)
     d = resumir(ejecutar(esc, c))

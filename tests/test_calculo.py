@@ -37,3 +37,13 @@ def test_escenario_se_guarda_y_se_lee_de_disco(tmp_path, monkeypatch):
     (tmp_path / "v0").mkdir()
     calculo.limpiar_cache("v1")
     assert not (tmp_path / "v0").exists() and calculo.en_disco(esc, "v1")
+
+
+def test_la_cache_no_depende_de_pyarrow():
+    """La web publicada no instala pyarrow: los escenarios guardados no pueden llevar texto de pyarrow."""
+    import pickle
+
+    import pandas as pd
+
+    import interfaz.calculo  # noqa: F401  (fija el formato del texto)
+    assert b"pyarrow" not in pickle.dumps(pd.DataFrame({"a": ["x", "y"]}))
