@@ -26,7 +26,7 @@ from datos.familias import a_familias
 from motor.agregador import agregar, preparar
 from motor.swing import proyectar
 
-FECHA = "2026-10-20"   # corte de encuestas por defecto; la app lo usa también como última fecha elegible
+FECHA = "2026-10-26"   # corte de encuestas por defecto; la app lo usa también como última fecha elegible
 PARTIDOS = ["PP", "PSOE", "VOX", "SUMAR", "PODEMOS", "SALF", "ERC", "JUNTS",
             "BILDU", "PNV", "BNG", "CC", "UPN", "ADELANTE"]
 BLANCO_PCT = 0.8   # voto en blanco 2023 ≈ 0,8 %

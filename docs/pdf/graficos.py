@@ -435,3 +435,33 @@ def pacto_huecos(filas: list[tuple[str, float, bool]]) -> str:
         c.append(t(X(v) + 8, y + 4, n(v, 1), "kb"))
     c.append(t(x0 + w, yfin + 48, "senadores de más para el bloque de derechas con el mejor pacto (media)", "q", "end"))
     return svg(680, yfin + 58, "".join(c), "Provincias donde el acuerdo deja más senadores")
+
+
+def pacto_ruta(pasos: list[tuple[str, float, str]], hitos: str = "") -> str:
+    """Escalera de mejoras del acuerdo. pasos: (texto, P tres quintos acumulada en %, tipo: 'base' | 'cambia' | 'nueva').
+    Cada fila es la probabilidad tras sumar ese cambio a los anteriores."""
+    x0, w = 300, 330
+
+    def X(v):
+        return x0 + v / 100 * w
+    y0, paso = 34, 25
+    yfin = y0 + paso * (len(pasos) - 1)
+    c = [f'<rect x="{x0}" y="2" width="12" height="12" rx="2" class="f1"/>',
+         t(x0 + 18, 12, "pasar de un solo candidato a retirada", "q"),
+         f'<rect x="{x0}" y="18" width="12" height="12" rx="2" class="f2"/>',
+         t(x0 + 18, 28, "provincia nueva en el acuerdo", "q")]
+    c = [f'<g transform="translate(0,4)">{"".join(c)}</g>']
+    y0 += 18
+    yfin += 18
+    for v in (0, 25, 50, 75, 100):
+        c += [ln(X(v), y0 - 12, X(v), yfin + 12, "ref" if v == 50 else "grid"),
+              t(X(v), yfin + 30, f"{v} %", "q", "middle")]
+    for i, (texto, v, tipo) in enumerate(pasos):
+        y = y0 + i * paso
+        cls = {"base": "k-fill", "cambia": "f1", "nueva": "f2"}[tipo]
+        c.append(t(x0 - 12, y + 4, texto, "kb" if tipo == "base" else "k", "end"))
+        c.append(f'<rect x="{x0}" y="{y - 8}" width="{X(v) - x0:.1f}" height="16" rx="2" class="{cls}"/>')
+        c.append(t(X(v) + 8, y + 4, f"{round(v)} %", "kb"))
+    if hitos:
+        c.append(t(20, yfin + 52, hitos, "q"))
+    return svg(680, yfin + (62 if hitos else 40), "".join(c), "Ruta de mejoras del acuerdo PP-Vox")

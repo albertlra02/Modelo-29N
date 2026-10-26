@@ -89,10 +89,10 @@ def test_compresion_y_paginas_en_memoria(monkeypatch):
     monkeypatch.delenv("CLAVE", raising=False)
     monkeypatch.delenv("VEDA", raising=False)
     monkeypatch.setenv("PUBLICADO", "1")
-    codigo, cab, _ = pedir("/participacion", cabeceras={"accept-encoding": "gzip"})
+    codigo, cab, _ = pedir("/metodologia", cabeceras={"accept-encoding": "gzip"})
     assert codigo == 200 and cab.get("content-encoding") == "gzip"
     memoria = next(m for m in _middlewares(aplicacion) if m.__class__.__name__ == "PaginasEnMemoria")
-    claves = [k for k in memoria.guardadas if k[0] == "/participacion"]
+    claves = [k for k in memoria.guardadas if k[0] == "/metodologia"]
     assert claves and gzip.decompress(memoria.guardadas[claves[0]][3]).startswith(b"<!doctype html>")
 
 
