@@ -38,7 +38,7 @@ from starlette.staticfiles import StaticFiles  # noqa: E402
 
 from interfaz import graficos as G  # noqa: E402
 from interfaz.estilo import (BRONCE, FONDO, FUENTE, FUENTE_CIFRAS, GRIS_DATO, PANEL, RAMPA_CLARO, REGLA, TINTA, TINTA_2,  # noqa: E402
-                             TINTA_3, color, nombre, num, orden, pct)
+                             TINTA_3, color, mezcla, nombre, num, orden, pct)
 from datos import escrutinio as E  # noqa: E402
 from datos.cargar import escanos_2026  # noqa: E402
 from motor import senado  # noqa: E402
@@ -569,7 +569,10 @@ def _por_provincia_senado(s: dict) -> pd.DataFrame:
             pacto = "sin coalición"
         else:
             pacto = "coalición sólo en La Gomera"
+        principal = g.sort_values("Senadores", ascending=False).iloc[0]    # en las islas, la mayor
         filas[prov] = {"ganador": orden_[0], "senadores": total,
+                       "p_ganadora": float(principal["P(ganadora)"]),
+                       "derecha": int(sum(suma.get(x, 0) for x in DERECHA_SEN)),
                        "hover": f"<b>{prov}</b> · {total} senadores · {pacto}<br>Reparto más probable: "
                                 + "<br>".join(lineas)}
     return pd.DataFrame.from_dict(filas, orient="index")
@@ -625,13 +628,54 @@ def _comparar_vox(d: dict, q: str) -> list[dict]:
     return filas
 
 
-def _mapa_senado(s: dict) -> dict:
+# Mapa del Senado: tramos de seguridad de la lista ganadora (probabilidad, aclarado como en el del Congreso)
+TRAMOS_SEGURIDAD = [(70, 0.55), (90, 0.25)]             # por encima del 90 %, color pleno
+# Bloque de derechas: tono según la parte de los senadores de la provincia que se lleva (neutro, no de partido)
+TRAMOS_DERECHA = [(0.0, "Ninguno", 0.92), (0.25, "1 de cada 4", 0.72), (0.5, "2 de cada 4", 0.48),
+                  (0.75, "3 de cada 4", 0.22), (1.0, "Todos", 0.0)]
+# Qué hace el acuerdo PP-Vox en cada provincia (colores neutros: no son partidos)
+ACUERDO = {"vox_fuera": ("Vox no se presenta", BRONCE),
+           "vox_uno": ("Vox con un solo candidato", mezcla(BRONCE, PANEL, 0.5)),
+           "pp_fuera": ("El PP no se presenta", "#4A5664"), "separados": ("Sin acuerdo", SIN_CAMBIO)}
+
+
+def _mapa_senado(d: dict, vox: str, modo: str = "ganador") -> dict:
+    s = _senado_de(d, vox)
     pp = _por_provincia_senado(s)
+    if modo == "derecha":
+        cuota = pp.derecha / pp.senadores
+        tramo = cuota.map(lambda c: next(t for t in TRAMOS_DERECHA if c <= t[0] + 1e-9))
+        colores = tramo.map(lambda t: mezcla(BRONCE, PANEL, t[2]))
+        hover = pp.hover + "<br>PP, Vox y UPN: " + pp.derecha.astype(str) + " de " + pp.senadores.astype(str)
+        cuenta = tramo.map(lambda t: t[1]).value_counts()
+        return {"fig": figura(G.mapa_colores(colores, hover)),
+                "leyenda": [{"nombre": t[1], "color": mezcla(BRONCE, PANEL, t[2]), "n": int(cuenta.get(t[1], 0))}
+                            for t in TRAMOS_DERECHA if cuenta.get(t[1], 0)],
+                "nota": "Parte de los senadores de cada provincia que se lleva el bloque de derechas (PP, Vox y UPN) en el "
+                        "reparto más probable. Cuanto más oscuro, más senadores."}
+    if modo == "acuerdo":
+        con, sin = _por_provincia_senado(_senado_de(d, "")), _por_provincia_senado(d["senado"])
+        tipo = pd.Series({p: ("vox_fuera" if p in senado.PACTO_VOX_FUERA else "pp_fuera" if p in senado.PACTO_PP_FUERA
+                              else "vox_uno" if p in senado.PACTO_VOX_UNO else "separados") for p in con.index})
+        dif = con.derecha - sin.derecha.reindex(con.index)
+        hover = (con.hover + "<br><b>" + tipo.map(lambda t: ACUERDO[t][0]) + "</b>: PP, Vox y UPN "
+                 + sin.derecha.reindex(con.index).astype(str) + " → " + con.derecha.astype(str) + " senadores")
+        cuenta = tipo.value_counts()
+        return {"fig": figura(G.mapa_colores(tipo.map(lambda t: ACUERDO[t][1]), hover)),
+                "leyenda": [{"nombre": texto, "color": c, "n": int(cuenta.get(k, 0))} for k, (texto, c) in ACUERDO.items()],
+                "nota": f"Qué hace el acuerdo PP-Vox del 26 de octubre en cada provincia. En el reparto más probable, el "
+                        f"bloque de derechas gana {int(dif.clip(lower=0).sum())} senadores con el acuerdo y pierde "
+                        f"{int(-dif.clip(upper=0).sum())}. Pasa el ratón para verlo provincia a provincia."}
+    tono = pd.Series([mezcla(color(g), PANEL, next((t for tope, t in TRAMOS_SEGURIDAD if p < tope), 0.0))
+                      for g, p in zip(pp.ganador, pp.p_ganadora)], index=pp.index)
+    hover = pp.hover + "<br>" + pp.ganador.map(nombre) + " primera en el " + pp.p_ganadora.round().astype(int).astype(str) \
+        + " % de las simulaciones"
     cuenta = pp.ganador.value_counts()
-    return {"fig": figura(G.mapa_ganador(pp.ganador, pp.hover)),
+    return {"fig": figura(G.mapa_colores(tono, hover)),
             "leyenda": [{"nombre": nombre(x), "color": color(x), "n": int(n)} for x, n in cuenta.items()],
             "nota": "Lista con más senadores en el reparto más probable de cada provincia (en Baleares y Canarias, "
-                    "sumando sus islas). Pasa el ratón para ver el reparto."}
+                    "sumando sus islas). Cuanto más claro, menos segura (gana en menos del 70 %, del 70 al 90 % o más "
+                    "del 90 % de las simulaciones)."}
 
 
 def _rango(sim: pd.DataFrame, x: str) -> dict | None:
@@ -683,7 +727,7 @@ def senado_pagina(request):
     return pagina(request, "senado.html", p, titular=titular, entradilla=entradilla, der=der, filas_prob=filas_prob,
                   hemiciclo=figura(G.hemiciclo(pl, der["total"], "senadores", f"tres quintos: {der['quintos']}",
                                                umbral=der["quintos"])),
-                  leyenda=G.leyenda_html(pl, total=der["total"]), tabla=tabla, mapa=_mapa_senado(s),
+                  leyenda=G.leyenda_html(pl, total=der["total"]), tabla=tabla, mapa=_mapa_senado(d, vox),
                   vox=vox, comparar_vox=_comparar_vox(d, p.query()), vox_con_lista=senado.VOX_CON_LISTA,
                   trasvase_vox=senado.TRASVASE_VOX, p_pp_seguro=senado.P_PP_SEGURO,
                   trasvase_pp=senado.TRASVASE_PP, marca_pp_vox=senado.MARCA_PP_VOX,
@@ -822,7 +866,7 @@ def api_mapa(request):
 
 def api_mapa_senado(request):
     p = params(request)
-    m = _mapa_senado(_senado_de(_exigir_calculado(p), _hipotesis_vox(request)))
+    m = _mapa_senado(_exigir_calculado(p), _hipotesis_vox(request), request.query_params.get("modo", "ganador"))
     return JSONResponse({"fig": m["fig"]["json"], "leyenda": m["leyenda"], "nota": m["nota"]})
 
 

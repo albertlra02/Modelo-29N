@@ -124,6 +124,13 @@
 </section>
 
 <section class="tarjeta mapa" data-mapa data-api="/api/mapa_senado">
+  <div class="mapa__controles">
+    <div class="segmentado" role="group" aria-label="Qué mostrar">
+      <button type="button" data-modo="ganador" aria-pressed="true">Lista con más senadores</button>
+      <button type="button" data-modo="derecha" aria-pressed="false">Bloque de derechas</button>
+      <button type="button" data-modo="acuerdo" aria-pressed="false">El acuerdo PP-Vox</button>
+    </div>
+  </div>
   {{ grafico("f-mapa", mapa.fig, "Mapa del Senado por provincias") }}
   <div class="leyenda" data-leyenda-mapa>
     {% for l in mapa.leyenda %}<div><i style="background: {{ l.color }}"></i>{{ l.nombre }} <b>{{ l.n }}</b> {{ 'provincia' if l.n == 1 else 'provincias' }}</div>{% endfor %}
