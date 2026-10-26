@@ -930,8 +930,16 @@ async def fallo(request, exc):
 
 
 def salud(request):
-    """Comprobación de vida para el alojamiento (sin contraseña ni veda)."""
-    return Response("ok", media_type="text/plain")
+    """Comprobación de vida para el alojamiento (sin contraseña ni veda). Con ?detalle, la versión del modelo,
+    cuántos escenarios hay en la caché y si el escenario por defecto está calculado."""
+    if "detalle" not in request.query_params:
+        return Response("ok", media_type="text/plain")
+    from interfaz.calculo import CACHE, _ruta, normalizar
+    esc = normalizar(params(request).escenario())
+    carpeta = CACHE / D.VERSION
+    return JSONResponse({"version": D.VERSION, "escenarios_en_cache": len(list(carpeta.glob("*.pkl.gz")))
+                         if carpeta.exists() else 0, "defecto": _ruta(esc, D.VERSION).name,
+                         "defecto_calculado": D.calculado(esc)})
 
 
 @contextlib.asynccontextmanager
