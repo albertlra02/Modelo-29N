@@ -686,7 +686,7 @@ def senado_pagina(request):
                   leyenda=G.leyenda_html(pl, total=der["total"]), tabla=tabla, mapa=_mapa_senado(s),
                   vox=vox, comparar_vox=_comparar_vox(d, p.query()), vox_con_lista=senado.VOX_CON_LISTA,
                   trasvase_vox=senado.TRASVASE_VOX, p_pp_seguro=senado.P_PP_SEGURO,
-                  trasvase_pp=senado.TRASVASE_PP, cumple_vox_uno=senado.CUMPLE_VOX_UNO,
+                  trasvase_pp=senado.TRASVASE_PP, marca_pp_vox=senado.MARCA_PP_VOX,
                   pacto_vox_fuera=senado.PACTO_VOX_FUERA, pacto_pp_fuera=senado.PACTO_PP_FUERA,
                   pacto_vox_uno=senado.PACTO_VOX_UNO,
                   filas=filas, ccaa=sorted(circ["CCAA"].unique()),

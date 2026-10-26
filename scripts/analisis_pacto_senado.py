@@ -130,7 +130,8 @@ def main(participacion: float = 0.65, reparto: str = "historico", n_sim: int = 5
     provs.to_csv(salida)
     print(f"Participación {participacion:.0%} ({reparto}), {n_sim} simulaciones, encuestas hasta {esc.fecha}")
     print(f"Supuestos: trasvase Vox→PP {senado.TRASVASE_VOX:.0%}, PP→Vox {senado.TRASVASE_PP:.0%}, "
-          f"votantes de Vox que marcan dos del PP {senado.CUMPLE_VOX_UNO:.0%}\n")
+          f"votantes de Vox que marcan también dos del PP {senado.MARCA_PP_VOX:.0%}, "
+          f"del PP que marcan al de Vox {senado.PP_MARCA_VOX:.0%}\n")
     print(tabla.round(3).to_string(index=False))
     distintas = provs[(provs.acuerdo != provs.ideal_senadores) | (provs.acuerdo != provs.ideal_tres_quintos)]
     print("\nProvincias donde el acuerdo no coincide con el ideal:")

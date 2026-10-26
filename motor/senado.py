@@ -25,22 +25,25 @@ Supuestos del modelo (validados contra 2023 con validacion/validar_senado.py):
     Frente Amplio en el Congreso (C. Valenciana y Canarias) su parte va al Senado por su cuenta.
   - Acuerdo PP-Vox para el Senado (26/10/2026, comunicado de Vox recogido por Moncloa.com, Demócrata y
     Vozpópuli; no es una coalición: cada partido mantiene su papeleta). Tres piezas:
-      * Vox no presenta lista en PACTO_VOX_FUERA (6 provincias). El TRASVASE_VOX de su voto va a la lista del
-        PP y el resto se pierde (blanco, abstención o sin marcar). En las de 4 senadores, uno de los tres
-        nombres del PP es un independiente propuesto por Vox: si la lista gana sus 3 escaños, uno es suyo.
+      * Vox no presenta lista en PACTO_VOX_FUERA (6 provincias). El TRASVASE_VOX de sus votantes sigue votando a
+        la derecha y el resto se pierde (blanco, abstención o sin marcar). En las de 4 senadores, el tercer
+        nombre del PP es un independiente propuesto por Vox y el reparto se hace nombre a nombre
+        (_repartir_vox_en_pp): los votantes de Vox marcan al independiente y MARCA_PP_VOX de ellos también a los
+        dos del PP; los del PP marcan a los suyos y al independiente con la caída habitual del tercer nombre.
       * El PP no presenta lista en PACTO_PP_FUERA (Gipuzkoa, Girona, Tarragona): el TRASVASE_PP de su voto va
         a Vox.
       * Vox presenta un solo candidato en PACTO_VOX_UNO (14 provincias) y pide a sus votantes marcar a ese
-        candidato y a dos del PP. Ahí el reparto se hace candidato a candidato (repartir_candidatos): cada
-        nombre del PP suma CUMPLE_VOX_UNO x 2/3 del voto de Vox (dos marcas de tres nombres, repartidas), y
-        se eligen los cuatro nombres más votados de todas las listas.
-    TRASVASE_VOX (80 %), TRASVASE_PP (60 %) y CUMPLE_VOX_UNO (80 %) son supuestos sin calibrar: no hay
+        candidato y a dos del PP; el PP presenta sus tres. Reparto nombre a nombre (_repartir_vox_uno): los dos
+        primeros del PP suman el voto del PP y el de MARCA_PP_VOX de los votantes de Vox; el tercero, sólo el del
+        PP con la caída habitual, y puede colarse el segundo de otra lista. PP_MARCA_VOX (0 por defecto) es la
+        parte de los votantes del PP que marcaría al de Vox en lugar de a su tercer nombre.
+    TRASVASE_VOX (80 %), TRASVASE_PP (60 %) y MARCA_PP_VOX (75 %) son supuestos sin calibrar: no hay
     precedente de un acuerdo así. Lo más parecido medido en España es Unidos Podemos en 2016, que conservó el
     83 % de los votos que Podemos e IU habían sacado por separado.
   - Hipótesis "amplia" (contrafactual): Vox no se presenta en ninguna provincia salvo Murcia, Almería y Ceuta y
     las provincias donde el PP queda primero de todos modos (en al menos P_PP_SEGURO de las simulaciones con
-    Vox presente). Donde Vox tiene al menos CUOTA_NOMBRE_VOX del voto de PP + Vox, uno de los tres nombres de
-    la lista del PP es suyo.
+    Vox presente). Como en el acuerdo, en las provincias de 4 senadores el tercer nombre del PP es un
+    independiente propuesto por Vox.
 
 Senadores designados por los parlamentos autonómicos (58): no dependen del 29-N sino de cada parlamento
 autonómico, así que se suman fijos tal como están hoy (datos/senado_designados.csv, transcrito de la web
@@ -89,9 +92,9 @@ VOX_CON_LISTA = ("Murcia", "Almería", "Ceuta")
 HIPOTESIS_VOX = ("pacto", "amplia")
 TRASVASE_VOX = 0.8          # parte del voto de Vox que va a la lista del PP donde Vox no se presenta
 TRASVASE_PP = 0.6           # parte del voto del PP que va a Vox donde el PP no se presenta
-CUMPLE_VOX_UNO = 0.8        # votantes de Vox que marcan dos nombres del PP donde Vox lleva un solo candidato
+MARCA_PP_VOX = 0.75         # votantes de Vox que, además de a su candidato, marcan a dos nombres del PP
+PP_MARCA_VOX = 0.0          # votantes del PP que marcan al candidato único de Vox en vez de a su tercer nombre
 P_PP_SEGURO = 0.95          # con esta probabilidad de quedar primero, el PP no necesita la retirada de Vox
-CUOTA_NOMBRE_VOX = 1 / 3    # voto de Vox / (PP + Vox) a partir del cual uno de los 3 nombres del PP es de Vox
 
 
 def retirada_vox(hipotesis: str | None, seguras: frozenset[str] = frozenset()) -> frozenset[str]:
@@ -129,8 +132,7 @@ def hipotesis_vox(hipotesis: str, s0: pd.DataFrame, seguras: frozenset[str] = fr
     """Argumentos de simular() para cada hipótesis: sin_vox, vox_en_pp, pp_fuera y vox_uno."""
     sv = retirada_vox(hipotesis, seguras)
     if hipotesis == "pacto":
-        cuatro = set(circunscripciones().query("escanos == 4").index)
-        return {"sin_vox": sv, "vox_en_pp": frozenset(p for p in sv if p in cuatro),
+        return {"sin_vox": sv, "vox_en_pp": nombres_vox(s0, sv),
                 "pp_fuera": frozenset(PACTO_PP_FUERA), "vox_uno": frozenset(PACTO_VOX_UNO)}
     return {"sin_vox": sv, "vox_en_pp": nombres_vox(s0, sv), "pp_fuera": frozenset(), "vox_uno": frozenset()}
 
@@ -138,9 +140,8 @@ def hipotesis_vox(hipotesis: str, s0: pd.DataFrame, seguras: frozenset[str] = fr
 def nombres_vox(s0: pd.DataFrame, sin_vox: frozenset[str]) -> frozenset[str]:
     """Provincias sin lista de Vox donde uno de los nombres de la lista del PP es de Vox (sólo las de 4
     senadores: en las islas cada lista lleva 1 o 2 nombres)."""
-    cuota = s0["VOX"] / (s0["PP"] + s0["VOX"])
     cuatro = set(circunscripciones().query("escanos == 4").index)
-    return frozenset(p for p in sin_vox if p in cuatro and cuota.get(p, 0) >= CUOTA_NOMBRE_VOX)
+    return frozenset(p for p in sin_vox if p in cuatro)
 
 
 @lru_cache(maxsize=1)
@@ -249,25 +250,41 @@ def repartir(votos: np.ndarray, escanos: int, umbral: np.ndarray | None = None) 
     return np.where(votos > 0, out, 0)
 
 
-def repartir_candidatos(votos: np.ndarray, nombres: np.ndarray, escanos: int,
-                        umbral: np.ndarray | None = None) -> np.ndarray:
-    """Voto limitado candidato a candidato. votos: (n, listas), lo que saca cada nombre de la lista;
-    nombres: (listas,), candidatos de cada lista. Salen los `escanos` nombres más votados.
+def elegir(candidatos: list[tuple[int, np.ndarray]], n_listas: int, escanos: int) -> np.ndarray:
+    """Los `escanos` nombres más votados. candidatos: (lista, votos de ese nombre (n,)). Devuelve (n, listas)."""
+    votos = np.stack([v for _, v in candidatos], axis=1)
+    lista = np.array([j for j, _ in candidatos])
+    elegidos = lista[np.argsort(-votos, axis=1, kind="stable")[:, :escanos]]
+    return np.stack([(elegidos == j).sum(axis=1) for j in range(n_listas)], axis=1)
 
-    Con `umbral` (n,), el tercer nombre de cada lista saca votos x (1 - umbral), como en repartir(): con dos
-    listas de 3 nombres da exactamente el mismo 3 + 1 o 2 + 2."""
-    votos = np.atleast_2d(np.asarray(votos, dtype=float))
-    n, L = votos.shape
-    u = np.zeros(n) if umbral is None else np.asarray(umbral, dtype=float)
-    cols, lista = [], []
-    for j in range(L):
-        for k in range(int(nombres[j])):
-            cols.append(votos[:, j] * (1 - u) if k == 2 else votos[:, j])
-            lista.append(j)
-    cand = np.stack(cols, axis=1)
-    elegidos = np.asarray(lista)[np.argsort(-cand, axis=1, kind="stable")[:, :escanos]]
-    out = np.stack([(elegidos == j).sum(axis=1) for j in range(L)], axis=1)
-    return np.where(votos > 0, out, 0)
+
+def _resto(v: np.ndarray, L: list[str], u: np.ndarray, fuera: tuple[int, ...]) -> list[tuple[int, np.ndarray]]:
+    """Nombres de las demás listas: tres cada una, el tercero con la caída habitual."""
+    return [(j, x) for j in range(len(L)) if j not in fuera and v[:, j].any()
+            for x in (v[:, j], v[:, j], v[:, j] * (1 - u))]
+
+
+def _repartir_vox_uno(v: np.ndarray, L: list[str], u: np.ndarray) -> np.ndarray:
+    """Vox lleva un solo nombre y el PP sus tres. Los votantes de Vox que siguen la consigna (MARCA_PP_VOX)
+    marcan a su candidato y a los dos primeros del PP; el tercero del PP sólo tiene voto del PP (con la caída
+    habitual), menos los votantes del PP que marquen al de Vox en su lugar (PP_MARCA_VOX)."""
+    pp, vx = L.index("PP"), L.index("VOX")
+    a, b = v[:, pp], v[:, vx]
+    cand = [(pp, a + MARCA_PP_VOX * b), (pp, a + MARCA_PP_VOX * b), (pp, a * (1 - u) * (1 - PP_MARCA_VOX)),
+            (vx, b + PP_MARCA_VOX * a)]
+    return elegir(cand + _resto(v, L, u, (pp, vx)), len(L), 4)
+
+
+def _repartir_vox_en_pp(v: np.ndarray, vox: np.ndarray, L: list[str], u: np.ndarray) -> np.ndarray:
+    """Vox no se presenta y el tercer nombre de la lista del PP es un independiente propuesto por Vox (cuenta como
+    Vox). De los votantes de Vox, TRASVASE_VOX sigue votando a la derecha: todos marcan al independiente y
+    MARCA_PP_VOX de ellos también a los dos del PP. Los del PP marcan a los suyos y al independiente con la caída
+    habitual del tercer nombre. `v` ya trae el voto de la lista del PP con el trasvase; `vox`, el de Vox antes."""
+    pp, vx = L.index("PP"), L.index("VOX")
+    a = v[:, pp] - TRASVASE_VOX * vox              # voto propio del PP
+    b = TRASVASE_VOX * vox                         # votantes de Vox que siguen votando a la derecha
+    cand = [(pp, a + MARCA_PP_VOX * b), (pp, a + MARCA_PP_VOX * b), (vx, a * (1 - u) + b)]
+    return elegir(cand + _resto(v, L, u, (pp, vx)), len(L), 4)
 
 
 def listas(partidos: list[str]) -> list[str]:
@@ -339,26 +356,21 @@ def simular(S: np.ndarray, provincias: list[str], partidos: list[str], ajena: pd
     `pp_fuera`:  provincias donde el PP no presenta lista.
     `vox_uno`:   provincias de 4 senadores donde Vox lleva un solo nombre y sus votantes marcan dos del PP."""
     V, L = voto_senado(S, provincias, partidos, ajena, coalicion, sin_vox, pp_fuera)
+    # voto de Vox antes de su retirada: hace falta para repartir nombre a nombre donde va dentro de la lista del PP
+    crudo = voto_senado(S, provincias, partidos, ajena, coalicion, frozenset(), pp_fuera)[0] if vox_en_pp else None
     circ = circunscripciones()
     rng = np.random.default_rng(semilla)
     u = rng.choice(umbrales_empate(), size=(V.shape[0], len(circ)))
     total = np.zeros((V.shape[0], len(L)), dtype=int)
     por_circ = {}
     for c, (nombre, fila) in enumerate(circ.iterrows()):
-        if nombre in vox_uno and fila.escanos == 4 and "VOX" in L:
-            pp, vx = L.index("PP"), L.index("VOX")
-            v = V[:, c, :].copy()
-            v[:, pp] += CUMPLE_VOX_UNO * 2 / 3 * v[:, vx]
-            nombres = np.full(len(L), VOTOS_ELECTOR[4])
-            nombres[vx] = 1
-            e = repartir_candidatos(v, nombres, 4, u[:, c])
+        cuatro = fila.escanos == 4 and "VOX" in L
+        if cuatro and nombre in vox_uno:
+            e = _repartir_vox_uno(V[:, c, :], L, u[:, c])
+        elif cuatro and nombre in vox_en_pp:
+            e = _repartir_vox_en_pp(V[:, c, :], crudo[:, c, L.index("VOX")], L, u[:, c])
         else:
             e = repartir(V[:, c, :], int(fila.escanos), u[:, c])
-        if nombre in vox_en_pp and "VOX" in L:
-            pp, vx = L.index("PP"), L.index("VOX")
-            tres = e[:, pp] == 3                 # la lista gana sus 3: entra también el nombre de Vox
-            e[tres, pp] -= 1
-            e[tres, vx] += 1
         total += e
         por_circ[nombre] = e
     usadas = [i for i, _ in enumerate(L) if total[:, i].any() or V[:, :, i].any()]
