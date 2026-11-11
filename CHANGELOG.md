@@ -17,6 +17,15 @@ Plantilla de entrada:
 ## [Sin publicar]
 
 ### Modelo
+- **Formentera elige su propio senador** (reforma del art. 69.3 de la Constitución, BOE de 20/05/2026, aplicable por
+  primera vez el 29-N). El Senado pasa a 209 electos y 60 circunscripciones; el pleno, a 267: los tres quintos pasan de
+  160 a **161** (la mayoría absoluta sigue en 134). El voto al Congreso de 2023 por isla separa Formentera (municipio
+  07024) con `datos/oficiales.py`; la validación contra 2023 sigue con Eivissa-Formentera junta (199 de 208).
+- **Participación base: del 65 % al 68 %.** Es la que suponen las encuestas que la publican, tomando la última de cada
+  casa (mediana 68,7 %; sin Sondaxe, media 67,8 %). Antes se hacía la media de todas las encuestas y NC Report, que
+  publica cada dos semanas con un 63-64 %, pesaba de más. No cambia el escenario central (las encuestas tal cual), sino
+  qué participación se le atribuye: los escenarios de más participación se miden ahora desde el 68 %.
+- Encuestas hasta el 8 de noviembre.
 - **Acuerdo PP-Vox para el Senado (26/10/2026)** en `motor/senado.py`, en lugar de la hipótesis de las 15
   provincias publicadas: Vox no se presenta en 6 provincias (uno de los tres nombres del PP es un independiente
   propuesto por Vox en las de 4 senadores), el PP no se presenta en Gipuzkoa, Girona y Tarragona, y en 14

@@ -64,7 +64,7 @@ ATAJOS = {
     "PSOE y su izquierda": ["PSOE", "SUMAR", "PODEMOS", "FRENTE_AMPLIO"],
 }
 ESCENARIOS_SENADO = {   # clave de las probabilidades del Senado -> texto (las primeras, las que se comparan)
-    "P(PP + Vox tres quintos)": "PP y Vox, tres quintos del pleno (160)",
+    "P(PP + Vox tres quintos)": "PP y Vox, tres quintos del pleno (161)",
     "P(PP + Vox + UPN mayoría absoluta)": "PP, Vox y UPN, mayoría absoluta del pleno (134)",
     "P(izquierda mayoría absoluta)": "La izquierda, mayoría absoluta del pleno",
     "P(PP + Vox ≥ 105)": "PP y Vox tienen la mitad de los electos",

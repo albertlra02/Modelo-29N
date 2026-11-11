@@ -5,13 +5,13 @@ import pytest
 
 from datos.familias import CCAA
 from motor.palancas import Palancas, aplicar
-from motor.pipeline import Escenario, ejecutar, piezas_centrales, registradas
+from motor.pipeline import PART_BASE, Escenario, ejecutar, piezas_centrales, registradas
 from web import datos as D
 
 
 @pytest.fixture(scope="module")
 def c():
-    return registradas(piezas_centrales("2026-10-12", 0.65, "historico"))
+    return registradas(piezas_centrales("2026-10-12", PART_BASE, "historico"))
 
 
 def test_sin_palancas_no_cambia_nada(c):
@@ -46,7 +46,7 @@ def test_palancas_mueven_la_simulacion():
     r0 = ejecutar(base)
     r1 = ejecutar(replace(base, palancas=Palancas(mov_izda=15)))
     assert r1.sim.PSOE.mean() > r0.sim.PSOE.mean() and r1.sim.PP.mean() < r0.sim.PP.mean()
-    assert (r1.sim.sum(axis=1) == 350).all() and (r1.senado["sim"].sum(axis=1) == 208).all()
+    assert (r1.sim.sum(axis=1) == 350).all() and (r1.senado["sim"].sum(axis=1) == 209).all()
 
 
 def test_palancas_en_la_url():

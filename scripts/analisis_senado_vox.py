@@ -1,11 +1,11 @@
 """
 ¿En qué provincias le conviene a Vox no presentarse al Senado si la derecha quiere los tres quintos?
 
-    python -m scripts.analisis_senado_vox [participación] [reparto]      (p. ej. 0.65 historico)
+    python -m scripts.analisis_senado_vox [participación] [reparto]      (p. ej. 0.68 historico)
 
-Los tres quintos del Senado completo (160 de 266) permiten a PP y Vox renovar sin el PSOE los magistrados del
-Constitucional y los vocales del CGPJ que elige el Senado. Con los 28 designados que ya tienen (PP 23, Vox 5), les
-hacen falta 132 de los 208 senadores electos.
+Los tres quintos del Senado completo (161 de 267, con el senador propio de Formentera) permiten a PP y Vox renovar
+sin el PSOE los magistrados del Constitucional y los vocales del CGPJ que elige el Senado. Con los 28 designados que ya
+tienen (PP 23, Vox 5), les hacen falta 133 de los 209 senadores electos.
 
 Método: retirarse en una provincia sólo cambia los senadores de esa provincia, así que se simula cada provincia
 una vez (las mismas simulaciones de voto y el mismo sorteo del 2 + 2 que el escenario base) y cualquier conjunto
@@ -29,7 +29,7 @@ from datos.cargar import escanos_2026
 from motor import senado
 from motor.montecarlo import simular
 from motor.palancas import aplicar
-from motor.pipeline import BLOQUES, ESTATALES, Escenario, piezas_centrales, registradas
+from motor.pipeline import BLOQUES, ESTATALES, PART_BASE, Escenario, piezas_centrales, registradas
 from scripts.consola import configurar_salida_utf8
 
 DERECHA = ("PP", "VOX")
@@ -58,7 +58,7 @@ def analizar(esc: Escenario) -> tuple[pd.DataFrame, pd.DataFrame, float]:
     base = derecha_por_circ(base_circ)
     designados = senado.designados_por_lista().reindex(list(DERECHA), fill_value=0).sum()
     total = senado.TOTAL + len(senado.designados())
-    umbral = -(-3 * total // 5) - designados                     # electos que les faltan para 160
+    umbral = -(-3 * total // 5) - designados                     # electos que les faltan para los tres quintos
     circ = senado.circunscripciones()
     base_total = sum(base.values())
 
@@ -96,7 +96,7 @@ def analizar(esc: Escenario) -> tuple[pd.DataFrame, pd.DataFrame, float]:
     return sueltas, pd.DataFrame(curva), p_base
 
 
-def main(participacion: float = 0.65, reparto: str = "historico", n_sim: int = 5000) -> None:
+def main(participacion: float = PART_BASE, reparto: str = "historico", n_sim: int = 5000) -> None:
     configurar_salida_utf8()
     esc = Escenario(participacion=participacion, reparto=reparto, n_sim=n_sim)
     sueltas, curva, p_base = analizar(esc)
@@ -104,7 +104,8 @@ def main(participacion: float = 0.65, reparto: str = "historico", n_sim: int = 5
     salida.parent.mkdir(parents=True, exist_ok=True)
     sueltas.to_csv(salida)
     print(f"Participación {participacion:.0%} ({reparto}), {n_sim} simulaciones, encuestas hasta {esc.fecha}")
-    print(f"P(PP + Vox ≥ 160 de 266) con Vox en todas: {p_base:.1%}\n")
+    total = senado.TOTAL + len(senado.designados())
+    print(f"P(PP + Vox ≥ {-(-3 * total // 5)} de {total}) con Vox en todas: {p_base:.1%}\n")
     print("Provincias donde retirarse ayuda (por separado):")
     print(sueltas[sueltas.ganancia_media > 0.01].round(3).to_string())
     print("\nRetiradas una a una:")
@@ -114,4 +115,4 @@ def main(participacion: float = 0.65, reparto: str = "historico", n_sim: int = 5
 
 if __name__ == "__main__":
     a = sys.argv[1:]
-    main(float(a[0]) if a else 0.65, a[1] if len(a) > 1 else "historico")
+    main(float(a[0]) if a else PART_BASE, a[1] if len(a) > 1 else "historico")

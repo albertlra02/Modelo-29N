@@ -164,8 +164,9 @@ Fallos conocidos:
 
 ### Qué hace el deslizador
 
-Con la participación del **65 %** el modelo **no añade nada**: las encuestas ya llevan dentro su propio supuesto de
-participación, y el 65 % es la media de lo que declaran las que la publican (julio–octubre de 2026).
+Con la participación del **68 %** el modelo **no añade nada**: las encuestas ya llevan dentro su propio supuesto de
+participación, y el 68 % es lo que declaran las que la publican (mediana de la última encuesta de cada casa, julio–noviembre
+de 2026; hasta el 9 de noviembre se usaba un 65 %, que daba demasiado peso a una casa que publica cada dos semanas).
 
 Mover la participación es un **escenario hipotético** («¿y si…?»), no algo que el modelo estime:
 
@@ -235,7 +236,7 @@ sube y los votantes adicionales se comportan como en 2015–2023.
 
 Como un **análisis de sensibilidad**, no como una afirmación:
 
-> «Si la participación supera el 65 % que suponen las encuestas y los votantes adicionales se reparten como entre 2015 y
+> «Si la participación supera el 68 % que suponen las encuestas y los votantes adicionales se reparten como entre 2015 y
 > 2023, la mayoría de PP y Vox baja del X % al Y %. Con un reparto simétrico, apenas cambia.»
 
 ### Movilización por bloque y voto útil

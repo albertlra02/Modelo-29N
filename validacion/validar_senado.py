@@ -34,9 +34,10 @@ def reparto_2023(empates: bool = False) -> tuple[pd.DataFrame, pd.DataFrame]:
     v["OTROS"] = e.votos.sum(axis=1) - v.sum(axis=1)
     v["BLANCO"] = e.meta.blancos
     s = v.div(v.sum(axis=1), axis=0)
-    V, L = voto_senado(s.to_numpy()[None], list(s.index), list(s.columns), pd.Series(dtype=float), coalicion=False)
+    V, L = voto_senado(s.to_numpy()[None], list(s.index), list(s.columns), pd.Series(dtype=float), coalicion=False,
+                       dividir=False)
     V = V[0]
-    circ = circunscripciones()
+    circ = circunscripciones(dividir=False)
     il = {p: i for i, p in enumerate(L)}
     prev = np.zeros((len(circ), len(L)))
     u = umbrales_empate()

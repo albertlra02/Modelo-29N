@@ -8,13 +8,17 @@ from validacion.validar_senado import reparto_2023
 
 def test_circunscripciones_y_pacto():
     c = senado.circunscripciones()
-    assert len(c) == 59 and c.escanos.sum() == 208
-    assert c.isla.sum() == 10
+    assert len(c) == 60 and c.escanos.sum() == 209
+    assert c.isla.sum() == 11
+    # Formentera, con senador propio desde la reforma de 2026; en 2023 iba con Eivissa
+    assert c.at["Formentera", "escanos"] == 1 and c.at["Eivissa", "escanos"] == 1
+    c23 = senado.circunscripciones(dividir=False)
+    assert len(c23) == 59 and c23.escanos.sum() == 208 and "Eivissa-Formentera" in c23.index
     assert set(c.loc[~c.pacto].provincia) == set(CCAA["Cataluña"] + CCAA["Canarias"])
     assert c.at["La Gomera", "pacto"] and not c.at["Tenerife", "pacto"]
     # 46 provincias con coalición, más La Gomera
     assert c[c.pacto & ~c.isla].provincia.nunique() + 1 == 46     # + Baleares, que va por islas
-    assert c.loc[c.pacto, "escanos"].sum() == 43 * 4 + 5 + 2 * 2 + 1
+    assert c.loc[c.pacto, "escanos"].sum() == 43 * 4 + 6 + 2 * 2 + 1
 
 
 def test_voto_limitado():

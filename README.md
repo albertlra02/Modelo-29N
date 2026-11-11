@@ -180,7 +180,7 @@ paquete de Plotly, sin internet salvo las fuentes).
 | `/mayorias` | Calculadora de pactos en el navegador (la coalición queda en la dirección: `#PP+VOX`), investidura con las posturas de cada partido (primera votación con 176 síes, segunda con más síes que noes, veto a Vox opcional) y probabilidad de cada escenario |
 | `/simulador` | «¿Y si…?»: deslizadores con el voto nacional de cada partido; reparto, sumas y mapa al instante sin Monte Carlo (`motor/simulador.py`). Lo fijado queda en la dirección (`?v_PP=34`) |
 | `/provincias` | Mapa (partido más votado, voto de un partido o cambios desde 2023) con el detalle de cada provincia al pulsarla, tabla filtrable por comunidad |
-| `/senado` | Los 208 senadores electos: hemiciclo, con y sin la coalición Senado de Progreso, mapa por provincias (con el detalle de cada isla), tabla de las 59 circunscripciones e hipótesis de retirada de Vox |
+| `/senado` | Los 209 senadores electos: hemiciclo, con y sin la coalición Senado de Progreso, mapa por provincias (con el detalle de cada isla), tabla de las 60 circunscripciones e hipótesis de retirada de Vox |
 | `/encuestas` | Media actual con su cambio a 30 días, evolución, últimas encuestas, sesgo de cada casa y encuestas autonómicas |
 | `/evolucion` | Hemiciclo animado semana a semana desde junio y líneas de mayoría y escaños |
 | `/participacion` | Barrido de participación del 62 % al 75 % con las candidaturas registradas y con la hipótesis de lista única |
@@ -226,17 +226,19 @@ Escenario por defecto (`registradas`): las coaliciones registradas el 16 de octu
   Amplio.
 - `lista_unica`: la hipótesis de una sola lista de Frente Amplio y Podemos en toda España, que no se ha dado, para comparar.
 
-**Senado** (`motor/senado.py`). En cada simulación, el voto simulado al Congreso de cada provincia se lleva a las 59
-circunscripciones del Senado (las islas con el patrón del Congreso de 2023, isla a isla) y se reparten los 208 senadores
+**Senado** (`motor/senado.py`). En cada simulación, el voto simulado al Congreso de cada provincia se lleva a las 60
+circunscripciones del Senado (las islas con el patrón del Congreso de 2023, isla a isla) y se reparten los 209 senadores
 electos con voto limitado y voto de partido: 3 + 1 en las provincias, 2 + 1 en Mallorca, Gran Canaria y Tenerife, 2 + 0
 en Ceuta y Melilla y 1 en el resto de islas. Si las dos primeras listas de una provincia quedan muy igualadas puede salir
 2 + 2: el margen se sortea con la caída de voto entre candidatos de una misma lista medida en las 47 provincias de 2023.
 ASG (La Gomera) y AHI (El Hierro), que no van al Congreso, se fijan en su voto al Senado de 2023. La coalición **Senado
 de Progreso** (PSOE, IU, Sumar, Compromís, Más Madrid, CHA, Batzarre y Més; acuerdo del 17 de octubre) suma los votos de
 PSOE y Frente Amplio en 46 provincias (todas salvo Cataluña y Canarias) y en La Gomera; Podemos no está en el pacto. Se
-calcula también sin la coalición. Para ver la cámara entera (266, mayoría absoluta en 134) se suman fijos los 58
+calcula también sin la coalición. Para ver la cámara entera (267, mayoría absoluta en 134 y tres quintos en 161) se suman fijos los 58
 senadores que designan hoy los parlamentos autonómicos (`datos/senado_designados.csv`, de la web del Senado a
-17/10/2026): no se votan el 29-N.
+17/10/2026): no se votan el 29-N. Desde la reforma del artículo 69.3 de la Constitución (BOE de 20 de mayo de 2026)
+Formentera elige su propio senador, separado de Eivissa: el 29-N son 209 electos. El voto de Formentera se separa con los
+resultados municipales de 2023 (es un solo municipio); la validación contra 2023 usa las 59 circunscripciones de entonces.
 
 **Hipótesis de retirada de Vox del Senado** (no es el escenario base; se elige en `/senado?vox=anunciadas|amplia`). Vox
 estudia no presentar lista donde divide el voto de la derecha (El Español, 18/10/2026). `anunciadas`: Vox no va en las 15

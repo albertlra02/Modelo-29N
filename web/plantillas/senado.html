@@ -3,7 +3,7 @@
 {% block titulo %}Senado{% endblock %}
 {% block contenido %}
 <section class="portada">
-  <p class="antetitulo">Senado · 208 senadores de elección directa</p>
+  <p class="antetitulo">Senado · 209 senadores de elección directa</p>
   <h1 class="titular">{{ titular }}</h1>
   <p class="entradilla">{{ entradilla }}</p>
 </section>
@@ -23,7 +23,7 @@
           <th scope="col" class="num">PP</th>
           <th scope="col" class="num">Vox</th>
           <th scope="col" class="num">PP + Vox + UPN en el pleno</th>
-          <th scope="col" class="num">Tres quintos (160)</th>
+          <th scope="col" class="num">Tres quintos (161)</th>
           <th scope="col" class="num">Mayoría absoluta (134)</th>
         </tr>
       </thead>
@@ -73,7 +73,7 @@
     <h2 class="tarjeta__titulo">El Senado completo: {{ der.total }} senadores</h2>
     {{ grafico("f-hemiciclo", hemiciclo, "Hemiciclo del Senado completo con la línea de los tres quintos") }}
     {{ leyenda|safe }}
-    <p class="nota">Reparto medio de las simulaciones: los 208 electos el 29-N más los 58 designados por los parlamentos
+    <p class="nota">Reparto medio de las simulaciones: los 209 electos el 29-N más los 58 designados por los parlamentos
       autonómicos. La línea marca los {{ der.quintos }} senadores de los tres quintos, contados desde la derecha. Senado de
       Progreso es la lista de PSOE y Frente Amplio (salvo en Cataluña y Canarias).</p>
   </article>
@@ -180,7 +180,7 @@
 
 <section class="seccion" id="pleno">
   <div class="seccion__cabecera"><h2>El Senado completo: {{ pleno_total }} senadores</h2></div>
-  <p class="entradilla">A los 208 electos se suman los {{ pleno_designados }} senadores que designan los parlamentos
+  <p class="entradilla">A los 209 electos (Formentera elige por primera vez senador propio) se suman los {{ pleno_designados }} senadores que designan los parlamentos
     autonómicos, tal como están hoy. La mayoría absoluta está en {{ pleno_mayoria }}.</p>
   <div class="rejilla rejilla--portada">
     <article class="tarjeta">

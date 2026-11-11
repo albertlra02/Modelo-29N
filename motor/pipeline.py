@@ -33,8 +33,10 @@ MAYORIAS = {
     "bloque de investidura 2023": SOCIOS_2023,
 }
 
-# Participación que suponen de media las encuestas que la publican (jul-oct 2026)
-PART_BASE = 0.65
+# Participación que suponen las encuestas que la publican: mediana de la última de cada casa (jul-nov 2026) = 68,7 %;
+# sin Sondaxe (77 %), media 67,8 %. Cada casa cuenta una vez, como en el agregador (NC Report publica cada dos semanas
+# y daba más peso de la cuenta a su 63-64 %, por eso antes salía un 65 %).
+PART_BASE = 0.68
 # Cómo se reparten los votantes extra (de cada 100 votos válidos adicionales)
 REPARTOS = {
     "historico": {"dcha": 0.18, "izda": 0.57, "resto": 0.25},     # regresión 2015-2023
@@ -225,7 +227,7 @@ def ejecutar(esc: Escenario, c: dict | None = None) -> Resultado:
                              "hipotesis_vox": hip_vox})
 
 
-MITAD_SENADO = senado.TOTAL // 2 + 1        # 105 de los 208 electos
+MITAD_SENADO = senado.TOTAL // 2 + 1        # 105 de los 209 electos
 IZQUIERDA_SENADO = [senado.PROGRESO, "PSOE", "FRENTE_AMPLIO", "PODEMOS", "ERC", "BILDU", "BNG", "GBAI"]
 DERECHA_SENADO = ["PP", "VOX", "UPN"]
 
@@ -235,8 +237,8 @@ def probs_senado(sen: pd.DataFrame, sin: pd.DataFrame) -> pd.Series:
         return float((df[[p for p in ps if p in df]].sum(axis=1) >= umbral).mean())
     pl, pl_sin = senado.pleno(sen), senado.pleno(sin)
     pleno_total = len(senado.designados()) + senado.TOTAL
-    mayoria = pleno_total // 2 + 1                                      # 134 de 266
-    tres_quintos = -(-3 * pleno_total // 5)                              # 160 de 266
+    mayoria = pleno_total // 2 + 1                                      # 134 de 267
+    tres_quintos = -(-3 * pleno_total // 5)                              # 161 de 267
     return pd.Series({
         "P(PP mayoría absoluta)": llega(pl, ["PP"], mayoria),
         "P(PP + Vox + UPN mayoría absoluta)": llega(pl, DERECHA_SENADO, mayoria),

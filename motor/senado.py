@@ -1,10 +1,11 @@
 """
-Senado: los 208 senadores de elección directa (LOREG arts. 161, 165 y 166).
+Senado: los 209 senadores de elección directa (LOREG arts. 161, 165 y 166).
 
-Circunscripciones: cada provincia elige 4; Mallorca, Gran Canaria y Tenerife, 3; Menorca,
-Eivissa-Formentera, Lanzarote, Fuerteventura, La Palma, La Gomera y El Hierro, 1; Ceuta y
-Melilla, 2. Voto limitado: cada elector marca como mucho 3 nombres en las provincias, 2 en las
-islas de 3 senadores y en Ceuta y Melilla, y 1 en las islas de un senador.
+Circunscripciones: cada provincia elige 4; Mallorca, Gran Canaria y Tenerife, 3; Menorca, Eivissa,
+Formentera, Lanzarote, Fuerteventura, La Palma, La Gomera y El Hierro, 1; Ceuta y Melilla, 2. Formentera
+elige senador propio por primera vez el 29-N (reforma del art. 69.3 de la Constitución, BOE de 20/05/2026);
+hasta 2023 iba junto a Eivissa, y así se valida 2023 (dividir=False). Voto limitado: cada elector marca como
+mucho 3 nombres en las provincias, 2 en las islas de 3 senadores y en Ceuta y Melilla, y 1 en las islas de un senador.
 
 Supuestos del modelo (validados contra 2023 con validacion/validar_senado.py):
   - Voto de partido: cada lista saca en el Senado el voto que su partido saca en el Congreso en la
@@ -47,7 +48,8 @@ Supuestos del modelo (validados contra 2023 con validacion/validar_senado.py):
 
 Senadores designados por los parlamentos autonómicos (58): no dependen del 29-N sino de cada parlamento
 autonómico, así que se suman fijos tal como están hoy (datos/senado_designados.csv, transcrito de la web
-del Senado el 17/10/2026, grupo parlamentario -> partido). El pleno tiene 208 + 58 = 266; mayoría, 134.
+del Senado el 17/10/2026, grupo parlamentario -> partido). El pleno tiene 209 + 58 = 267; mayoría, 134;
+tres quintos, 161.
 """
 from __future__ import annotations
 
@@ -64,7 +66,9 @@ RUTA_SENADO = RAIZ / "datos" / "raw" / "senado_2023-07.csv"
 RUTA_ISLAS = RAIZ / "datos" / "raw" / "congreso_2023-07_islas.csv"
 RUTA_DESIGNADOS = RAIZ / "datos" / "senado_designados.csv"
 
-TOTAL = 208
+TOTAL = 209
+# Circunscripciones de 2023 que el 29-N se dividen: (nueva, escaños), en el orden en que se colocan
+DIVISIONES = {"Eivissa-Formentera": (("Eivissa", 1), ("Formentera", 1))}
 # Partido de cada designado -> lista del modelo (Compromís y Más Madrid están en el Frente Amplio)
 LISTA_DESIGNADO = {"PP": "PP", "PSOE": "PSOE", "Vox": "VOX", "Junts": "JUNTS", "ERC": "ERC", "BNG": "BNG",
                    "PNV": "PNV", "EH Bildu": "BILDU", "Coalición Canaria": "CC", "Compromís": "FRENTE_AMPLIO",
@@ -170,27 +174,41 @@ def pleno(sim: pd.DataFrame) -> pd.DataFrame:
     return sim.reindex(columns=cols, fill_value=0).add(d.reindex(cols, fill_value=0), axis=1).astype(sim.dtypes.iloc[0])
 
 
-@lru_cache(maxsize=1)
-def circunscripciones() -> pd.DataFrame:
+@lru_cache(maxsize=2)
+def circunscripciones(dividir: bool = True) -> pd.DataFrame:
     """Índice: nombre de la circunscripción (la provincia del modelo, o la isla). Columnas: provincia,
-    escanos, isla (bool), pacto (bool: hay lista del Senado de Progreso)."""
+    escanos, isla (bool), pacto (bool: hay lista del Senado de Progreso).
+    dividir: las del 29-N (DIVISIONES aplicadas); False, las de 2023."""
     s = senado_2023().drop_duplicates("circ")
     isla = s.circ.str[2] != "9"
     nombre = np.where(isla, s.circunscripcion, s.provincia)
     c = pd.DataFrame({"provincia": s.provincia.to_numpy(), "escanos": s.escanos.to_numpy(), "isla": isla.to_numpy()},
                      index=pd.Index(nombre, name="circunscripcion"))
+    if dividir:
+        filas = []
+        for k, f in c.iterrows():
+            for nuevo, esc in DIVISIONES.get(k, ((k, f.escanos),)):
+                filas.append(pd.Series({**f.to_dict(), "escanos": esc}, name=nuevo))
+        c = pd.DataFrame(filas).astype({"escanos": int, "isla": bool})
+        c.index.name = "circunscripcion"
     c["pacto"] = ~c.provincia.isin(SIN_PACTO) | c.index.isin(ISLAS_CON_PACTO)
-    assert c.escanos.sum() == TOTAL, c.escanos.sum()
+    assert c.escanos.sum() == (TOTAL if dividir else TOTAL - sum(len(v) - 1 for v in DIVISIONES.values())), \
+        c.escanos.sum()
     return c
 
 
 @lru_cache(maxsize=1)
 def cocientes_islas() -> pd.DataFrame:
-    """isla x columna del Congreso 2023: cuota en la isla / cuota en el conjunto de islas de su provincia."""
+    """isla x columna del Congreso 2023: cuota en la isla / cuota en el conjunto de islas de su provincia.
+    Incluye también las circunscripciones de 2023 que se dividen (suma de sus partes), para validar 2023."""
     v = pd.read_csv(RUTA_ISLAS, index_col="isla")
     prov = v.pop("provincia")
+    tot = v.groupby(prov).sum()                       # el total provincial, antes de añadir las juntas
+    for junta, partes in DIVISIONES.items():
+        nombres = [n for n, _ in partes]
+        v.loc[junta] = v.loc[nombres].sum()
+        prov.loc[junta] = prov.loc[nombres[0]]
     cuota_isla = v.div(v.sum(axis=1), axis=0)
-    tot = v.groupby(prov).sum()
     cuota_prov = tot.div(tot.sum(axis=1), axis=0).reindex(prov.to_numpy())
     cuota_prov.index = v.index
     q = (cuota_isla / cuota_prov).where(cuota_prov > 0)
@@ -282,16 +300,17 @@ def listas(partidos: list[str]) -> list[str]:
 
 def voto_senado(S: np.ndarray, provincias: list[str], partidos: list[str], ajena: pd.Series,
                 coalicion: bool = True, sin_vox: frozenset[str] = frozenset(),
-                pp_fuera: frozenset[str] = frozenset()) -> tuple[np.ndarray, list[str]]:
+                pp_fuera: frozenset[str] = frozenset(), dividir: bool = True) -> tuple[np.ndarray, list[str]]:
     """Voto de cada lista al Senado en cada circunscripción.
 
     S:        voto simulado al Congreso (n, provincia, partido), filas que suman 1
     ajena:    por provincia, fracción de la lista FRENTE_AMPLIO que no entra en el pacto (Podemos, NC)
     sin_vox:  provincias donde Vox no presenta lista (su voto pasa en parte al PP: TRASVASE_VOX)
     pp_fuera: provincias donde el PP no presenta lista (su voto pasa en parte a Vox: TRASVASE_PP)
+    dividir:  circunscripciones del 29-N (True) o de 2023 (False; ver circunscripciones)
     Devuelve (array (n, circunscripción, lista) en el orden de circunscripciones(), nombres de las listas).
     """
-    circ = circunscripciones()
+    circ = circunscripciones(dividir)
     L = listas(partidos)
     il = {p: i for i, p in enumerate(L)}
     ip = {p: i for i, p in enumerate(partidos)}

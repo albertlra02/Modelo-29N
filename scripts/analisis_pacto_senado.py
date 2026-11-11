@@ -1,7 +1,7 @@
 """
 El acuerdo PP-Vox para el Senado (26/10/2026) frente a no pactar y frente al mejor pacto posible.
 
-    python -m scripts.analisis_pacto_senado [participación] [reparto]      (p. ej. 0.65 historico)
+    python -m scripts.analisis_pacto_senado [participación] [reparto]      (p. ej. 0.68 historico)
 
 En cada provincia hay cuatro opciones (motor/senado.py):
   separados   cada partido con su lista de 3 nombres
@@ -26,7 +26,7 @@ import numpy as np
 import pandas as pd
 
 from motor import senado
-from motor.pipeline import Escenario
+from motor.pipeline import PART_BASE, Escenario
 from scripts.analisis_senado_vox import cuotas_simuladas
 from scripts.consola import configurar_salida_utf8
 
@@ -73,7 +73,7 @@ def analizar(esc: Escenario) -> tuple[pd.DataFrame, pd.DataFrame]:
     d = derecha_por_provincia(q, esc)
     designados = senado.designados_por_lista().reindex(list(DERECHA), fill_value=0).sum()
     pleno_total = senado.TOTAL + len(senado.designados())
-    umbral = -(-3 * pleno_total // 5) - designados                  # electos que faltan para 160
+    umbral = -(-3 * pleno_total // 5) - designados                  # electos que faltan para los tres quintos
     provs = sorted(d)
 
     def total(eleccion: dict[str, str]) -> np.ndarray:
@@ -121,7 +121,7 @@ def analizar(esc: Escenario) -> tuple[pd.DataFrame, pd.DataFrame]:
     return tabla, pd.DataFrame(filas).set_index("provincia")
 
 
-def main(participacion: float = 0.65, reparto: str = "historico", n_sim: int = 5000) -> None:
+def main(participacion: float = PART_BASE, reparto: str = "historico", n_sim: int = 5000) -> None:
     configurar_salida_utf8()
     esc = Escenario(participacion=participacion, reparto=reparto, n_sim=n_sim)
     tabla, provs = analizar(esc)
@@ -142,4 +142,4 @@ def main(participacion: float = 0.65, reparto: str = "historico", n_sim: int = 5
 
 if __name__ == "__main__":
     a = sys.argv[1:]
-    main(float(a[0]) if a else 0.65, a[1] if len(a) > 1 else "historico")
+    main(float(a[0]) if a else PART_BASE, a[1] if len(a) > 1 else "historico")

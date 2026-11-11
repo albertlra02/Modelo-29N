@@ -542,7 +542,7 @@ def provincias(request):
 
 # ------------------------------------------------------------------ Senado
 
-SENADORES = 208
+SENADORES = senado.TOTAL
 MITAD_SENADO = SENADORES // 2 + 1
 
 
@@ -758,7 +758,7 @@ def _pleno_senado(sim: pd.DataFrame, sin: pd.DataFrame, probs: pd.Series) -> dic
         "pleno_total": total, "pleno_mayoria": mayoria, "pleno_pp": pp_pl, "pleno_pp_sin": pp_sin,
         "pleno_designados": len(des), "pleno_tabla": tabla, "pleno_ccaa": por_ccaa,
         "pleno_filas": [
-            ("PP, Vox y UPN: tres quintos (160)", pct(_derecha_pleno(sim)["p_quintos"])),
+            ("PP, Vox y UPN: tres quintos (161)", pct(_derecha_pleno(sim)["p_quintos"])),
             ("PP, Vox y UPN: mayoría absoluta", pct(_derecha_pleno(sim)["p_mayoria"])),
             ("La izquierda: mayoría absoluta", pct(probs["P(izquierda mayoría absoluta)"])),
         ],

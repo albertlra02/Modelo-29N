@@ -42,9 +42,9 @@ def test_candidaturas_desconocidas():
 
 def test_senado(base):
     s = base.senado
-    assert (s["sim"].sum(axis=1) == 208).all() and (s["sin_coalicion"].sum(axis=1) == 208).all()
+    assert (s["sim"].sum(axis=1) == 209).all() and (s["sin_coalicion"].sum(axis=1) == 209).all()
     assert "PROGRESO" in s["sim"] and "PROGRESO" not in s["sin_coalicion"]
-    assert len(s["circunscripciones"]) == 59
+    assert len(s["circunscripciones"]) == 60
     assert s["probs"].between(0, 1).all()
     # la coalición no puede dejar a PSOE + Frente Amplio con menos senadores de los que tendrían por separado
     con = s["sim"][[x for x in ("PROGRESO", "PSOE", "FRENTE_AMPLIO") if x in s["sim"]]].sum(axis=1)

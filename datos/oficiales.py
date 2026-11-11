@@ -45,6 +45,9 @@ CONGRESO = {"2015-12": "02201512", "2016-06": "02201606", "2019-04": "02201904",
 EUROPEAS = {"2024-06": "07202406"}
 SENADO = {"2023-07": "03202307"}
 PROV_ISLAS = ("07", "35", "38")   # Illes Balears, Las Palmas, Santa Cruz de Tenerife
+# Reforma del art. 69.3 de la Constitución (BOE 20/05/2026): desde el 29-N Formentera elige su propio senador.
+# El voto por isla se da ya separado (Formentera es un solo municipio, 07024); el Senado de 2023 sigue junto.
+SEPARAR_ISLAS = {"Eivissa-Formentera": ("Eivissa", {"07024": "Formentera"})}
 # Columnas de las europeas que usa el modelo (siglas oficiales de la cabecera nacional -> nombre)
 COLUMNAS_EUROPEAS = {"PP": "PP", "PSOE": "PSOE", "VOX": "Vox", "SUMAR": "Sumar", "PODEMOS": "Podemos",
                      'AGRUPACIÓN DE ELECTORES "SE ACABÓ LA FIESTA"': "SALF"}
@@ -217,6 +220,8 @@ def escribir_senado(eleccion: str = "2023-07") -> list[Path]:
     listas, isla = senado(eleccion)
     r1 = RAW / f"senado_{eleccion}.csv"
     listas.to_csv(r1, index=False, encoding="utf-8")
+    for junta, (resto, aparte) in SEPARAR_ISLAS.items():
+        isla = {m: (aparte.get(m, resto) if i == junta else i) for m, i in isla.items()}
     islas = congreso_por_isla(eleccion, isla)
     prov = {i: INE_PROVINCIA[m[:2]] for m, i in isla.items()}
     islas.insert(0, "provincia", [prov[i] for i in islas.index])

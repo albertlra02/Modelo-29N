@@ -59,7 +59,7 @@ def test_paginas_largas_responden_o_piden_calcular(ruta, tarea):
 def test_parametros_no_validos_vuelven_al_escenario_por_defecto():
     p = D.Params.de_query({"fecha": "1999-01-01", "cand": "x", "part": "900", "sim": "7", "semilla": "-3"})
     assert p == D.Params(participacion=D.PARTICIPACION_MAX, semilla=0)
-    assert D.Params.de_query({"reparto": "simetrico"}).reparto == "historico"   # sin efecto al 65 %
+    assert D.Params.de_query({"reparto": "simetrico"}).reparto == "historico"   # sin efecto con la participación base
     assert D.Params().query() == ""
     assert D.Params().query(candidaturas="lista_unica") == "?cand=lista_unica"
 

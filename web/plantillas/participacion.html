@@ -3,7 +3,7 @@
 {% block titulo %}Participación{% endblock %}
 {% block contenido %}
 {{ cabecera("Participación", "¿Y si vota más gente?",
-  "El escenario recalculado para participaciones del 62 % al 75 %. Los votantes que se suman o se restan frente al 65 % de las encuestas se reparten " ~ (NOMBRES_REPARTO[p.reparto]|lower) ~ ": de cada 100 votos extra, " ~ DETALLE_REPARTO[p.reparto] ~ ". " ~ (n_barrido|miles) ~ " simulaciones por punto.") }}
+  "El escenario recalculado para participaciones del 62 % al 75 %. Los votantes que se suman o se restan frente al " ~ PART_BASE ~ " % de las encuestas se reparten " ~ (NOMBRES_REPARTO[p.reparto]|lower) ~ ": de cada 100 votos extra, " ~ DETALLE_REPARTO[p.reparto] ~ ". " ~ (n_barrido|miles) ~ " simulaciones por punto.") }}
 
 {% if p.participacion == PART_BASE %}
 <p class="aviso aviso--suave">El reparto de los votantes adicionales se elige en <button type="button" class="enlace" data-abrir-escenario>Cambiar escenario</button>
