@@ -238,7 +238,7 @@ def flujo():
           caja(500, 120, 196, "Tu escenario", "participación, voto útil…", "caja-alt"),
           caja(500, 200, 196, "04  Simulación", "10.000 elecciones con error", "caja-clave"),
           caja(246, 294, 210, "Congreso: 350 escaños", "D’Hondt y 3 % por provincia"),
-          caja(500, 294, 196, "Senado: 208 + 58", "voto limitado y designados")]
+          caja(500, 294, 196, "Senado: 209 + 58", "voto limitado y designados")]
     return svg(710, 330, "".join(c), "Flujo del modelo")
 
 
@@ -359,16 +359,16 @@ def portada_flujo():
 
 
 # ---------------------------------------------------------------- artículo del acuerdo PP-Vox (Senado)
-def pacto_barras(filas: list[tuple[str, float, float]]) -> str:
+def pacto_barras(filas: list[tuple[str, float, float]], quintos: int = 161, mayoria: int = 134) -> str:
     """filas: (escenario, P tres quintos, P mayoría absoluta) en %. Barras agrupadas."""
     x0, w = 230, 400
 
     def X(v):
         return x0 + v / 100 * w
 
-    c = [f'<rect x="{x0}" y="4" width="12" height="12" rx="2" class="f1"/>', t(x0 + 18, 14, "tres quintos (160)", "q"),
+    c = [f'<rect x="{x0}" y="4" width="12" height="12" rx="2" class="f1"/>', t(x0 + 18, 14, f"tres quintos ({quintos})", "q"),
          f'<rect x="{x0 + 170}" y="4" width="12" height="12" rx="2" class="f2"/>',
-         t(x0 + 188, 14, "mayoría absoluta (134)", "q")]
+         t(x0 + 188, 14, f"mayoría absoluta ({mayoria})", "q")]
     y0, alto, hueco = 36, 26, 22
     yfin = y0 + len(filas) * (2 * alto + hueco) - hueco
     for v in (0, 25, 50, 75, 100):
@@ -384,7 +384,7 @@ def pacto_barras(filas: list[tuple[str, float, float]]) -> str:
     return svg(680, yfin + 26, "".join(c), "Tres quintos y mayoría absoluta del bloque de derechas según el pacto")
 
 
-def pacto_participacion(part: list[int], quintos: list[float], mayoria: list[float]) -> str:
+def pacto_participacion(part: list[int], quintos: list[float], mayoria: list[float], base: float = 68) -> str:
     """Probabilidad (en %) de los tres quintos y de la mayoría absoluta con el acuerdo, según la participación."""
     def X(v):
         return 70 + (v - part[0]) / (part[-1] - part[0]) * 450
@@ -397,7 +397,7 @@ def pacto_participacion(part: list[int], quintos: list[float], mayoria: list[flo
     for p in part:
         c.append(t(X(p), 270, f"{p} %", "q", "middle"))
     c.append(t(520, 288, "participación sobre el censo", "q", "end"))
-    c += [ln(X(65), 22, X(65), 250, "ref"), t(X(65) + 6, 18, "lo que suponen las encuestas", "q")]
+    c += [ln(X(base), 22, X(base), 250, "ref"), t(X(base) + 6, 18, "lo que suponen las encuestas", "q")]
     if part[0] <= 71.8 <= part[-1]:
         c += [ln(X(71.8), 30, X(71.8), 250, "ref"), t(X(71.8) + 6, 40, "abril de 2019: 71,8 %", "q")]
     c.append(poli([(X(p), Y(v)) for p, v in zip(part, mayoria)], "s2"))
@@ -465,3 +465,24 @@ def pacto_ruta(pasos: list[tuple[str, float, str]], hitos: str = "") -> str:
     if hitos:
         c.append(t(20, yfin + 52, hitos, "q"))
     return svg(680, yfin + (62 if hitos else 40), "".join(c), "Ruta de mejoras del acuerdo PP-Vox")
+
+
+def pacto_un_candidato(filas: list[tuple[str, float, float, str]], total: int = 14) -> str:
+    """Provincias ganadas (3 senadores) de las `total` con Vox en un solo candidato, según el formato.
+    filas: (formato, provincias ganadas de media, senadores de PP + Vox de media, clase de la barra)."""
+    x0, w = 250, 380
+
+    def X(v):
+        return x0 + v / total * w
+    y0, paso = 30, 46
+    yfin = y0 + paso * (len(filas) - 1)
+    c = []
+    for v in range(0, total + 1, 2):
+        c += [ln(X(v), y0 - 18, X(v), yfin + 18, "grid"), t(X(v), yfin + 36, str(v), "q", "middle")]
+    c.append(t(x0 + w, yfin + 56, f"provincias ganadas (3 senadores), de {total}", "q", "end"))
+    for i, (texto, v, sen, cls) in enumerate(filas):
+        y = y0 + i * paso
+        c.append(t(x0 - 12, y + 5, texto, "kb" if cls == "f1" else "k", "end"))
+        c.append(f'<rect x="{x0}" y="{y - 12}" width="{max(X(v) - x0, 2):.1f}" height="24" rx="2" class="{cls}"/>')
+        c.append(t(X(v) + 8, y + 5, f"{str(round(v, 1)).replace('.', ',')}  ·  {round(sen)} senadores", "kb"))
+    return svg(720, yfin + 64, "".join(c), "Provincias que gana la derecha según el formato del acuerdo")

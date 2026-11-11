@@ -1,6 +1,6 @@
 [project]
 name = "modelo-electoral-29n"
-version = "1.1.0"
+version = "1.2.0"
 description = "Modelo del Congreso para el 29-N de 2026: media de encuestas, capa autonómica, reparto provincial y Monte Carlo de escaños con D'Hondt."
 readme = "README.md"
 requires-python = ">=3.10"

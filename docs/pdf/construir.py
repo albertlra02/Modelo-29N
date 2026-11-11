@@ -14,6 +14,7 @@ AQUI = Path(__file__).parent
 EDGE = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 AUTOR = "Alberto"
 FECHA = "20 de octubre de 2026"
+FECHA_TECNICO = "11 de noviembre de 2026"
 
 
 def md(texto):
@@ -171,7 +172,7 @@ def tecnico(paginas=None):
     texto = re.sub(r"\[«Una mayoría que depende de quién vote»\]\([^)]*\)", "«Una mayoría que depende de quién vote»", texto)
     html = comun(md(texto))
     figs = [
-        figura("De las encuestas a 350 diputados y 208 senadores en cuatro pasos",
+        figura("De las encuestas a 350 diputados y 209 senadores en cuatro pasos",
                "Qué entra, qué se calcula y qué sale", g.flujo(), "Esquema del modelo"),
         figura("Cuantos más días faltan para votar, más grande es el error que se simula",
                "Error típico del voto de cada bloque, en puntos, medido en las generales de 2015 a 2023",
@@ -191,7 +192,7 @@ def tecnico(paginas=None):
     portada = f"""<section class="portada">
 <div class="p-franja"></div>
 <div class="p-cont">
-  <p class="p-kicker">DOCUMENTO TÉCNICO · v1.1</p>
+  <p class="p-kicker">DOCUMENTO TÉCNICO · v1.2</p>
   <h1>Modelo 29-N</h1>
   <p class="p-sub">Cómo funciona la aplicación y por qué está hecha así: doce decisiones, cómo se tomaron y cómo se
   comprobaron</p>
@@ -203,7 +204,7 @@ def tecnico(paginas=None):
     <div><span class="d-num">199/208</span><span class="d-lbl">senadores bien asignados con el voto real de 2023</span></div>
   </div>
   <p class="p-web">Pruébala: <b>{WEB}</b> · Código: <b>{GITHUB}</b><br>DOI: <b>10.5281/zenodo.23530778</b></p>
-  <p class="p-firma"><b>{AUTOR}</b> · {FECHA}<br>Acompaña al documento de análisis «Una mayoría que depende de quién vote»</p>
+  <p class="p-firma"><b>{AUTOR}</b> · {FECHA_TECNICO}<br>Acompaña al documento de análisis «Una mayoría que depende de quién vote»</p>
 </div></section>"""
     cuerpo = portada + indice(lista, paginas or {}) + f'<main>{html}</main>'
     return pagina("Modelo 29-N · documento técnico", ESTILO_TECNICO, FUENTES_TECNICO, cuerpo), lista
@@ -246,14 +247,15 @@ PRUEBALO_OPINION = (
 
 CAPTURAS_TECNICO = (
     "<p>Antes de entrar en el detalle, así se ve. Las capturas son de la aplicación con el escenario "
-    "base (encuestas hasta el 20 de octubre).</p>"
+    "base (encuestas hasta el 9 de noviembre).</p>"
     + captura("resumen", "/", "Resumen: la respuesta en una frase",
               "Titular, hemiciclo y probabilidades. El botón «Cambiar escenario» recalcula todo el sitio.")
     + captura("provincias", "/provincias", "Congreso: las 52 circunscripciones",
               "Mapa del partido más votado, del voto de cada partido o de los cambios desde 2023, con el escaño en juego "
               "en cada provincia.")
-    + captura("senado", "/senado", "Senado: 208 electos y 266 en el pleno",
-              "Las tres hipótesis sobre Vox lado a lado, con la probabilidad de cada mayoría.")
+    + captura("senado", "/senado", "Senado: 209 electos y 267 en el pleno",
+              "El acuerdo PP-Vox frente a no pactar y a que Vox se retire casi en todas, con la probabilidad de los tres "
+              "quintos y de la mayoría absoluta.")
     + captura("simulador", "/simulador", "¿Y si…?: el simulador sin Monte Carlo",
               "Mueve el voto de cualquier partido y el reparto de escaños se recalcula al instante."))
 

@@ -20,7 +20,7 @@ Tiene seis secciones, y todas comparten el mismo escenario: lo que cambias en el
 | --- | --- |
 | Resumen | Titular, hemiciclo con el reparto medio, probabilidades principales y ficha de cada partido |
 | Congreso | Voto y escaños con sus rangos y descarga de las simulaciones; calculadora de cualquier suma de partidos; mapa y tabla de las 52 provincias con el escaño en juego |
-| Senado | 208 electos y pleno de 266, con el acuerdo PP-Vox del 26 de octubre y sin él, tres quintos y mayoría absoluta del bloque de derechas, mapa con el detalle de cada isla y designados por comunidad |
+| Senado | 209 electos y pleno de 267, con el acuerdo PP-Vox del 26 de octubre y sin él, tres quintos y mayoría absoluta del bloque de derechas, mapa con el detalle de cada isla y designados por comunidad |
 | Escenarios | Barrido de participación; simulador «¿Y si…?» que fija el voto de cualquier partido; dos escenarios lado a lado |
 | Encuestas | Media actual, serie de cada partido, sesgo de cada encuestadora y evolución semana a semana |
 | Cómo funciona | Pasos, supuestos con su justificación y fuentes, validación y límites |
@@ -33,7 +33,7 @@ La noche del 29-N se añade una séptima sección que va proyectando los escaño
 | --- | --- | --- |
 | Encuestas hasta | Cortes semanales desde junio | Usa sólo las encuestas terminadas antes de esa fecha: muestra qué decía el modelo entonces |
 | Candidaturas | Registradas / lista única | Las coaliciones registradas el 16 de octubre, o la hipótesis de Frente Amplio y Podemos juntos en toda España |
-| Participación | 60 a 76 % | Suma o resta votantes respecto al 65 % que suponen las encuestas |
+| Participación | 60 a 76 % | Suma o resta votantes respecto al 68 % que suponen las encuestas |
 | Reparto de votantes adicionales | Histórico, simétrico, muy asimétrico | De cada 100 votos extra: 57/18/25 (izquierda/derecha/resto), 49/45/6 o 80/5/15 |
 | Movilización por bloque | −20 a +20 %, en España o una comunidad | Sube o baja el voto de la izquierda, la derecha o los nacionalistas y regionalistas |
 | Voto útil | 0 a 50 %, en todas las provincias o sólo donde el partido no saca escaño | Podemos → Frente Amplio, Frente Amplio → PSOE, Vox → PP, SALF → Vox |
@@ -116,7 +116,7 @@ Las candidaturas que no tienen una base comparable en 2023 necesitan otra refere
 
 ### 8. La participación
 
-Las encuestas que publican su estimación de participación suponen de media un 65 %, y ese es el punto de partida. El usuario puede moverla entre el 60 % y el 76 %, y entonces hay que decidir a quién votan los que se suman o se restan. Para eso hice una regresión de los votos de cada bloque sobre el total de votantes en las cinco generales de 2015 a 2023: de cada 100 votantes adicionales, 57 votaron izquierda, 18 derecha y 25 al resto.
+Las encuestas que publican su estimación de participación suponen hoy un 68 %, y ese es el punto de partida: con esa participación el modelo no añade ni quita votantes, porque las encuestas ya la llevan dentro. La cifra sale de la última encuesta de cada casa que la publica (mediana del 68,7 %), contando cada casa una vez, igual que en la media de encuestas; si se promedian todas, las casas que publican cada dos semanas pesan de más (con ese cálculo salía un 65 %). El usuario puede moverla entre el 60 % y el 76 %, y entonces hay que decidir a quién votan los que se suman o se restan. Para eso hice una regresión de los votos de cada bloque sobre el total de votantes en las cinco generales de 2015 a 2023: de cada 100 votantes adicionales, 57 votaron izquierda, 18 derecha y 25 al resto.
 
 No me fío del todo de esa regla. Cinco elecciones son pocas, para la derecha la relación es débil (r = 0,45), y la literatura no da una regla fija: en España la relación entre participación y voto al PSOE responde a varios mecanismos que no siempre empujan hacia el mismo lado ([Lago y Montero, 2009](https://reis.cis.es/index.php/reis/article/download/791/1003/1312)), y en otros países más participación sobre todo hace el resultado menos predecible ([Hansford y Gomez, 2010](https://www.cambridge.org/core/journals/american-political-science-review/article/estimating-the-electoral-effects-of-voter-turnout/8A880C28E79BE770A5CA1A9BB6CF933C)). Por eso no impongo una regla, sino que ofrezco tres: la histórica; una simétrica, que reproduce cómo cayó la participación entre abril y noviembre de 2019 (49 a la izquierda y 45 a la derecha); y una muy asimétrica (80 y 5), que no sale de ningún dato y sirve como prueba de estrés.
 
@@ -136,7 +136,7 @@ Los nueve fallos fueron lo más útil de la prueba, porque enseñan dónde está
 
 Hay dos islas que trato aparte desde el principio: La Gomera y El Hierro, donde ganan partidos que no se presentan al Congreso (ASG y AHI). Como no hay encuesta que los mida, les dejo su voto al Senado de 2023, y por eso esos dos escaños salen bien en la validación de forma automática.
 
-El resto de decisiones del Senado: las islas se calculan desde su provincia con el patrón que tuvo cada isla en el Congreso de 2023, municipio a municipio; la coalición Senado de Progreso suma íntegros los votos de PSOE y Frente Amplio en las 46 provincias del acuerdo más La Gomera (con la misma reserva que las listas conjuntas); y los 58 senadores que designan los parlamentos autonómicos se suman tal y como están hoy, según la web del Senado. 
+El resto de decisiones del Senado: las islas se calculan desde su provincia con el patrón que tuvo cada isla en el Congreso de 2023, municipio a municipio; la coalición Senado de Progreso suma íntegros los votos de PSOE y Frente Amplio en las 46 provincias del acuerdo más La Gomera (con la misma reserva que las listas conjuntas); y los 58 senadores que designan los parlamentos autonómicos se suman tal y como están hoy, según la web del Senado. Desde la reforma del artículo 69.3 de la Constitución (BOE del 20 de mayo de 2026), Formentera elige su propio senador separado de Eivissa, así que el 29-N se eligen 209 y el pleno tiene 267: los tres quintos son 161. Como Formentera es un solo municipio, su voto al Congreso de 2023 sale directamente de los resultados municipales; la validación con 2023 se hace con las circunscripciones de entonces.
 
 El 26 de octubre PP y Vox anunciaron un acuerdo para el Senado, y tuve que meterlo en el modelo con tres piezas. En seis provincias Vox no se presenta y el PP lleva en su lista a un independiente propuesto por Vox; supongo que el 80 % de los votantes de Vox vota esa lista (no hay precedente directo, así que lo anclo en el 83 % que conservó Unidos Podemos en 2016). Supongo que quien coge esa papeleta marca la lista entera, porque nada en ella le indica cuál de los tres nombres es el de Vox; por eso el independiente sólo sale si el PP gana sus tres senadores. En tres provincias el PP no se presenta y el 60 % de su voto va a Vox. Y en catorce Vox lleva un solo candidato y pide a sus votantes que marquen también a dos del PP. Ahí el reparto ya no se puede hacer por listas: lo hago nombre a nombre. Los dos primeros del PP suman los votos de los votantes de Vox que conocen la consigna (supongo la mitad), pero el tercero sólo tiene los del PP, y puede perder el escaño frente al segundo de otra lista. Comprobé que el reparto nombre a nombre da exactamente lo mismo que el de listas cuando no hay acuerdo, para no meter diferencias por la puerta de atrás.
 
@@ -144,7 +144,7 @@ El 26 de octubre PP y Vox anunciaron un acuerdo para el Senado, y tuve que meter
 
 Con el acuerdo ya anunciado, la pregunta útil es cuánto se aleja del mejor pacto posible. En cada provincia hay cuatro opciones: ir por separado, que Vox no se presente, que no se presente el PP o que Vox lleve un solo candidato. Probar todas las combinaciones es imposible: con 52 provincias y cuatro opciones salen más números de los que se pueden escribir. Me fijé en algo que lo simplifica mucho: lo que se haga en una provincia sólo cambia los senadores de esa provincia. Así que simulo cada opción una vez en todas las provincias, con las mismas 5.000 elecciones simuladas, y cualquier combinación se calcula sumando. Después elijo provincia a provincia la opción que más sube la probabilidad de los tres quintos. No garantiza el óptimo exacto, pero como las provincias son independientes se queda muy cerca.
 
-El resultado, con la participación que suponen las encuestas, es que el acuerdo lleva la probabilidad de los tres quintos del bloque de derechas del 12 % al 31 %, y el mejor pacto posible la llevaría a cerca del 87 %. Casi toda la diferencia viene de dos cosas: el formato de «un solo candidato de Vox» rinde más o menos la mitad que la retirada, y el acuerdo deja fuera provincias como Barcelona, Córdoba, Teruel o León.
+El resultado, con las encuestas hasta el 8 de noviembre y la participación que suponen, es que el acuerdo lleva la probabilidad de los tres quintos del bloque de derechas del 9 % al 27 %, y el mejor pacto posible la llevaría al 86 %. Casi toda la diferencia viene del formato de «un solo candidato de Vox»: en esas catorce provincias la derecha gana con sus tres senadores unas cinco, prácticamente las mismas que yendo por separado, mientras que con la retirada de Vox ganaría casi doce. Sólo con ese cambio los tres quintos pasarían al 47 %. El resto lo explican provincias que se quedaron fuera del acuerdo, como Barcelona, Córdoba, Teruel o León.
 
 ### 12. Cuántas simulaciones
 
@@ -179,11 +179,11 @@ Todo lo que usa la aplicación son datos públicos, y las encuestas se actualiza
 
 | Dato | Fuente | Actualización |
 | --- | --- | --- |
-| Encuestas nacionales | Todas las publicadas, recogidas en Wikipedia | Diaria; la última incorporada es del 17 de octubre de 2026 |
+| Encuestas nacionales | Todas las publicadas, recogidas en Wikipedia | Diaria; la última incorporada es del 8 de noviembre de 2026 |
 | Encuestas autonómicas | CEO, Sondaxe, GAD3 y otras | Con cada encuesta nueva |
 | Resultados 2015–2023 y Senado 2023 | Ministerio del Interior (infoelectoral) | Fijos, sellados para detectar cualquier cambio |
-| Senadores designados | Web del Senado | A 17 de octubre de 2026 |
-| Candidaturas | Coaliciones registradas ante la Junta Electoral Central | 16 de octubre; las listas se cierran el 26 |
+| Senadores designados | Web del Senado | Comprobados el 11 de noviembre de 2026 |
+| Candidaturas | Coaliciones registradas ante la Junta Electoral Central | 16 de octubre; listas cerradas el 26 y publicadas en el BOE |
 
 Cuando sale una encuesta nueva, la aplicación la incorpora, comprueba que el modelo sigue pasando todas sus pruebas, recalcula los escenarios habituales y publica la versión nueva. La noche electoral se puede cargar el escrutinio para ir proyectando los escaños a medida que avanza el recuento.
 

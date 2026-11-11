@@ -14,7 +14,7 @@ Plantilla de entrada:
 ### Interfaz y herramientas
 ```
 
-## [Sin publicar]
+## [1.2.0] – 2026-11-11
 
 ### Modelo
 - **Formentera elige su propio senador** (reforma del art. 69.3 de la Constitución, BOE de 20/05/2026, aplicable por
