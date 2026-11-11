@@ -1,0 +1,21 @@
+#!/bin/sh
+# Comprobaciones antes de cada commit (activar una vez con: git config core.hooksPath .githooks).
+# Saltarlas en un caso concreto: git commit --no-verify
+set -e
+cd "$(git rev-parse --show-toplevel)"
+
+if [ -x .venv/Scripts/python.exe ]; then PY=.venv/Scripts/python.exe
+elif [ -x .venv/bin/python ]; then PY=.venv/bin/python
+else PY=python; fi
+
+echo "pre-commit: ruff"
+"$PY" -m ruff check .
+
+echo "pre-commit: tests"
+"$PY" -m pytest -q -p no:cacheprovider
+
+# El motor de escaños tiene que seguir reproduciendo el Congreso 2015-2023 (ver CLAUDE.md / README).
+if git diff --cached --name-only | grep -q '^motor/escanos.py$'; then
+    echo "pre-commit: validar_motor (motor/escanos.py modificado)"
+    "$PY" -m validacion.validar_motor > /dev/null
+fi

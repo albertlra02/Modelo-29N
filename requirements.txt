@@ -1,0 +1,8 @@
+numpy>=1.26
+pandas>=2.2
+plotly>=5.24
+streamlit>=1.50
+starlette>=0.40
+uvicorn>=0.30
+jinja2>=3.1
+pytest>=8.0

@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% from "_macros.html" import grafico, cabecera %}
+{% block titulo %}Noche electoral{% endblock %}
+{% macro dif(x) %}{% if x == 0 %}<span class="sub">=</span>{% else %}<span class="{{ 'sube' if x > 0 else 'baja' }}">{{ '%+d'|format(x)|replace('-', '−') }}</span>{% endif %}{% endmacro %}
+{% block contenido %}
+{% if esc is none %}
+{{ cabecera("Noche electoral", "Esperando al escrutinio",
+  "La noche del 29 de noviembre esta página compara el recuento con la predicción y proyecta los escaños a medida que llegan los votos.") }}
+<section class="tarjeta calculo">
+  {% if error %}
+  <p class="aviso">El fichero del escrutinio tiene un error: {{ error }}</p>
+  {% endif %}
+  <h2 class="tarjeta__titulo">Cómo cargar el escrutinio</h2>
+  <p>Escribe los votos contados en <code>{{ fichero or 'datos/escrutinio/escrutinio.csv' }}</code>: una fila por
+    provincia, con el porcentaje de mesas escrutadas, los votos en blanco y una columna de votos por candidatura (con las
+    claves del modelo: PP, PSOE, VOX, FRENTE_AMPLIO, PODEMOS, ERC…). El formato completo está en
+    <code>datos/escrutinio.py</code>. La página se actualiza al recargarla.</p>
+  <p>Para probarla antes de la noche, genera un escrutinio de prueba con los votos de 2023:</p>
+  <pre><code>python -m scripts.escrutinio simulacro --avance 40</code></pre>
+  <p>y bórralo después con <code>python -m scripts.escrutinio borrar</code>.</p>
+</section>
+{% else %}
+<section class="portada">
+  <p class="antetitulo">Noche electoral · escrutado el {{ avance|num }} % · datos de las {{ hora }}</p>
+  <h1 class="titular">Proyección con el escrutinio</h1>
+  <p class="entradilla">Lo contado en cada provincia, mezclado con la predicción del modelo según lo que falta por contar:
+    con poco escrutado pesa más la predicción; al acabar, sólo el recuento.</p>
+  {% if simulacro %}<p class="aviso">Esto es un simulacro con los votos reales de 2023, no el escrutinio del 29-N.
+    Bórralo con <code>python -m scripts.escrutinio borrar</code>.</p>{% endif %}
+  <label class="interruptor"><input type="checkbox" data-recargar> <span>Recargar cada minuto</span></label>
+</section>
+
+<section class="rejilla rejilla--portada">
+  <article class="tarjeta">
+    <h2 class="tarjeta__titulo">Escaños proyectados</h2>
+    {{ grafico("f-noche-hemiciclo", hemiciclo, "Hemiciclo con la proyección del escrutinio") }}
+    {{ leyenda|safe }}
+  </article>
+  <aside class="tarjeta">
+    <h2 class="tarjeta__titulo">¿Llegan a {{ mayoria }}?</h2>
+    <dl class="filas filas--sumas">
+      {% for s in sumas %}
+      <div><dt>{{ s.texto }}</dt><dd class="{{ 'llega' if s.escanos >= mayoria else 'no-llega' }}">{{ s.escanos }}<span>{{ 'sí llegan' if s.escanos >= mayoria else 'les faltan ' ~ (mayoria - s.escanos) }}</span></dd></div>
+      {% endfor %}
+    </dl>
+  </aside>
+</section>
+
+<section class="seccion">
+  <div class="seccion__cabecera"><h2>Predicción, recuento y proyección</h2></div>
+  <div class="tarjeta tarjeta--tabla">
+    <div class="tabla-scroll">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th scope="col">Partido</th>
+            <th scope="col" class="num">Escaños: modelo</th>
+            <th scope="col" class="num">Con lo contado</th>
+            <th scope="col" class="num">Proyección</th>
+            <th scope="col" class="num">Frente al modelo</th>
+            <th scope="col" class="num">Voto: modelo</th>
+            <th scope="col" class="num">Escrutado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in filas %}
+          <tr>
+            <th scope="row"><span class="punto" style="--c: {{ f.clave|color }}"></span>{{ f.clave|nombre }}</th>
+            <td class="num">{{ f.modelo|num(0) }}</td>
+            <td class="num">{{ f.ahora }}</td>
+            <td class="num fuerte">{{ f.proy }}</td>
+            <td class="num">{{ dif(f.dif) }}</td>
+            <td class="num">{{ (f.v_modelo|num ~ ' %') if f.v_modelo == f.v_modelo else '—' }}</td>
+            <td class="num">{{ f.v_esc|num }} %</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="nota">Modelo: mediana de las simulaciones del escenario elegido. «Con lo contado»: D'Hondt con los votos
+    escrutados tal cual (las provincias sin votos contados no reparten). Proyección: lo contado y la predicción mezclados
+    según el porcentaje escrutado de cada provincia. No corrige que unas mesas se cuenten antes que otras (suelen ir
+    delante las rurales, que al principio favorecen al PP y a Vox): con poco escrutado, mejor fiarse de la predicción.</p>
+</section>
+
+<section class="seccion">
+  <div class="seccion__cabecera"><h2>Quién va primero</h2></div>
+  <div class="tarjeta">
+    {{ grafico("f-noche-mapa", mapa, "Mapa del partido que va primero en el recuento") }}
+  </div>
+  <p class="nota">Partido más votado en lo escrutado de cada provincia; el tono, su ventaja sobre el segundo. En gris, las
+    provincias sin votos contados.</p>
+</section>
+
+<section class="seccion">
+  <div class="seccion__cabecera"><h2>Dónde se aparta el recuento de la predicción</h2></div>
+  <div class="tarjeta tarjeta--tabla">
+    <div class="tabla-scroll">
+      <table class="tabla tabla--densa">
+        <thead>
+          <tr>
+            <th scope="col">Provincia</th>
+            <th scope="col" class="num">Escrutado</th>
+            <th scope="col">Va primero</th>
+            <th scope="col">Recuento frente a predicción (puntos)</th>
+            <th scope="col">Reparto proyectado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in provincias %}
+          <tr>
+            <th scope="row">{{ f.provincia }}</th>
+            <td class="num">{{ f.escrutado|num }} %</td>
+            <td><span class="punto" style="--c: {{ f.primero|color }}"></span>{{ f.primero|nombre }}</td>
+            <td>{% for k, v in f.desvio %}<span class="{{ 'sube' if v > 0 else 'baja' }}">{{ k|nombre }} {{ ('%+.1f'|format(v))|replace('.', ',')|replace('-', '−') }}</span>{{ ' · ' if not loop.last }}{% else %}<span class="sub">como se esperaba</span>{% endfor %}</td>
+            <td class="reparto">{{ f.reparto }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="nota">Las {{ n_prov }} provincias con votos contados, de más a menos desviadas: diferencia entre el porcentaje
+    de cada partido en lo escrutado y en la predicción central.</p>
+</section>
+{% endif %}
+{% endblock %}
+{% block final %}
+<script>
+  (() => {
+    const c = document.querySelector("[data-recargar]");
+    if (!c) return;
+    let activo = false;
+    try { activo = localStorage.getItem("noche-recargar") === "1"; } catch {}
+    c.checked = activo;
+    let t = activo ? setTimeout(() => location.reload(), 60000) : null;
+    c.addEventListener("change", () => {
+      try { localStorage.setItem("noche-recargar", c.checked ? "1" : "0"); } catch {}
+      clearTimeout(t);
+      if (c.checked) t = setTimeout(() => location.reload(), 60000);
+    });
+  })();
+</script>
+{% endblock %}

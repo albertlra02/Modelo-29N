@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "_macros.html" import grafico, cabecera %}
+{% block titulo %}¿Y si…?{% endblock %}
+{% block contenido %}
+{{ cabecera("Simulador", "¿Y si…?",
+  "Mueve el voto de cualquier partido y mira cómo cambian los escaños.") }}
+
+<section class="simulador" data-simulador>
+  <div class="tarjeta simulador__controles">
+    <div class="simulador__cab">
+      <h2 class="tarjeta__titulo">Voto nacional</h2>
+      <button type="button" class="boton boton--secundario" data-restablecer>Volver a la proyección</button>
+    </div>
+    {% for x in partidos %}
+    <div class="deslizador" style="--c: {{ x.clave|color }}" data-clave="{{ x.clave }}" data-base="{{ x.base }}">
+      <label for="v-{{ x.clave }}"><span class="punto" style="--c: {{ x.clave|color }}"></span>{{ x.clave|nombre }}</label>
+      <output for="v-{{ x.clave }}" data-valor>{{ x.valor|num }} %</output>
+      <input type="range" id="v-{{ x.clave }}" min="0" max="{{ x.max }}" step="0.1" value="{{ x.valor }}">
+      <small data-base-texto>proyección: {{ x.base|num }} %</small>
+    </div>
+    {% endfor %}
+    <p class="nota">Lo que mueves queda fijo; el resto se reparte lo que sobra.</p>
+  </div>
+
+  <div class="simulador__resultado" aria-live="polite">
+    <div class="tarjeta">
+      {{ grafico("f-sim-hemiciclo", res.hemiciclo, "Hemiciclo con el reparto simulado") }}
+      <div data-sim-leyenda>{{ res.leyenda|safe }}</div>
+    </div>
+    <div data-sim-tablas>{% include "_simulador.html" %}</div>
+    <div class="tarjeta">
+      <h2 class="tarjeta__titulo">Partido más votado en cada provincia</h2>
+      {{ grafico("f-sim-mapa", res.mapa, "Mapa del partido más votado con el voto simulado") }}
+    </div>
+  </div>
+</section>
+<p class="nota">Un solo reparto, sin incertidumbre, a partir de la proyección central. El enlace guarda lo que has
+  movido.</p>
+{% endblock %}
+{% block final %}<script src="/estatico/simulador.js?v={{ v }}" defer></script>{% endblock %}

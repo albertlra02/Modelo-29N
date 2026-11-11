@@ -1,0 +1,35 @@
+{
+  "generado": "2026-10-16T17:07:31+02:00",
+  "git": {
+    "commit": "0c99c03f8355c2f459fefe75fb0495b2e51cfa26",
+    "cambios_sin_confirmar": false
+  },
+  "huella_modelo": "3a0e724c84f4d447",
+  "escenario": {
+    "fecha": "2026-10-12",
+    "candidaturas": "separados",
+    "participacion": 0.65,
+    "reparto": "historico",
+    "n_sim": 10000,
+    "semilla": 2026
+  },
+  "encuestas": {
+    "n": 333,
+    "ultima": {
+      "fin": "2026-10-11",
+      "encuestadora": "SocioMétrica",
+      "medio": "El Español"
+    }
+  },
+  "entorno": {
+    "python": "3.12.10",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "plotly": "7.1.0"
+  },
+  "ficheros": {
+    "simulaciones_2026-10-12_separados.csv.gz": "715a09d75a4b089718ebbbe0c5a624cd637c6de3db328d0f1598a5e631053bf5",
+    "prediccion_2026-10-12_separados.csv": "eb83f27302fa6b1149c8c03d64dc119ab10a5f1b99931dea5c8d740ee4ae145e",
+    "probabilidades_2026-10-12_separados.csv": "60cc5dd2a645a39b4d5a977e5efdfe1aa2e90cc7ec4813ba66f8f5ea2dc7ba5a"
+  }
+}

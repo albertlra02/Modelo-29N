@@ -1,0 +1,53 @@
+provincia,acuerdo,ideal_senadores,ideal_tres_quintos,media_separados,media_vox_fuera,media_pp_fuera,media_vox_uno,ganancia_acuerdo,ganancia_ideal
+A Coruña,separados,vox_fuera,vox_fuera,2.83,2.97,2.28,2.88,0.0,0.14
+Alacant/Alicante,vox_uno,vox_fuera,vox_fuera,2.25,2.98,2.89,2.61,0.35,0.73
+Albacete,separados,vox_fuera,vox_fuera,2.68,2.99,2.95,2.89,0.0,0.32
+Almería,separados,vox_uno,vox_fuera,3.22,3.0,2.99,3.24,0.0,0.02
+Araba/Álava,vox_uno,vox_fuera,vox_fuera,0.45,1.06,0.45,0.82,0.37,0.61
+Asturias,vox_uno,vox_fuera,vox_fuera,1.66,2.87,2.35,2.14,0.48,1.21
+Badajoz,vox_uno,vox_fuera,vox_fuera,1.88,2.94,2.61,2.34,0.45,1.05
+Barcelona,separados,vox_fuera,vox_fuera,0.19,1.09,0.95,0.81,0.0,0.9
+Bizkaia,separados,vox_fuera,vox_fuera,0.01,0.1,0.0,0.03,0.0,0.1
+Burgos,separados,vox_fuera,vox_fuera,2.47,2.98,2.83,2.71,0.0,0.51
+Cantabria,separados,vox_fuera,vox_fuera,2.74,2.99,2.93,2.88,0.0,0.26
+Castelló/Castellón,vox_fuera,vox_fuera,vox_fuera,1.82,2.96,2.76,2.34,1.14,1.14
+Ceuta,separados,vox_fuera,vox_fuera,1.82,2.0,1.99,1.82,0.0,0.18
+Ciudad Real,separados,vox_fuera,vox_fuera,2.66,2.99,2.95,2.88,0.0,0.33
+Cuenca,vox_uno,vox_fuera,vox_fuera,2.38,2.99,2.89,2.69,0.31,0.61
+Cáceres,vox_uno,vox_fuera,vox_fuera,1.95,2.95,2.65,2.38,0.44,1.0
+Cádiz,vox_fuera,vox_fuera,vox_fuera,1.94,2.93,2.45,2.36,0.98,0.98
+Córdoba,separados,vox_fuera,vox_fuera,2.23,2.95,2.46,2.53,0.0,0.72
+Gipuzkoa,pp_fuera,vox_fuera,vox_fuera,0.0,0.0,0.0,0.0,0.0,0.0
+Girona,pp_fuera,vox_fuera,vox_fuera,0.03,0.6,0.42,0.1,0.39,0.57
+Granada,vox_uno,vox_fuera,vox_fuera,2.31,2.98,2.74,2.61,0.3,0.67
+Guadalajara,separados,vox_fuera,vox_fuera,2.62,2.99,2.96,2.9,0.0,0.37
+Huelva,vox_uno,vox_fuera,vox_fuera,1.99,2.93,2.39,2.39,0.4,0.94
+Huesca,vox_uno,vox_fuera,vox_fuera,1.66,2.83,1.92,2.12,0.45,1.17
+Illes Balears,vox_fuera,vox_fuera,vox_fuera,2.55,3.78,3.17,2.55,1.23,1.23
+Jaén,vox_uno,vox_fuera,vox_fuera,2.21,2.96,2.57,2.54,0.33,0.75
+La Rioja,separados,vox_fuera,vox_fuera,2.75,2.98,2.76,2.86,0.0,0.23
+Las Palmas,vox_fuera,vox_fuera,vox_fuera,1.74,3.69,3.3,1.74,1.95,1.95
+León,separados,vox_fuera,vox_fuera,2.38,2.98,2.84,2.67,0.0,0.6
+Lleida,separados,vox_fuera,vox_fuera,0.01,0.64,0.26,0.11,0.0,0.63
+Lugo,separados,vox_fuera,vox_fuera,2.98,3.0,2.8,2.99,0.0,0.01
+Madrid,separados,vox_fuera,vox_fuera,2.77,2.99,2.94,2.92,0.0,0.22
+Melilla,separados,vox_fuera,vox_fuera,2.0,2.0,2.0,2.0,0.0,0.0
+Murcia,separados,vox_uno,vox_fuera,3.3,3.0,2.99,3.33,0.0,0.04
+Málaga,separados,vox_fuera,vox_fuera,2.62,2.99,2.87,2.79,0.0,0.37
+Navarra,vox_uno,vox_fuera,vox_fuera,0.75,1.26,0.97,1.03,0.28,0.51
+Ourense,separados,vox_fuera,vox_fuera,2.98,3.0,2.82,2.99,0.0,0.01
+Palencia,separados,vox_fuera,vox_fuera,2.67,2.99,2.9,2.84,0.0,0.32
+Pontevedra,vox_uno,vox_fuera,vox_fuera,2.24,2.79,1.43,2.44,0.2,0.55
+Salamanca,separados,vox_uno,vox_uno,3.19,3.0,2.99,3.2,0.0,0.01
+Santa Cruz de Tenerife,vox_fuera,vox_fuera,vox_fuera,2.3,2.98,2.9,2.3,0.68,0.68
+Segovia,separados,vox_uno,vox_fuera,3.04,3.0,2.98,3.08,0.0,0.04
+Sevilla,vox_uno,vox_fuera,vox_fuera,1.44,2.71,1.7,1.9,0.46,1.28
+Soria,separados,vox_fuera,vox_fuera,2.59,2.93,2.74,2.75,0.0,0.34
+Tarragona,pp_fuera,vox_fuera,vox_fuera,0.31,1.52,1.29,0.8,0.98,1.21
+Teruel,separados,vox_fuera,vox_fuera,2.28,2.97,2.73,2.58,0.0,0.69
+Toledo,separados,vox_uno,vox_fuera,2.9,2.99,2.98,3.09,0.0,0.19
+Valladolid,separados,vox_fuera,vox_fuera,2.7,2.99,2.94,2.88,0.0,0.3
+València/Valencia,vox_fuera,vox_fuera,vox_fuera,1.55,2.93,2.57,2.13,1.38,1.38
+Zamora,separados,vox_uno,vox_fuera,2.99,3.0,2.97,3.03,0.0,0.04
+Zaragoza,vox_uno,vox_fuera,vox_fuera,1.59,2.88,2.3,2.11,0.52,1.29
+Ávila,separados,vox_uno,separados,3.4,3.0,3.0,3.41,0.0,0.01

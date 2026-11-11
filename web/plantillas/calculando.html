@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cabecera %}
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block contenido %}
+{{ cabecera(titulo, "Hay que calcular este escenario") }}
+<section class="tarjeta calculo" data-calcular="{{ tarea }}" data-total="{{ total }}" data-pendientes="{{ pendientes }}" data-auto="{{ '1' if auto else '0' }}">
+  {% if tarea == "evolucion" %}
+  <p>Con este escenario faltan por calcular <strong>{{ pendientes }} de las {{ total }} semanas</strong> (unos {{ segundos }}
+    segundos). Con los valores por defecto ya están calculadas de antemano (<code>python -m scripts.precalcular</code>).</p>
+  {% elif tarea == "barrido" %}
+  <p>El barrido recalcula el escenario con siete participaciones y las dos opciones de candidaturas: faltan
+    <strong>{{ pendientes }} de {{ total }}</strong> cálculos (unos {{ segundos }} segundos).</p>
+  {% else %}
+  <p>Es la primera vez que se pide este escenario: hay que simular {{ p.n_sim|miles }} elecciones. Tarda unos segundos y queda
+    guardado para la próxima vez.</p>
+  {% endif %}
+  <div class="progreso" role="progressbar" aria-valuemin="0" aria-valuemax="{{ total }}" aria-valuenow="{{ total - pendientes }}">
+    <i style="width: {{ 100 * (total - pendientes) / total }}%"></i>
+  </div>
+  <p class="calculo__estado" data-estado>{{ texto if auto else "Listo para empezar." }}</p>
+  {% if not auto %}<button type="button" class="boton" data-empezar>Calcular</button>{% endif %}
+</section>
+{% endblock %}

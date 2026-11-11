@@ -1,0 +1,36 @@
+{
+  "generado": "2026-10-17T13:14:10+02:00",
+  "git": {
+    "commit": "aabde95c6e3ab141987b70f638624a60dc83c53c",
+    "cambios_sin_confirmar": true
+  },
+  "huella_modelo": "73682b5d65916c14",
+  "escenario": {
+    "fecha": "2026-10-12",
+    "candidaturas": "registradas",
+    "participacion": 0.65,
+    "reparto": "historico",
+    "n_sim": 10000,
+    "semilla": 2026
+  },
+  "encuestas": {
+    "n": 333,
+    "ultima": {
+      "fin": "2026-10-11",
+      "encuestadora": "SocioMétrica",
+      "medio": "El Español"
+    }
+  },
+  "entorno": {
+    "python": "3.12.10",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "plotly": "7.1.0"
+  },
+  "ficheros": {
+    "simulaciones_2026-10-12_registradas.csv.gz": "2c23ea50a1e0d8bd1be73589c44ea83dc998c27bb8f571974a0fe39287fcee50",
+    "prediccion_2026-10-12_registradas.csv": "4fd99c250628af786146c273fe0aac6678e1a145ca789b08e566c1053dc0ccfd",
+    "probabilidades_2026-10-12_registradas.csv": "65eb05f05739a59eb2b3a988ade723e47f2a202e291a2e3a11515f6e9f8108f5",
+    "senado_2026-10-12_registradas.csv": "e1d98486ceb916d54e8b54c1a199b3f2646acc7ed16c1b48ea4d8de2d4750061"
+  }
+}

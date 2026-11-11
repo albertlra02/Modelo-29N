@@ -1,0 +1,35 @@
+{
+  "generado": "2026-10-16T17:07:41+02:00",
+  "git": {
+    "commit": "0c99c03f8355c2f459fefe75fb0495b2e51cfa26",
+    "cambios_sin_confirmar": false
+  },
+  "huella_modelo": "3a0e724c84f4d447",
+  "escenario": {
+    "fecha": "2026-10-12",
+    "candidaturas": "frente_amplio",
+    "participacion": 0.65,
+    "reparto": "historico",
+    "n_sim": 10000,
+    "semilla": 2026
+  },
+  "encuestas": {
+    "n": 333,
+    "ultima": {
+      "fin": "2026-10-11",
+      "encuestadora": "SocioMétrica",
+      "medio": "El Español"
+    }
+  },
+  "entorno": {
+    "python": "3.12.10",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "plotly": "7.1.0"
+  },
+  "ficheros": {
+    "simulaciones_2026-10-12_frente_amplio.csv.gz": "fcb43dae04d5a3a5733f737e61642215e7b828facb96b04b52a8a3eeb7534408",
+    "prediccion_2026-10-12_frente_amplio.csv": "b2d423a46eb8d3d340832d61c686b93a9287fc3944558b03d89675b67757e6c4",
+    "probabilidades_2026-10-12_frente_amplio.csv": "60023bf937249b44f72d7940e23f5197e15168f6218811bf7b9bb3ba109d1afe"
+  }
+}

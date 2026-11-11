@@ -1,0 +1,96 @@
+Backtest fuera de muestra (dejando fuera cada elección) del Monte Carlo de escaños
+10000 simulaciones por caso; horizontes [30, 14, 1] días; elecciones ['2016', '2019A', '2019N', '2023'].
+
+Escalas usadas (error de bloque derecha / izquierda a 1 y 48 días; trasvase k):
+  2016   dcha 2.1→4.1 pp, izda 1.8→4.1 pp, k 0.033→0.104
+  2019A  dcha 1.8→2.0 pp, izda 2.0→3.8 pp, k 0.036→0.112
+  2019N  dcha 2.3→4.2 pp, izda 2.0→3.6 pp, k 0.037→0.063
+  2023   dcha 2.3→3.6 pp, izda 1.7→3.6 pp, k 0.036→0.095
+
+== Calibración fuera de muestra
+  Cobertura (todos los partidos, n = 147): 80 % -> 76 %, 95 % -> 88 %
+  Cobertura (partidos estatales, n = 54): 80 % -> 76 %, 95 % -> 93 %
+  Por horizonte (estatales): 30 días: 80 % -> 78 %, 95 % -> 89 %, 14 días: 80 % -> 78 %, 95 % -> 89 %, 1 días: 80 % -> 72 %, 95 % -> 100 %
+  Error medio absoluto en escaños (estatales): mediana del modelo 8.1, proyección central 8.0, repetir la elección anterior 21.9
+  Brier P(derecha ≥ 176): 0.143 (referencia 50 %: 0,250) | Brier P(PP > PSOE): 0.003
+
+== Calibración dentro de muestra
+  Cobertura (todos los partidos, n = 147): 80 % -> 76 %, 95 % -> 90 %
+  Cobertura (partidos estatales, n = 54): 80 % -> 74 %, 95 % -> 98 %
+  Por horizonte (estatales): 30 días: 80 % -> 83 %, 95 % -> 94 %, 14 días: 80 % -> 72 %, 95 % -> 100 %, 1 días: 80 % -> 67 %, 95 % -> 100 %
+  Error medio absoluto en escaños (estatales): mediana del modelo 8.1, proyección central 8.0, repetir la elección anterior 21.9
+  Brier P(derecha ≥ 176): 0.144 (referencia 50 %: 0,250) | Brier P(PP > PSOE): 0.004
+
+Eventos, fuera de muestra:
+eleccion  dias_antes  encuestas  p_derecha_176  derecha_mediana  derecha_real  p_pp_mas_que_psoe  pp_mas_que_psoe_real
+    2016          30         92          0.252            166.0           169              0.964                  True
+    2016          14        109          0.134            162.0           169              0.984                  True
+    2016           1        151          0.076            162.0           169              0.997                  True
+   2019A          30         51          0.173            164.0           149              0.069                 False
+   2019A          14         72          0.059            158.0           149              0.018                 False
+   2019A           1        115          0.035            157.0           149              0.004                 False
+   2019N          30         70          0.035            144.0           153              0.111                 False
+   2019N          14        108          0.037            151.0           153              0.117                 False
+   2019N           1        147          0.021            151.0           153              0.032                 False
+    2023          30         25          0.779            184.0           171              0.950                  True
+    2023          14         73          0.722            181.0           171              0.943                  True
+    2023           1        163          0.685            179.0           171              0.980                  True
+
+Partidos estatales, fuera de muestra (real frente a mediana e intervalo del 80 %):
+eleccion  dias_antes partido  real  mediana   p10   p90  percentil_real
+    2016          30      PP   137    124.0 103.0 144.0            0.79
+    2016          30    PSOE    85     80.0  59.0  96.0            0.65
+    2016          30      CS    32     41.0  24.0  59.0            0.26
+    2016          30     IZQ    71     84.0  63.0 103.0            0.21
+    2016          14      PP   137    121.0 106.0 137.0            0.90
+    2016          14    PSOE    85     80.0  65.0  93.0            0.67
+    2016          14      CS    32     40.0  27.0  54.0            0.22
+    2016          14     IZQ    71     87.0  71.0 102.0            0.09
+    2016           1      PP   137    124.0 114.0 134.0            0.94
+    2016           1    PSOE    85     82.0  73.0  90.0            0.69
+    2016           1      CS    32     37.0  29.0  45.0            0.19
+    2016           1     IZQ    71     86.0  76.0  95.0            0.03
+   2019A          30      PP    66     84.0  64.0 105.0            0.13
+   2019A          30    PSOE   123    122.0 101.0 142.0            0.53
+   2019A          30     VOX    24     25.0  11.0  44.0            0.47
+   2019A          30      CS    57     55.0  34.0  71.0            0.57
+   2019A          30     IZQ    43     37.0  24.0  54.0            0.69
+   2019A          14      PP    66     82.0  67.0  98.0            0.08
+   2019A          14    PSOE   123    125.0 109.0 141.0            0.43
+   2019A          14     VOX    24     21.0  11.0  34.0            0.63
+   2019A          14      CS    57     52.0  37.0  65.0            0.67
+   2019A          14     IZQ    43     40.0  29.0  53.0            0.64
+   2019A           1      PP    66     79.0  70.0  89.0            0.04
+   2019A           1    PSOE   123    120.0 108.0 131.0            0.65
+   2019A           1     VOX    24     28.0  20.0  36.0            0.29
+   2019A           1      CS    57     49.0  40.0  57.0            0.89
+   2019A           1     IZQ    43     47.0  39.0  57.0            0.26
+   2019N          30      PP    89     93.0  75.0 108.0            0.36
+   2019N          30    PSOE   120    120.0 102.0 138.0            0.49
+   2019N          30     VOX    52     24.0  14.0  36.0            1.00
+   2019N          30      CS    10     25.0  14.0  38.0            0.02
+   2019N          30     IZQ    38     52.0  41.0  66.0            0.06
+   2019N          14      PP    89     94.0  79.0 106.0            0.32
+   2019N          14    PSOE   120    116.0 101.0 131.0            0.63
+   2019N          14     VOX    52     32.0  22.0  43.0            0.99
+   2019N          14      CS    10     22.0  14.0  32.0            0.01
+   2019N          14     IZQ    38     49.0  40.0  60.0            0.07
+   2019N           1      PP    89     86.0  75.0  97.0            0.61
+   2019N           1    PSOE   120    116.0 104.0 128.0            0.67
+   2019N           1     VOX    52     48.0  38.0  57.0            0.72
+   2019N           1      CS    10     15.0  10.0  21.0            0.08
+   2019N           1     IZQ    38     49.0  41.0  58.0            0.03
+    2023          30      PP   137    140.0 123.0 158.0            0.40
+    2023          30    PSOE   121    100.0  86.0 117.0            0.94
+    2023          30     VOX    33     42.0  29.0  56.0            0.18
+    2023          30     IZQ    31     34.0  22.0  45.0            0.38
+    2023          14      PP   137    140.0 126.0 154.0            0.37
+    2023          14    PSOE   121    107.0  95.0 122.0            0.89
+    2023          14     VOX    33     40.0  30.0  50.0            0.19
+    2023          14     IZQ    31     34.0  24.0  42.0            0.34
+    2023           1      PP   137    143.0 133.0 152.0            0.23
+    2023           1    PSOE   121    110.0 101.0 120.0            0.92
+    2023           1     VOX    33     36.0  29.0  42.0            0.28
+    2023           1     IZQ    31     34.0  28.0  40.0            0.27
+
+Límites: 4 elecciones (2015 no tiene base); sin encuestas autonómicas; K_REG, K_PROV, margen ×1,10, correlación −0,65 y colas t(5) fijos; los horizontes de una misma elección no son independientes.

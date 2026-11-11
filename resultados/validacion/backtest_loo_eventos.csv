@@ -1,0 +1,25 @@
+eleccion,dias_antes,calibracion,encuestas,p_derecha_176,derecha_176_real,derecha_mediana,derecha_real,p_pp_mas_que_psoe,pp_mas_que_psoe_real,p_pp_o_psoe_primero_correcto
+2016,30,fuera de muestra,92,0.252,False,166.0,169,0.964,True,0.9171
+2016,30,dentro de muestra,92,0.2261,False,165.0,169,0.9745,True,0.9386
+2016,14,fuera de muestra,109,0.134,False,162.0,169,0.9836,True,0.9455
+2016,14,dentro de muestra,109,0.1195,False,162.0,169,0.9879,True,0.9573
+2016,1,fuera de muestra,151,0.0764,False,162.0,169,0.9972,True,0.9932
+2016,1,dentro de muestra,151,0.0796,False,162.0,169,0.9965,True,0.9922
+2019A,30,fuera de muestra,51,0.1732,False,164.0,149,0.0687,False,0.9255
+2019A,30,dentro de muestra,51,0.2058,False,164.0,149,0.0613,False,0.9334
+2019A,14,fuera de muestra,72,0.0593,False,158.0,149,0.0179,False,0.9796
+2019A,14,dentro de muestra,72,0.0769,False,158.0,149,0.017,False,0.9808
+2019A,1,fuera de muestra,115,0.0347,False,157.0,149,0.0041,False,0.9949
+2019A,1,dentro de muestra,115,0.0384,False,157.0,149,0.0043,False,0.9948
+2019N,30,fuera de muestra,70,0.0351,False,144.0,153,0.1109,False,0.881
+2019N,30,dentro de muestra,70,0.0255,False,145.0,153,0.1324,False,0.8571
+2019N,14,fuera de muestra,108,0.0367,False,151.0,153,0.117,False,0.8731
+2019N,14,dentro de muestra,108,0.0284,False,151.0,153,0.1252,False,0.8649
+2019N,1,fuera de muestra,147,0.0206,False,151.0,153,0.0315,False,0.964
+2019N,1,dentro de muestra,147,0.0154,False,151.0,153,0.024,False,0.9728
+2023,30,fuera de muestra,25,0.7786,False,184.0,171,0.9503,True,0.9503
+2023,30,dentro de muestra,25,0.7794,False,184.0,171,0.9509,True,0.9509
+2023,14,fuera de muestra,73,0.7217,False,181.0,171,0.943,True,0.943
+2023,14,dentro de muestra,73,0.7233,False,181.0,171,0.9442,True,0.9442
+2023,1,fuera de muestra,163,0.6846,False,179.0,171,0.9795,True,0.9795
+2023,1,dentro de muestra,163,0.6859,False,179.0,171,0.9806,True,0.9806

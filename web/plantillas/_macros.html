@@ -1,0 +1,13 @@
+{# Gráfica de Plotly: la figura viaja como JSON junto al hueco donde se pinta. #}
+{% macro grafico(id, fig, etiqueta="") %}
+<div class="grafico" id="{{ id }}" data-fig="{{ id }}-datos" style="min-height: {{ fig.alto }}px"{% if etiqueta %} role="img" aria-label="{{ etiqueta }}"{% endif %}></div>
+<script type="application/json" id="{{ id }}-datos">{{ fig.json|safe }}</script>
+{% endmacro %}
+
+{% macro cabecera(antetitulo, titulo, entradilla="") %}
+<header class="cab-pagina">
+  <p class="antetitulo">{{ antetitulo }}</p>
+  <h1>{{ titulo }}</h1>
+  {% if entradilla %}<p class="entradilla">{{ entradilla }}</p>{% endif %}
+</header>
+{% endmacro %}

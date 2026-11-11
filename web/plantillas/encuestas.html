@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% from "_macros.html" import grafico, cabecera %}
+{% block titulo %}Encuestas{% endblock %}
+{% block contenido %}
+{{ cabecera("Encuestas", "La media de encuestas",
+  (n_enc|string) ~ " encuestas nacionales de " ~ (n_casas|string) ~ " casas hasta el " ~ (p.fecha|fecha_larga) ~ ", corregidas por el sesgo propio de cada casa. No incluye encuestas encargadas por partidos.") }}
+
+<section class="medias" aria-label="Media actual">
+  {% for m in medias %}
+  <div class="media" style="--c: {{ m.clave|color }}">
+    <div class="media__nombre">{{ m.clave|nombre }}</div>
+    <div class="media__valor">{{ m.media|num }}<span> %</span></div>
+    <div class="media__detalle">
+      ± {{ (1.96 * m.sd)|num }} ·
+      {% if m.cambio is none %}sin dato hace 30 días
+      {% elif m.cambio >= 0.05 %}▲ {{ m.cambio|num }} en 30 días
+      {% elif m.cambio <= -0.05 %}▼ {{ (-m.cambio)|num }} en 30 días
+      {% else %}= en 30 días{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</section>
+<p class="nota nota--suelta">Media del agregador el {{ p.fecha|fecha_larga }}, con su margen del 95 % (sólo el error entre
+  encuestas: el error común de toda la industria se añade en la simulación) y el cambio en puntos frente a hace 30 días.</p>
+
+<section class="tarjeta" data-encuestas>
+  <div class="tarjeta__barra">
+    <h2 class="tarjeta__titulo">Evolución</h2>
+    <div class="fichas" role="group" aria-label="Partidos">
+      {% for x in partidos %}
+      <button type="button" class="ficha" data-enc-partido="{{ x }}" aria-pressed="{{ 'true' if x in ['PP', 'PSOE', 'VOX', 'SUMAR'] else 'false' }}" style="--c: {{ x|color }}"><i></i>{{ x|nombre }}</button>
+      {% endfor %}
+    </div>
+    <div class="segmentado" role="group" aria-label="Desde">
+      {% for k, t in DESDE.items() %}
+      <button type="button" data-desde="{{ k }}" aria-pressed="{{ 'true' if k == '2026-01-01' else 'false' }}">{{ t }}</button>
+      {% endfor %}
+    </div>
+  </div>
+  {{ grafico("f-serie", fig_serie, "Evolución de la media de encuestas") }}
+  <p class="nota">La línea es la media del modelo, ya corregida por el sesgo de cada casa; los puntos, las encuestas tal como
+    se publicaron.</p>
+</section>
+
+<section class="rejilla rejilla--dos seccion">
+  <article class="tarjeta tarjeta--tabla">
+    <h2 class="tarjeta__titulo tarjeta__titulo--relleno">Últimas encuestas</h2>
+    <div class="tabla-scroll">
+      <table class="tabla tabla--densa">
+        <thead>
+          <tr>
+            <th scope="col">Casa</th>
+            <th scope="col">Fin</th>
+            {% for x in partidos %}<th scope="col" class="num">{{ x|nombre }}</th>{% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in ultimas %}
+          <tr>
+            <th scope="row">{{ e.casa }}{% if e.medio %}<span class="sub">{{ e.medio }}</span>{% endif %}</th>
+            <td class="sin-salto">{{ e.fin }}</td>
+            {% for val in e.valores %}<td class="num">{% if val == val %}{{ val|num }}{% else %}–{% endif %}</td>{% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="tarjeta" data-casas>
+    <div class="tarjeta__barra">
+      <h2 class="tarjeta__titulo">Sesgo de cada casa</h2>
+      <label class="filtro">Partido
+        <select data-casa-partido>
+          {% for x in partidos %}<option value="{{ x }}">{{ x|nombre }}</option>{% endfor %}
+        </select>
+      </label>
+    </div>
+    {{ grafico("f-casas", fig_casas, "Sesgo de cada casa encuestadora") }}
+    <p class="nota">Diferencia media de cada casa frente al conjunto de encuestadoras (casas con 5 o más encuestas). Es un
+      sesgo relativo, no un error frente al resultado real.</p>
+  </article>
+</section>
+
+<details class="desplegable">
+  <summary>Encuestas autonómicas usadas</summary>
+  <div class="tarjeta tarjeta--tabla">
+    <div class="tabla-scroll">
+      <table class="tabla tabla--densa" data-ordenable>
+        <thead>
+          <tr>{% for c in diag_cols %}<th scope="col" data-orden="{{ 'texto' if loop.index <= 2 else 'num' }}"{% if loop.index > 2 %} class="num"{% endif %}>{{ c }}</th>{% endfor %}</tr>
+        </thead>
+        <tbody>
+          {% for fila in diag %}
+          <tr>
+            {% for c in diag_cols %}
+            {% set val = fila[c] %}
+            {% if loop.index <= 2 %}<td data-valor="{{ val }}">{{ val|nombre if c == 'Partido' else val }}</td>
+            {% elif c == 'Encuestas' %}<td class="num" data-valor="{{ val }}">{{ val }}</td>
+            {% else %}<td class="num" data-valor="{{ val }}">{% if val == val %}{{ val|num }}{% endif %}</td>{% endif %}
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="nota">Donde hay encuestas autonómicas recientes, el modelo corrige el reparto territorial sin cambiar el total
+    nacional. «Usado por el modelo» es el objetivo final en cada comunidad.</p>
+</details>
+{% endblock %}

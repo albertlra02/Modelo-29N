@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% from "_macros.html" import grafico, cabecera %}
+{% block titulo %}Evolución{% endblock %}
+{% block contenido %}
+{{ cabecera("Evolución", "Semana a semana",
+  "Cada punto es el modelo completo corrido con las encuestas disponibles ese día, desde el " ~ (FECHAS[0]|fecha_larga) ~ ".") }}
+
+<section class="tarjeta">
+  <h2 class="tarjeta__titulo">El hemiciclo, semana a semana</h2>
+  {{ grafico("f-animado", fig_animado, "Hemiciclo animado por semanas") }}
+  <p class="nota">Pulsa ▶ para ver cómo ha cambiado el reparto semana a semana, o arrastra el deslizador. En el centro, el
+    porcentaje de simulaciones en que PP y Vox suman mayoría.</p>
+</section>
+
+<section class="rejilla rejilla--dos seccion">
+  <article class="tarjeta">
+    <h2 class="tarjeta__titulo">Probabilidad de mayoría</h2>
+    {{ grafico("f-bloques", fig_bloques, "Evolución de la probabilidad de mayoría por bloques") }}
+  </article>
+  <article class="tarjeta">
+    <h2 class="tarjeta__titulo">Escaños, mediana</h2>
+    {{ grafico("f-escanos-ev", fig_escanos, "Evolución de la mediana de escaños") }}
+  </article>
+</section>
+<p class="nota nota--suelta">La línea vertical marca la fecha del escenario. Antes de {{ DIAS_CALIBRADOS }} días de la
+  elección el error de las encuestas se extrapola, así que los rangos de esas semanas son más inciertos.</p>
+
+<details class="desplegable">
+  <summary>Ver los datos semana a semana</summary>
+  <div class="tarjeta tarjeta--tabla">
+    <div class="tabla-scroll">
+      <table class="tabla tabla--densa">
+        <thead>
+          <tr>
+            <th scope="col">Encuestas hasta</th>
+            <th scope="col" class="num">PP + Vox ≥ 176</th>
+            <th scope="col" class="num">Bloque de 2023 ≥ 176</th>
+            {% for x in principales %}<th scope="col" class="num">{{ x|nombre }}</th>{% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in filas %}
+          <tr{% if f.fecha == p.fecha %} class="marcada"{% endif %}>
+            <th scope="row">{{ f.fecha|fecha_larga }}</th>
+            <td class="num">{{ f.ppvox|pct }}</td>
+            <td class="num">{{ f.bloque|pct }}</td>
+            {% for m in f.medianas %}<td class="num">{{ m|num(0) }}</td>{% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="nota">Escaños: mediana de las simulaciones de cada semana.</p>
+</details>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cabecera %}
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block barra_escenario %}{% endblock %}
+{% block contenido %}
+{{ cabecera("Error", titulo, mensaje) }}
+<p><a class="boton" href="/{{ q }}">Ir al resumen</a></p>
+{% endblock %}

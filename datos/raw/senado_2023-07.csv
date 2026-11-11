@@ -1,0 +1,541 @@
+circ,provincia,circunscripcion,escanos,siglas,votos,votos_2,votos_3,electos
+019,Araba/Álava,Araba/Álava,4,PSE-EE (PSOE),45868,42738,42148,3
+019,Araba/Álava,Araba/Álava,4,EH BILDU-INDEPENDENTZIA EZKERRETIK,35535,34102,31486,1
+019,Araba/Álava,Araba/Álava,4,EAJ-PNV,31610,28956,28054,0
+019,Araba/Álava,Araba/Álava,4,PP,29736,29139,28261,0
+019,Araba/Álava,Araba/Álava,4,SUMAR,20578,15955,15644,0
+019,Araba/Álava,Araba/Álava,4,VOX,6102,5591,5213,0
+019,Araba/Álava,Araba/Álava,4,PACMA,1769,0,0,0
+019,Araba/Álava,Araba/Álava,4,ESCAÑOS EN BLANCO,1126,875,781,0
+019,Araba/Álava,Araba/Álava,4,RECORTES CERO,597,0,0,0
+019,Araba/Álava,Araba/Álava,4,PCTE,538,0,0,0
+019,Araba/Álava,Araba/Álava,4,PUM+J,310,0,0,0
+029,Albacete,Albacete,4,PP,91216,89492,87462,3
+029,Albacete,Albacete,4,PSOE,77585,74603,72546,1
+029,Albacete,Albacete,4,VOX,31301,29489,28270,0
+029,Albacete,Albacete,4,SUMAR,16196,13781,13458,0
+029,Albacete,Albacete,4,PACMA,2898,0,0,0
+029,Albacete,Albacete,4,PUM+J,1120,0,0,0
+029,Albacete,Albacete,4,RECORTES CERO,742,0,0,0
+039,Alacant/Alicante,Alacant/Alicante,4,PP,338386,326809,322094,3
+039,Alacant/Alicante,Alacant/Alicante,4,PSOE,300586,284617,267652,1
+039,Alacant/Alicante,Alacant/Alicante,4,VOX,124821,116968,109384,0
+039,Alacant/Alicante,Alacant/Alicante,4,SUMAR - COMPROMÍS,111238,97639,86666,0
+039,Alacant/Alicante,Alacant/Alicante,4,PACMA,12987,8996,8931,0
+039,Alacant/Alicante,Alacant/Alicante,4,RECORTES CERO,3081,0,0,0
+039,Alacant/Alicante,Alacant/Alicante,4,CJ,2283,1170,1095,0
+049,Almería,Almería,4,PP,129806,125559,124493,3
+049,Almería,Almería,4,PSOE,91868,90355,85795,1
+049,Almería,Almería,4,VOX,64820,62106,61321,0
+049,Almería,Almería,4,SUMAR,23514,18541,17271,0
+049,Almería,Almería,4,PACMA,3448,2223,2102,0
+049,Almería,Almería,4,ALM,2649,0,0,0
+049,Almería,Almería,4,PUM+J,984,0,0,0
+049,Almería,Almería,4,RECORTES CERO,906,0,0,0
+049,Almería,Almería,4,LB,554,0,0,0
+059,Ávila,Ávila,4,PP,42755,41693,40692,3
+059,Ávila,Ávila,4,PSOE,25946,25359,23602,1
+059,Ávila,Ávila,4,VOX,12059,10858,10463,0
+059,Ávila,Ávila,4,XAV,10912,8853,8388,0
+059,Ávila,Ávila,4,SUMAR,6153,4323,3899,0
+059,Ávila,Ávila,4,PACMA,696,0,0,0
+059,Ávila,Ávila,4,FE de las JONS,334,0,0,0
+059,Ávila,Ávila,4,PCTE,266,0,0,0
+059,Ávila,Ávila,4,PUM+J,251,0,0,0
+059,Ávila,Ávila,4,RECORTES CERO,133,0,0,0
+069,Badajoz,Badajoz,4,PSOE,151087,150764,146413,2
+069,Badajoz,Badajoz,4,PP,148448,147020,144421,2
+069,Badajoz,Badajoz,4,VOX,45084,42441,40647,0
+069,Badajoz,Badajoz,4,SUMAR,26825,22793,22616,0
+069,Badajoz,Badajoz,4,BQEX,6178,5364,4967,0
+069,Badajoz,Badajoz,4,PACMA,2964,1743,0,0
+069,Badajoz,Badajoz,4,PUM+J,1230,0,0,0
+069,Badajoz,Badajoz,4,RECORTES CERO,604,0,0,0
+071,Illes Balears,Mallorca,3,PP,143225,135984,0,2
+071,Illes Balears,Mallorca,3,PSIB-PSOE,120255,113710,0,1
+071,Illes Balears,Mallorca,3,MÉS PER MALLORCA-SUMAR,63586,52275,0,0
+071,Illes Balears,Mallorca,3,VOX,55822,51156,0,0
+071,Illes Balears,Mallorca,3,PACMA,5725,3411,0,0
+071,Illes Balears,Mallorca,3,PCTE,1152,0,0,0
+071,Illes Balears,Mallorca,3,RECORTES CERO,820,494,0,0
+072,Illes Balears,Menorca,1,PP,16222,0,0,1
+072,Illes Balears,Menorca,1,PSIB-PSOE,15156,0,0,0
+072,Illes Balears,Menorca,1,MÉS PER MENORCA-SUMAR,8870,0,0,0
+072,Illes Balears,Menorca,1,VOX,3577,0,0,0
+072,Illes Balears,Menorca,1,RECORTES CERO,249,0,0,0
+073,Illes Balears,Eivissa-Formentera,1,PSOE-SUMAR-EUIB-ARA EIVISSA,26389,0,0,1
+073,Illes Balears,Eivissa-Formentera,1,PP,23472,0,0,0
+073,Illes Balears,Eivissa-Formentera,1,VOX,6607,0,0,0
+073,Illes Balears,Eivissa-Formentera,1,RECORTES CERO,577,0,0,0
+089,Barcelona,Barcelona,4,PSC,858698,829562,769248,3
+089,Barcelona,Barcelona,4,ERC,488137,449935,395769,1
+089,Barcelona,Barcelona,4,SUMAR - ECP,420254,315938,282798,0
+089,Barcelona,Barcelona,4,PP,363510,353762,340168,0
+089,Barcelona,Barcelona,4,JxCAT - JUNTS,303419,272729,238807,0
+089,Barcelona,Barcelona,4,VOX,165824,153065,145521,0
+089,Barcelona,Barcelona,4,PACMA,56473,49077,34414,0
+089,Barcelona,Barcelona,4,PDeCAT-E-CiU,36733,0,0,0
+089,Barcelona,Barcelona,4,PCTC,18737,0,0,0
+089,Barcelona,Barcelona,4,RECORTES CERO,8848,4419,4384,0
+099,Burgos,Burgos,4,PP,81393,80357,78401,3
+099,Burgos,Burgos,4,PSOE,69754,68118,62906,1
+099,Burgos,Burgos,4,VOX,23081,20755,19397,0
+099,Burgos,Burgos,4,SUMAR,18524,16398,13409,0
+099,Burgos,Burgos,4,VB,5510,0,0,0
+099,Burgos,Burgos,4,EV-PCAS-TC,3327,1991,1575,0
+099,Burgos,Burgos,4,PACMA,2348,0,0,0
+099,Burgos,Burgos,4,PUM+J,1239,0,0,0
+099,Burgos,Burgos,4,PCTE,971,0,0,0
+099,Burgos,Burgos,4,RECORTES CERO,757,0,0,0
+109,Cáceres,Cáceres,4,PP,90104,88062,86849,2
+109,Cáceres,Cáceres,4,PSOE,89108,88668,86098,2
+109,Cáceres,Cáceres,4,VOX,27013,25612,25084,0
+109,Cáceres,Cáceres,4,SUMAR,16460,14514,14395,0
+109,Cáceres,Cáceres,4,BQEX,3473,2644,2157,0
+109,Cáceres,Cáceres,4,Somos Cc,2011,1479,1283,0
+109,Cáceres,Cáceres,4,PACMA,1892,0,0,0
+109,Cáceres,Cáceres,4,PUM+J,608,0,0,0
+109,Cáceres,Cáceres,4,RECORTES CERO,380,0,0,0
+119,Cádiz,Cádiz,4,PP,223648,216236,208400,3
+119,Cádiz,Cádiz,4,PSOE,206747,199457,189438,1
+119,Cádiz,Cádiz,4,VOX,84296,77398,72941,0
+119,Cádiz,Cádiz,4,SUMAR,78496,74627,67274,0
+119,Cádiz,Cádiz,4,ADELANTE ANDALUCÍA,12990,10879,9172,0
+119,Cádiz,Cádiz,4,PACMA,9871,6800,6694,0
+119,Cádiz,Cádiz,4,PUM+J,2194,0,0,0
+119,Cádiz,Cádiz,4,CJ,1392,0,0,0
+119,Cádiz,Cádiz,4,RECORTES CERO,1112,0,0,0
+129,Castelló/Castellón,Castelló/Castellón,4,PP,111393,109397,105932,3
+129,Castelló/Castellón,Castelló/Castellón,4,PSOE,107391,101309,94391,1
+129,Castelló/Castellón,Castelló/Castellón,4,SUMAR - COMPROMÍS,44387,34888,31317,0
+129,Castelló/Castellón,Castelló/Castellón,4,VOX,41745,37918,36611,0
+129,Castelló/Castellón,Castelló/Castellón,4,PACMA,3949,2329,2307,0
+129,Castelló/Castellón,Castelló/Castellón,4,RECORTES CERO,1056,631,0,0
+129,Castelló/Castellón,Castelló/Castellón,4,FE de las JONS,735,0,0,0
+139,Ciudad Real,Ciudad Real,4,PP,117847,116163,114024,3
+139,Ciudad Real,Ciudad Real,4,PSOE,100666,99176,95731,1
+139,Ciudad Real,Ciudad Real,4,VOX,38063,35822,34467,0
+139,Ciudad Real,Ciudad Real,4,SUMAR,17612,16143,13650,0
+139,Ciudad Real,Ciudad Real,4,PACMA,2819,1742,0,0
+139,Ciudad Real,Ciudad Real,4,PUM+J,964,0,0,0
+139,Ciudad Real,Ciudad Real,4,RECORTES CERO,914,0,0,0
+149,Córdoba,Córdoba,4,PP,174571,170525,166484,3
+149,Córdoba,Córdoba,4,PSOE,146697,139885,138352,1
+149,Córdoba,Córdoba,4,SUMAR,55910,52590,51150,0
+149,Córdoba,Córdoba,4,VOX,51399,48810,46845,0
+149,Córdoba,Córdoba,4,PACMA,4802,3159,3057,0
+149,Córdoba,Córdoba,4,ESCAÑOS EN BLANCO,1763,1422,1155,0
+149,Córdoba,Córdoba,4,PUM+J,1282,0,0,0
+149,Córdoba,Córdoba,4,PCTE,1258,0,0,0
+149,Córdoba,Córdoba,4,RECORTES CERO,944,0,0,0
+159,A Coruña,A Coruña,4,PP,282314,274545,271990,3
+159,A Coruña,A Coruña,4,PSdeG-PSOE,191809,179739,169068,1
+159,A Coruña,A Coruña,4,B.N.G.,89328,71563,70356,0
+159,A Coruña,A Coruña,4,SUMAR,81962,58871,56804,0
+159,A Coruña,A Coruña,4,VOX,28516,25306,24435,0
+159,A Coruña,A Coruña,4,PACMA,7426,4195,4102,0
+159,A Coruña,A Coruña,4,RECORTES CERO,1840,0,0,0
+169,Cuenca,Cuenca,4,PP,46726,45986,44687,3
+169,Cuenca,Cuenca,4,PSOE,42177,40899,40352,1
+169,Cuenca,Cuenca,4,VOX,14835,13845,13210,0
+169,Cuenca,Cuenca,4,SUMAR,7316,6442,5807,0
+169,Cuenca,Cuenca,4,PACMA,989,0,0,0
+169,Cuenca,Cuenca,4,ESCAÑOS EN BLANCO,342,271,208,0
+169,Cuenca,Cuenca,4,PUM+J,339,0,0,0
+169,Cuenca,Cuenca,4,PCTE,304,0,0,0
+169,Cuenca,Cuenca,4,RECORTES CERO,241,0,0,0
+179,Girona,Girona,4,PSC,83432,76372,74739,3
+179,Girona,Girona,4,JxCAT - JUNTS,73006,65296,64108,1
+179,Girona,Girona,4,ERC-ESQUERRES PER LA INDEPENDÈNCIA,67002,62938,55939,0
+179,Girona,Girona,4,SUMAR - ECP,32934,28975,22814,0
+179,Girona,Girona,4,PP,30855,29244,28164,0
+179,Girona,Girona,4,VOX,18177,16820,15982,0
+179,Girona,Girona,4,PACMA,9652,5463,5023,0
+179,Girona,Girona,4,PDeCAT-E-CiU,5475,0,0,0
+179,Girona,Girona,4,PCTC,2597,0,0,0
+179,Girona,Girona,4,RECORTES CERO,1142,0,0,0
+189,Granada,Granada,4,PP,188627,184219,182755,3
+189,Granada,Granada,4,PSOE,168819,165260,156465,1
+189,Granada,Granada,4,VOX,68716,64323,61091,0
+189,Granada,Granada,4,SUMAR,52750,47358,47123,0
+189,Granada,Granada,4,PACMA,6785,4118,0,0
+189,Granada,Granada,4,JxG,3845,2373,2287,0
+189,Granada,Granada,4,PUM+J,2167,0,0,0
+189,Granada,Granada,4,PCTE,1706,0,0,0
+189,Granada,Granada,4,RECORTES CERO,1000,434,0,0
+189,Granada,Granada,4,CJ,958,0,0,0
+199,Guadalajara,Guadalajara,4,PP,52910,51531,50376,3
+199,Guadalajara,Guadalajara,4,PSOE,47313,45365,43417,1
+199,Guadalajara,Guadalajara,4,VOX,24213,22729,21704,0
+199,Guadalajara,Guadalajara,4,SUMAR,13217,12247,9907,0
+199,Guadalajara,Guadalajara,4,PACMA,2261,0,0,0
+199,Guadalajara,Guadalajara,4,PUM+J,734,0,0,0
+199,Guadalajara,Guadalajara,4,PCTE,606,0,0,0
+199,Guadalajara,Guadalajara,4,RECORTES CERO,518,0,0,0
+199,Guadalajara,Guadalajara,4,FE de las JONS,393,0,0,0
+209,Gipuzkoa,Gipuzkoa,4,EH BILDU-INDEPENDENTZIA EZKERRETIK,118906,117073,112565,3
+209,Gipuzkoa,Gipuzkoa,4,EAJ-PNV,90080,87756,84699,1
+209,Gipuzkoa,Gipuzkoa,4,PSE-EE (PSOE),85708,80644,79405,0
+209,Gipuzkoa,Gipuzkoa,4,SUMAR,34447,32915,30304,0
+209,Gipuzkoa,Gipuzkoa,4,PP,31993,31379,30506,0
+209,Gipuzkoa,Gipuzkoa,4,VOX,6886,6344,5987,0
+209,Gipuzkoa,Gipuzkoa,4,PACMA,2320,2188,1539,0
+209,Gipuzkoa,Gipuzkoa,4,ESCAÑOS EN BLANCO,1515,1409,1116,0
+209,Gipuzkoa,Gipuzkoa,4,PCTE/ELAK,789,0,0,0
+209,Gipuzkoa,Gipuzkoa,4,RECORTES CERO,614,0,0,0
+209,Gipuzkoa,Gipuzkoa,4,PUM+J,320,0,0,0
+219,Huelva,Huelva,4,PP,93630,89953,87318,2
+219,Huelva,Huelva,4,PSOE,92269,87611,85105,2
+219,Huelva,Huelva,4,VOX,32965,28934,27465,0
+219,Huelva,Huelva,4,SUMAR,25561,23314,21265,0
+219,Huelva,Huelva,4,XH,4337,2835,2597,0
+219,Huelva,Huelva,4,PACMA,3182,1911,1738,0
+219,Huelva,Huelva,4,PUM+J,773,0,0,0
+219,Huelva,Huelva,4,RECORTES CERO,626,0,0,0
+229,Huesca,Huesca,4,PP,46025,44828,43718,3
+229,Huesca,Huesca,4,PSOE,41182,39453,37477,1
+229,Huesca,Huesca,4,SUMAR ARAGÓN,13306,11774,9889,0
+229,Huesca,Huesca,4,VOX,12799,11653,11017,0
+229,Huesca,Huesca,4,EXISTE,2747,2002,1502,0
+229,Huesca,Huesca,4,PAR,1553,1015,868,0
+229,Huesca,Huesca,4,PACMA,1318,0,0,0
+229,Huesca,Huesca,4,ESCAÑOS EN BLANCO,944,819,690,0
+229,Huesca,Huesca,4,PCTE,500,0,0,0
+229,Huesca,Huesca,4,PUM+J,326,0,0,0
+229,Huesca,Huesca,4,F.I.A.,318,125,120,0
+229,Huesca,Huesca,4,RECORTES CERO,258,0,0,0
+239,Jaén,Jaén,4,PP,141443,138351,133344,3
+239,Jaén,Jaén,4,PSOE,133826,129453,128413,1
+239,Jaén,Jaén,4,VOX,45480,42741,40577,0
+239,Jaén,Jaén,4,SUMAR,28886,27531,23999,0
+239,Jaén,Jaén,4,JM+,14342,0,0,0
+239,Jaén,Jaén,4,PACMA,4177,0,0,0
+239,Jaén,Jaén,4,PUM+J,1503,0,0,0
+239,Jaén,Jaén,4,RECORTES CERO,1236,0,0,0
+249,León,León,4,PP,101403,99272,97396,3
+249,León,León,4,PSOE,90619,88280,84270,1
+249,León,León,4,U.P.L.,32678,28706,26593,0
+249,León,León,4,VOX,28914,25600,25141,0
+249,León,León,4,SUMAR,19747,14866,13493,0
+249,León,León,4,PACMA,1813,980,929,0
+249,León,León,4,ESPAÑA VACIADA,1649,756,0,0
+249,León,León,4,PREPAL,1118,563,0,0
+249,León,León,4,PCTE,874,0,0,0
+249,León,León,4,PUM+J,486,0,0,0
+249,León,León,4,RECORTES CERO,283,0,0,0
+259,Lleida,Lleida,4,PSC,48601,45632,44353,3
+259,Lleida,Lleida,4,ERC-ESQUERRES PER LA INDEPENDÈNCIA,43919,38488,36048,1
+259,Lleida,Lleida,4,JxCAT - JUNTS,37285,34440,32153,0
+259,Lleida,Lleida,4,PP,23371,22242,21930,0
+259,Lleida,Lleida,4,SUMAR - ECP,14566,11022,9854,0
+259,Lleida,Lleida,4,VOX,10433,9658,9589,0
+259,Lleida,Lleida,4,PACMA,3231,1999,1970,0
+259,Lleida,Lleida,4,PDeCAT-E-CiU,3043,0,0,0
+259,Lleida,Lleida,4,ESCONS EN BLANC,1143,909,751,0
+259,Lleida,Lleida,4,PCTC,1109,0,0,0
+259,Lleida,Lleida,4,RECORTES CERO,473,0,0,0
+269,La Rioja,La Rioja,4,PP,79729,78360,77762,3
+269,La Rioja,La Rioja,4,PSOE,62066,60282,58282,1
+269,La Rioja,La Rioja,4,VOX,15088,13968,13201,0
+269,La Rioja,La Rioja,4,SUMAR,13033,10954,9147,0
+269,La Rioja,La Rioja,4,PACMA,1451,880,831,0
+269,La Rioja,La Rioja,4,ESCAÑOS EN BLANCO,1166,913,816,0
+269,La Rioja,La Rioja,4,PUM+J,710,0,0,0
+269,La Rioja,La Rioja,4,PCTE,608,0,0,0
+269,La Rioja,La Rioja,4,RECORTES CERO,416,0,0,0
+279,Lugo,Lugo,4,PP,95897,94187,92419,3
+279,Lugo,Lugo,4,PSdeG-PSOE,58773,56010,53660,1
+279,Lugo,Lugo,4,B.N.G.,21124,16597,14861,0
+279,Lugo,Lugo,4,SUMAR,10727,8380,6655,0
+279,Lugo,Lugo,4,VOX,7363,6423,6110,0
+279,Lugo,Lugo,4,PACMA,1792,0,0,0
+279,Lugo,Lugo,4,PCTG,496,0,0,0
+279,Lugo,Lugo,4,PUM+J,478,0,0,0
+279,Lugo,Lugo,4,RECORTES CERO,392,0,0,0
+289,Madrid,Madrid,4,PP,1505318,1468969,1453394,3
+289,Madrid,Madrid,4,PSOE,1063568,1007322,981051,1
+289,Madrid,Madrid,4,SUMAR,569765,458931,415508,0
+289,Madrid,Madrid,4,VOX,442850,410404,387940,0
+289,Madrid,Madrid,4,PACMA,42060,22098,21772,0
+289,Madrid,Madrid,4,PUM+J,17733,0,0,0
+289,Madrid,Madrid,4,PCTE,12980,0,0,0
+289,Madrid,Madrid,4,PH,8298,3520,3168,0
+289,Madrid,Madrid,4,FE de las JONS,7318,0,0,0
+289,Madrid,Madrid,4,RECORTES CERO,7090,3940,3908,0
+299,Málaga,Málaga,4,PP,304853,292062,288692,3
+299,Málaga,Málaga,4,PSOE,239075,234557,218938,1
+299,Málaga,Málaga,4,VOX,111904,102669,97208,0
+299,Málaga,Málaga,4,SUMAR,98531,78701,76694,0
+299,Málaga,Málaga,4,PACMA,15626,9220,9184,0
+299,Málaga,Málaga,4,PUM+J,4829,0,0,0
+299,Málaga,Málaga,4,RECORTES CERO,2954,0,0,0
+299,Málaga,Málaga,4,CJ,2032,0,0,0
+309,Murcia,Murcia,4,PP,303628,295678,292705,3
+309,Murcia,Murcia,4,PSOE,199680,189602,181091,1
+309,Murcia,Murcia,4,VOX,159086,151190,147241,0
+309,Murcia,Murcia,4,SUMAR,69215,56686,52111,0
+309,Murcia,Murcia,4,PACMA,7778,7127,5153,0
+309,Murcia,Murcia,4,POR MI REGIÓN,3426,2277,2204,0
+309,Murcia,Murcia,4,ESCAÑOS EN BLANCO,2529,1911,1811,0
+309,Murcia,Murcia,4,RECORTES CERO,1023,661,0,0
+309,Murcia,Murcia,4,FE de las JONS,864,0,0,0
+309,Murcia,Murcia,4,CJ,645,476,0,0
+319,Navarra,Navarra,4,PSN-PSOE,93448,89107,83435,3
+319,Navarra,Navarra,4,U.P.N.,66132,62470,59975,1
+319,Navarra,Navarra,4,EH BILDU-INDEPENDENTZIA EZKERRETIK,65004,58533,56230,0
+319,Navarra,Navarra,4,PP,61227,58060,56761,0
+319,Navarra,Navarra,4,SUMAR,42383,32853,28845,0
+319,Navarra,Navarra,4,GBAI,15295,11539,10541,0
+319,Navarra,Navarra,4,PACMA,4263,0,0,0
+319,Navarra,Navarra,4,PUM+J,2408,0,0,0
+319,Navarra,Navarra,4,PCTE,1357,0,0,0
+319,Navarra,Navarra,4,RECORTES CERO,1174,0,0,0
+329,Ourense,Ourense,4,PP,88910,87593,85657,3
+329,Ourense,Ourense,4,PSdeG-PSOE,52444,49327,48117,1
+329,Ourense,Ourense,4,B.N.G.,20477,16144,14738,0
+329,Ourense,Ourense,4,SUMAR,11023,9150,6822,0
+329,Ourense,Ourense,4,VOX,7710,6930,6591,0
+329,Ourense,Ourense,4,PACMA,2053,0,0,0
+329,Ourense,Ourense,4,PUM+J,581,0,0,0
+329,Ourense,Ourense,4,PCTG,448,0,0,0
+329,Ourense,Ourense,4,RECORTES CERO,346,0,0,0
+329,Ourense,Ourense,4,CCD,237,135,95,0
+339,Asturias,Asturias,4,PP,216691,213858,209295,3
+339,Asturias,Asturias,4,PSOE,215066,206832,201546,1
+339,Asturias,Asturias,4,SUMAR,80002,75623,67406,0
+339,Asturias,Asturias,4,VOX,62732,58721,56307,0
+339,Asturias,Asturias,4,PACMA,5840,3733,3433,0
+339,Asturias,Asturias,4,ASTURIAS EXISTE EV,5545,3345,3033,0
+339,Asturias,Asturias,4,PCTE,3693,0,0,0
+339,Asturias,Asturias,4,PUM+J,1916,0,0,0
+339,Asturias,Asturias,4,RECORTES CERO,986,624,465,0
+339,Asturias,Asturias,4,PUEDE,520,0,0,0
+349,Palencia,Palencia,4,PP,40929,39469,39366,3
+349,Palencia,Palencia,4,PSOE,34903,32168,30781,1
+349,Palencia,Palencia,4,VOX,10641,9644,9333,0
+349,Palencia,Palencia,4,SUMAR,6883,5179,0,0
+349,Palencia,Palencia,4,VP,3244,0,0,0
+349,Palencia,Palencia,4,ESPAÑA VACIADA,1162,693,0,0
+349,Palencia,Palencia,4,GITV,1055,787,690,0
+349,Palencia,Palencia,4,PACMA,838,0,0,0
+349,Palencia,Palencia,4,PCTE,376,0,0,0
+349,Palencia,Palencia,4,PUM+J,363,0,0,0
+349,Palencia,Palencia,4,FE de las JONS,249,0,0,0
+349,Palencia,Palencia,4,RECORTES CERO,154,0,0,0
+349,Palencia,Palencia,4,CJ,137,58,0,0
+351,Las Palmas,Gran Canaria,3,PSOE,149463,143368,0,2
+351,Las Palmas,Gran Canaria,3,PP,124098,115232,0,1
+351,Las Palmas,Gran Canaria,3,VOX,51118,0,0,0
+351,Las Palmas,Gran Canaria,3,CCa,30745,23907,0,0
+351,Las Palmas,Gran Canaria,3,NC-bc,29587,26458,0,0
+351,Las Palmas,Gran Canaria,3,SUMAR,27702,26130,7551,0
+351,Las Palmas,Gran Canaria,3,PACMA,3750,1596,1276,0
+351,Las Palmas,Gran Canaria,3,AHORA CANARIAS-PCPC,1063,538,0,0
+351,Las Palmas,Gran Canaria,3,PUM+J,866,0,0,0
+351,Las Palmas,Gran Canaria,3,RECORTES CERO,530,0,0,0
+352,Las Palmas,Lanzarote,1,PSOE,21618,0,0,1
+352,Las Palmas,Lanzarote,1,PP,13822,0,0,0
+352,Las Palmas,Lanzarote,1,CCa,7449,0,0,0
+352,Las Palmas,Lanzarote,1,VOX,5663,0,0,0
+352,Las Palmas,Lanzarote,1,SUMAR,5505,0,0,0
+352,Las Palmas,Lanzarote,1,NC-bc,1332,0,0,0
+352,Las Palmas,Lanzarote,1,RECORTES CERO,118,0,0,0
+353,Las Palmas,Fuerteventura,1,PSOE,10878,0,0,1
+353,Las Palmas,Fuerteventura,1,PP,8924,0,0,0
+353,Las Palmas,Fuerteventura,1,CCa,8032,0,0,0
+353,Las Palmas,Fuerteventura,1,VOX,4390,0,0,0
+353,Las Palmas,Fuerteventura,1,SUMAR,3397,0,0,0
+353,Las Palmas,Fuerteventura,1,NC-bc,2650,0,0,0
+353,Las Palmas,Fuerteventura,1,PACMA,289,0,0,0
+353,Las Palmas,Fuerteventura,1,AHORA CANARIAS-PCPC,79,0,0,0
+353,Las Palmas,Fuerteventura,1,RECORTES CERO,22,0,0,0
+369,Pontevedra,Pontevedra,4,PP,220415,215311,212456,3
+369,Pontevedra,Pontevedra,4,PSdeG-PSOE,186980,170474,164939,1
+369,Pontevedra,Pontevedra,4,B.N.G.,68956,60385,51503,0
+369,Pontevedra,Pontevedra,4,SUMAR,68826,57658,51801,0
+369,Pontevedra,Pontevedra,4,VOX,23849,21170,20658,0
+369,Pontevedra,Pontevedra,4,PACMA,5971,5185,3498,0
+369,Pontevedra,Pontevedra,4,PCTG,2097,0,0,0
+369,Pontevedra,Pontevedra,4,RECORTES CERO,1437,0,0,0
+379,Salamanca,Salamanca,4,PP,93848,91723,91148,3
+379,Salamanca,Salamanca,4,PSOE,59967,57049,55174,1
+379,Salamanca,Salamanca,4,VOX,24110,22390,21418,0
+379,Salamanca,Salamanca,4,SUMAR,13303,9524,8812,0
+379,Salamanca,Salamanca,4,ESPAÑA VACIADA,2307,1834,1393,0
+379,Salamanca,Salamanca,4,U.P.L.,1979,1080,836,0
+379,Salamanca,Salamanca,4,PACMA,1582,0,0,0
+379,Salamanca,Salamanca,4,PREPAL,618,403,0,0
+379,Salamanca,Salamanca,4,PUM+J,543,0,0,0
+379,Salamanca,Salamanca,4,PCTE,534,0,0,0
+379,Salamanca,Salamanca,4,CJ,279,172,118,0
+379,Salamanca,Salamanca,4,RECORTES CERO,240,0,0,0
+384,Santa Cruz de Tenerife,Tenerife,3,PSOE,147040,138640,0,2
+384,Santa Cruz de Tenerife,Tenerife,3,PP,122111,117876,0,1
+384,Santa Cruz de Tenerife,Tenerife,3,CCa,63148,60136,0,0
+384,Santa Cruz de Tenerife,Tenerife,3,VOX,42270,39191,0,0
+384,Santa Cruz de Tenerife,Tenerife,3,SUMAR,40344,27439,4705,0
+384,Santa Cruz de Tenerife,Tenerife,3,PACMA,5654,4950,0,0
+384,Santa Cruz de Tenerife,Tenerife,3,NC-bc,3583,2448,0,0
+384,Santa Cruz de Tenerife,Tenerife,3,AHORA CANARIAS-PCPC,935,587,0,0
+384,Santa Cruz de Tenerife,Tenerife,3,RECORTES CERO,609,0,0,0
+385,Santa Cruz de Tenerife,La Palma,1,PSOE,12912,0,0,1
+385,Santa Cruz de Tenerife,La Palma,1,PP,12685,0,0,0
+385,Santa Cruz de Tenerife,La Palma,1,CCa,11090,0,0,0
+385,Santa Cruz de Tenerife,La Palma,1,SUMAR,2282,0,0,0
+385,Santa Cruz de Tenerife,La Palma,1,VOX,2254,0,0,0
+385,Santa Cruz de Tenerife,La Palma,1,PACMA,282,0,0,0
+385,Santa Cruz de Tenerife,La Palma,1,NC-bc,269,0,0,0
+385,Santa Cruz de Tenerife,La Palma,1,AHORA CANARIAS-PCPC,52,0,0,0
+385,Santa Cruz de Tenerife,La Palma,1,RECORTES CERO,32,0,0,0
+386,Santa Cruz de Tenerife,La Gomera,1,ASG,3996,0,0,1
+386,Santa Cruz de Tenerife,La Gomera,1,PSOE,3096,0,0,0
+386,Santa Cruz de Tenerife,La Gomera,1,PP,1747,0,0,0
+386,Santa Cruz de Tenerife,La Gomera,1,CCa,766,0,0,0
+386,Santa Cruz de Tenerife,La Gomera,1,VOX,572,0,0,0
+386,Santa Cruz de Tenerife,La Gomera,1,AHORA CANARIAS-PCPC,139,0,0,0
+386,Santa Cruz de Tenerife,La Gomera,1,RECORTES CERO,54,0,0,0
+387,Santa Cruz de Tenerife,El Hierro,1,A.H.I.,2189,0,0,1
+387,Santa Cruz de Tenerife,El Hierro,1,PSOE,1759,0,0,0
+387,Santa Cruz de Tenerife,El Hierro,1,PP,1173,0,0,0
+387,Santa Cruz de Tenerife,El Hierro,1,ASAMBLEA HERREÑA,360,0,0,0
+387,Santa Cruz de Tenerife,El Hierro,1,VOX,262,0,0,0
+387,Santa Cruz de Tenerife,El Hierro,1,AHORA CANARIAS-PCPC,68,0,0,0
+387,Santa Cruz de Tenerife,El Hierro,1,RECORTES CERO,24,0,0,0
+399,Cantabria,Cantabria,4,PP,151183,147367,145735,3
+399,Cantabria,Cantabria,4,PSOE,116730,115653,110219,1
+399,Cantabria,Cantabria,4,VOX,40199,37774,36197,0
+399,Cantabria,Cantabria,4,SUMAR,30481,24200,23088,0
+399,Cantabria,Cantabria,4,PACMA,4299,0,0,0
+399,Cantabria,Cantabria,4,PCTE,1808,0,0,0
+399,Cantabria,Cantabria,4,RECORTES CERO,1416,0,0,0
+409,Segovia,Segovia,4,PP,40424,39439,38781,3
+409,Segovia,Segovia,4,PSOE,27996,26390,25012,1
+409,Segovia,Segovia,4,VOX,10934,10020,9581,0
+409,Segovia,Segovia,4,SUMAR,7725,6068,5646,0
+409,Segovia,Segovia,4,PACMA,831,0,0,0
+409,Segovia,Segovia,4,3e,642,0,0,0
+409,Segovia,Segovia,4,PUM+J,444,0,0,0
+409,Segovia,Segovia,4,PCTE,332,0,0,0
+409,Segovia,Segovia,4,RECORTES CERO,296,0,0,0
+409,Segovia,Segovia,4,CJ,225,152,110,0
+419,Sevilla,Sevilla,4,PSOE,382095,374032,356536,3
+419,Sevilla,Sevilla,4,PP,356631,343139,338011,1
+419,Sevilla,Sevilla,4,SUMAR,145467,128159,125391,0
+419,Sevilla,Sevilla,4,VOX,121173,111898,105766,0
+419,Sevilla,Sevilla,4,PACMA,15528,13675,9153,0
+419,Sevilla,Sevilla,4,PUM+J,4374,0,0,0
+419,Sevilla,Sevilla,4,PCTE,3361,0,0,0
+419,Sevilla,Sevilla,4,RECORTES CERO,3183,0,0,0
+419,Sevilla,Sevilla,4,CJ,2387,0,0,0
+419,Sevilla,Sevilla,4,FE de las JONS,1014,551,475,0
+429,Soria,Soria,4,PP,18456,17796,17280,3
+429,Soria,Soria,4,PSOE,14611,13820,13050,1
+429,Soria,Soria,4,SY,11433,10198,9756,0
+429,Soria,Soria,4,VOX,4599,4038,3796,0
+429,Soria,Soria,4,SUMAR,2370,1600,1345,0
+429,Soria,Soria,4,PACMA,262,0,0,0
+429,Soria,Soria,4,PCTE,127,0,0,0
+429,Soria,Soria,4,PUM+J,92,0,0,0
+429,Soria,Soria,4,RECORTES CERO,62,0,0,0
+439,Tarragona,Tarragona,4,PSC,108820,106336,99154,3
+439,Tarragona,Tarragona,4,ERC-ESQUERRES PER LA INDEPENDÈNCIA,71440,66424,60692,1
+439,Tarragona,Tarragona,4,PP,50254,49041,47303,0
+439,Tarragona,Tarragona,4,JxCAT - JUNTS,47165,43490,39728,0
+439,Tarragona,Tarragona,4,SUMAR - ECP,38004,28866,28687,0
+439,Tarragona,Tarragona,4,VOX,29158,28121,26859,0
+439,Tarragona,Tarragona,4,PACMA,7470,6355,4729,0
+439,Tarragona,Tarragona,4,PDeCAT-E-CiU,4051,0,0,0
+439,Tarragona,Tarragona,4,PCTC,2253,0,0,0
+439,Tarragona,Tarragona,4,RECORTES CERO,1011,0,0,0
+439,Tarragona,Tarragona,4,EVC,800,572,377,0
+449,Teruel,Teruel,4,PP,27056,25719,25359,3
+449,Teruel,Teruel,4,PSOE,21524,20280,19601,1
+449,Teruel,Teruel,4,EXISTE,13991,12311,11467,0
+449,Teruel,Teruel,4,VOX,8358,7469,7060,0
+449,Teruel,Teruel,4,SUMAR,4772,3496,3229,0
+449,Teruel,Teruel,4,PAR,1020,788,633,0
+449,Teruel,Teruel,4,PACMA,412,0,0,0
+449,Teruel,Teruel,4,ESCAÑOS EN BLANCO,328,242,228,0
+449,Teruel,Teruel,4,PCTE,200,0,0,0
+449,Teruel,Teruel,4,PUM+J,112,0,0,0
+449,Teruel,Teruel,4,RECORTES CERO,87,0,0,0
+449,Teruel,Teruel,4,F.I.A.,45,28,20,0
+459,Toledo,Toledo,4,PP,152356,148728,147509,3
+459,Toledo,Toledo,4,PSOE,130046,126618,122920,1
+459,Toledo,Toledo,4,VOX,64103,61112,59208,0
+459,Toledo,Toledo,4,SUMAR,31583,26447,24215,0
+459,Toledo,Toledo,4,PACMA,3994,2467,2293,0
+459,Toledo,Toledo,4,PUM+J,1172,0,0,0
+459,Toledo,Toledo,4,FE de las JONS,1029,0,0,0
+459,Toledo,Toledo,4,RECORTES CERO,860,0,0,0
+469,València/Valencia,València/Valencia,4,PP,503009,485817,474967,2
+469,València/Valencia,València/Valencia,4,PSOE,496571,482194,441179,2
+469,València/Valencia,València/Valencia,4,SUMAR - COMPROMÍS,225400,202188,181533,0
+469,València/Valencia,València/Valencia,4,VOX,186277,172669,167867,0
+469,València/Valencia,València/Valencia,4,PACMA,21849,11984,11052,0
+469,València/Valencia,València/Valencia,4,PUM+J,4566,0,0,0
+469,València/Valencia,València/Valencia,4,EVB,4034,0,0,0
+469,València/Valencia,València/Valencia,4,RECORTES CERO,3273,2117,1328,0
+469,València/Valencia,València/Valencia,4,FE de las JONS,1765,0,0,0
+469,València/Valencia,València/Valencia,4,CJ,1670,1188,762,0
+479,Valladolid,Valladolid,4,PP,130827,129357,127564,3
+479,Valladolid,Valladolid,4,PSOE,105958,103988,97156,1
+479,Valladolid,Valladolid,4,VOX,40996,37526,36647,0
+479,Valladolid,Valladolid,4,SUMAR,28650,21916,21204,0
+479,Valladolid,Valladolid,4,ESPAÑA VACIADA,3426,1963,1576,0
+479,Valladolid,Valladolid,4,PACMA,2109,1777,1177,0
+479,Valladolid,Valladolid,4,ESCAÑOS EN BLANCO,1414,931,836,0
+479,Valladolid,Valladolid,4,Ud.Ca,1193,612,0,0
+479,Valladolid,Valladolid,4,PCTE,922,0,0,0
+479,Valladolid,Valladolid,4,PUM+J,882,0,0,0
+479,Valladolid,Valladolid,4,FE de las JONS,659,0,0,0
+479,Valladolid,Valladolid,4,RECORTES CERO,427,0,0,0
+489,Bizkaia,Bizkaia,4,EAJ-PNV,176614,167622,164577,3
+489,Bizkaia,Bizkaia,4,PSE-EE (PSOE),154134,147915,141689,1
+489,Bizkaia,Bizkaia,4,EH BILDU-INDEPENDENTZIA EZKERRETIK,133125,124704,121834,0
+489,Bizkaia,Bizkaia,4,PP,69874,67992,66314,0
+489,Bizkaia,Bizkaia,4,SUMAR,61830,53187,49617,0
+489,Bizkaia,Bizkaia,4,VOX,13832,12922,12270,0
+489,Bizkaia,Bizkaia,4,PACMA,4776,2848,2727,0
+489,Bizkaia,Bizkaia,4,PUM+J,2245,0,0,0
+489,Bizkaia,Bizkaia,4,PCTE,1710,0,0,0
+489,Bizkaia,Bizkaia,4,RECORTES CERO,1459,0,0,0
+499,Zamora,Zamora,4,PP,45476,44350,44167,3
+499,Zamora,Zamora,4,PSOE,33553,32555,31077,1
+499,Zamora,Zamora,4,VOX,11527,10392,9706,0
+499,Zamora,Zamora,4,SUMAR,5903,4824,4166,0
+499,Zamora,Zamora,4,Zsi,3439,2243,1978,0
+499,Zamora,Zamora,4,U.P.L.,1246,800,653,0
+499,Zamora,Zamora,4,PACMA,776,0,0,0
+499,Zamora,Zamora,4,PREPAL,540,272,223,0
+499,Zamora,Zamora,4,PCTE,281,0,0,0
+499,Zamora,Zamora,4,PUM+J,246,0,0,0
+499,Zamora,Zamora,4,RECORTES CERO,169,0,0,0
+509,Zaragoza,Zaragoza,4,PP,191671,184753,181503,3
+509,Zaragoza,Zaragoza,4,PSOE,165978,161351,148638,1
+509,Zaragoza,Zaragoza,4,VOX,69121,63800,60289,0
+509,Zaragoza,Zaragoza,4,SUMAR ARAGÓN,66988,59976,50376,0
+509,Zaragoza,Zaragoza,4,EXISTE,13211,10213,8046,0
+509,Zaragoza,Zaragoza,4,PACMA,5997,0,0,0
+509,Zaragoza,Zaragoza,4,PAR,5785,3951,2789,0
+509,Zaragoza,Zaragoza,4,ESCAÑOS EN BLANCO,4051,3617,3006,0
+509,Zaragoza,Zaragoza,4,PCTE,1632,0,0,0
+509,Zaragoza,Zaragoza,4,PUM+J,1240,0,0,0
+509,Zaragoza,Zaragoza,4,RECORTES CERO,1159,0,0,0
+509,Zaragoza,Zaragoza,4,FE de las JONS,998,0,0,0
+509,Zaragoza,Zaragoza,4,F.I.A.,753,448,340,0
+519,Ceuta,Ceuta,2,PP,12219,11715,0,2
+519,Ceuta,Ceuta,2,PSOE,10704,10235,0,0
+519,Ceuta,Ceuta,2,VOX,7941,7534,0,0
+519,Ceuta,Ceuta,2,SUMAR,1031,773,0,0
+519,Ceuta,Ceuta,2,PUM+J,87,0,0,0
+519,Ceuta,Ceuta,2,LB,75,0,0,0
+519,Ceuta,Ceuta,2,RECORTES CERO,38,0,0,0
+529,Melilla,Melilla,2,PP,13501,12961,0,2
+529,Melilla,Melilla,2,PSOE,6065,6051,0,0
+529,Melilla,Melilla,2,VOX,4041,4009,0,0
+529,Melilla,Melilla,2,CpM,1418,1253,0,0
+529,Melilla,Melilla,2,SUMAR,788,766,0,0
+529,Melilla,Melilla,2,PACMA,291,0,0,0
+529,Melilla,Melilla,2,PUM+J,68,0,0,0
+529,Melilla,Melilla,2,RECORTES CERO,40,0,0,0
